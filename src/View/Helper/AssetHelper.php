@@ -54,21 +54,7 @@ class AssetHelper extends Helper
         list($plugin, $resource) = pluginSplit($asset);
         $map = $this->loadEntrypoint($plugin);
 
-        $urlPrefix = '/';
-        if ($plugin !== null) {
-            $urlPrefix = '/' . trim(Inflector::dasherize($plugin), '/') . '/';
-        }
-
-
-        $resources = Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
-        $resources = array_map(
-            function (string $path) use ($urlPrefix): string {
-                return sprintf('%s%s', $urlPrefix, ltrim($path, '/'));
-            },
-            $resources
-        );
-
-        return $resources;
+        return Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
     }
 
     public function css(string $asset): string
