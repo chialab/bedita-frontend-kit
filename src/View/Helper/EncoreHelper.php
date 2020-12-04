@@ -6,11 +6,11 @@ use Cake\Utility\Hash;
 use Cake\View\Helper;
 
 /**
- * Asset helper
+ * Encore helper
  *
  * @property-read \Cake\View\Helper\HtmlHelper $Html
  */
-class AssetHelper extends Helper
+class EncoreHelper extends Helper
 {
 
     public $helpers = ['Html'];
