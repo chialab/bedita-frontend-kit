@@ -3,9 +3,7 @@ namespace Chialab\Frontend\View\Helper;
 
 use Cake\Core\Plugin;
 use Cake\Utility\Hash;
-use Cake\Utility\Inflector;
 use Cake\View\Helper;
-use Cake\View\View;
 
 /**
  * Asset helper
@@ -27,9 +25,20 @@ class AssetHelper extends Helper
         'entrypointFile' => 'entrypoints.json',
     ];
 
+    /**
+     * Cache entrypoints.
+     *
+     * @var array
+     */
     protected $cache = [];
 
-    protected function loadEntrypoint(string $plugin = null): ?array
+    /**
+     * Load entrypoints for a frontend plugin.
+     *
+     * @param string|null $plugin The frontend plugin name.
+     * @return array A list of entrypoints.
+     */
+    protected function loadEntrypoints(string $plugin = null): ?array
     {
         if ($plugin === null) {
             $plugin = '_';
@@ -49,31 +58,50 @@ class AssetHelper extends Helper
         return $this->cache[$plugin] = json_decode(file_get_contents($path), true);
     }
 
-    public function getAsset(string $asset, string $type): array
+    /**
+     * Get assets by type.
+     *
+     * @param string $asset The assets name.
+     * @param string $type The asset type.
+     * @return array A list of resources.
+     */
+    public function getAssets(string $asset, string $type): array
     {
         list($plugin, $resource) = pluginSplit($asset);
-        $map = $this->loadEntrypoint($plugin);
+        $map = $this->loadEntrypoints($plugin);
 
         return Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
     }
 
+    /**
+     * Get css assets.
+     *
+     * @param string $asset The assets name.
+     * @return array A list of css resources.
+     */
     public function css(string $asset): string
     {
         return join('', array_map(
             function (string $path): string {
                 return $this->Html->css($path);
             },
-            $this->getAsset($asset, 'css')
+            $this->getAssets($asset, 'css')
         ));
     }
 
+    /**
+     * Get js assets.
+     *
+     * @param string $asset The assets name.
+     * @return array A list of js resources.
+     */
     public function script(string $asset): string
     {
         return join('', array_map(
             function (string $path): string {
                 return $this->Html->script($path);
             },
-            $this->getAsset($asset, 'js')
+            $this->getAssets($asset, 'js')
         ));
     }
 }
