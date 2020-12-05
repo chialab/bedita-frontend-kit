@@ -54,6 +54,9 @@ class EncoreHelper extends Helper
         }
 
         $path .= rtrim($this->getConfig('buildPath'), DS) . DS . $this->getConfig('entrypointFile');
+        if (!file_exists($path) || !is_readable($path)) {
+            return null;
+        }
 
         return $this->cache[$plugin] = json_decode(file_get_contents($path), true);
     }
@@ -69,6 +72,9 @@ class EncoreHelper extends Helper
     {
         list($plugin, $resource) = pluginSplit($asset);
         $map = $this->loadEntrypoints($plugin);
+        if ($map === null) {
+            return [];
+        }
 
         return Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
     }
