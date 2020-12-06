@@ -244,7 +244,6 @@ class ObjectsComponent extends Component
                             $rel->clean();
                         });
                     $object->set($prop, $related);
-                    $object->set(sprintf('%sByType', $prop), $related->groupBy('type'));
                 }
 
                 $object->clean();
