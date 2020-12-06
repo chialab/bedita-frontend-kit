@@ -12,9 +12,15 @@ use InvalidArgumentException;
 
 /**
  * Publication component
+ *
+ * @property-read \Chialab\Frontend\Controller\Component\ObjectsComponent $Objects
  */
 class PublicationComponent extends Component
 {
+
+    /** {@inheritDoc} */
+    public $components = ['Chialab/Frontend.Objects'];
+
     /**
      * Default configuration.
      *
@@ -47,17 +53,8 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $unames = array_merge([$publicationUname], $this->getConfig('menuFolders', []));
-
-        /** @var \BEdita\Core\Model\Table\FoldersTable $FoldersTable */
-        $FoldersTable = TableRegistry::getTableLocator()->get('Folders');
-        $menuFolders = $FoldersTable->find()
-            ->where([
-                'deleted' => false,
-                'status IN' => ['on', 'draft'],
-                'uname IN' => $unames,
-            ])
-            ->contain(['Children'])
+        $uname = array_merge([$publicationUname], $this->getConfig('menuFolders', []));
+        $menuFolders = $this->Objects->loadObjects(compact('uname'), 'folders')
             ->indexBy('uname')
             ->toArray();
 
