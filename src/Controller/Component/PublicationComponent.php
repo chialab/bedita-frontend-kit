@@ -62,7 +62,8 @@ class PublicationComponent extends Component
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname));
         }
         $this->publication = $menuFolders[$publicationUname];
-        $this->publication['uname_path'] = sprintf('/%s', $this->publication['uname']);
+        $this->publication->set('uname_path', sprintf('/%s', $this->publication->get('uname')));
+        $this->publication->clean();
         unset($menuFolders[$publicationUname]);
 
         $this->getController()->set('publication', $this->publication);
@@ -86,7 +87,7 @@ class PublicationComponent extends Component
      */
     public function genericTreeAction(string $path = ''): Response
     {
-        // $path = sprintf('%s/%s', $this->publication['uname_path'], $path);
+        $path = sprintf('%s/%s', $this->publication->get('uname_path'), $path);
         $items = $this->loadObjectPath($path);
 
         $object = $items[count($items) - 1];
