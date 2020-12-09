@@ -3,6 +3,7 @@ namespace Chialab\Frontend\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -53,18 +54,25 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $uname = array_merge([$publicationUname], $this->getConfig('menuFolders', []));
-        $menuFolders = $this->Objects->loadObjects(compact('uname'), 'folders')
+        $menuFolders = $this->getConfig('menuFolders', []);
+        $uname = array_merge([$publicationUname], array_values($menuFolders));
+        $folders = $this->Objects->loadObjects(compact('uname'), 'folders')
             ->indexBy('uname')
             ->toArray();
 
-        if (!isset($menuFolders[$publicationUname])) {
+        if (!isset($folders[$publicationUname])) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname));
         }
-        $this->publication = $menuFolders[$publicationUname];
+        $this->publication = $folders[$publicationUname];
         $this->publication->set('uname_path', sprintf('/%s', $this->publication->get('uname')));
         $this->publication->clean();
-        unset($menuFolders[$publicationUname]);
+
+        $menuFolders = array_combine(
+            array_keys($menuFolders),
+            array_map(function (string $uname) use ($folders): ?Folder {
+                return $folders[$uname] ?? null;
+            }, array_values($menuFolders))
+        );
 
         $this->getController()->set('publication', $this->publication);
         $this->getController()->set('menuFolders', $menuFolders);
@@ -88,7 +96,7 @@ class PublicationComponent extends Component
     public function genericTreeAction(string $path = ''): Response
     {
         $path = sprintf('%s/%s', $this->publication->get('uname_path'), $path);
-        $items = $this->loadObjectPath($path);
+        $items = $this->loadObjectPath($path)->toList();
 
         $object = $items[count($items) - 1];
         $ancestors = array_slice($items, 0, -1);
@@ -119,19 +127,13 @@ class PublicationComponent extends Component
      * Load all objects in a path.
      *
      * @param string $path Path.
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[] List of objects, the root element in the path being the first in the list, the leaf being the latter.
+     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[] List of objects, the root element in the path being the first in the list, the leaf being the latter.
      */
-    public function loadObjectPath(string $path): array
+    public function loadObjectPath(string $path): CollectionInterface
     {
         $parts = array_filter(explode('/', $path));
-        $Objects = TableRegistry::getTableLocator()->get('Objects');
-        $leaf = $Objects->find()
-            ->where([
-                $Objects->aliasField('deleted') => false,
-                'status IN' => ['on', 'draft'],
-                $Objects->aliasField('uname') => array_pop($parts),
-            ])
-            ->firstOrFail();
+        $leaf = $this->Objects->loadObject(array_pop($parts));
+        $leaf = $this->Objects->loadObject($leaf->id, $leaf->type);
 
         $Trees = TableRegistry::getTableLocator()->get('Trees');
         $found = $Trees->find()
@@ -155,21 +157,12 @@ class PublicationComponent extends Component
             ->firstOrFail();
 
         $ids = explode(',', $found['parent_path_ids']);
-        $Folders = TableRegistry::getTableLocator()->get('Folders');
-        $ancestors = $Folders->find()
-            ->where([
-                $Folders->aliasField('deleted') => false,
-                'status IN' => ['on', 'draft'],
-                $Folders->aliasField('id') . ' IN' => $ids,
-            ])
-            ->toArray();
 
-        usort($ancestors, function (Folder $a, Folder $b) use ($ids): int {
-            return array_search($a->id, $ids) <=> array_search($b->id, $ids);
-        });
-        $ancestors[] = $leaf;
-
-        return $ancestors;
+        return $this->Objects->loadObjects(['id' => $ids], 'folders')
+            ->sortBy(function (Folder $folder) use ($ids): int {
+                return array_search($folder->id, $ids);
+            }, SORT_ASC)
+            ->append([$leaf]);
     }
 
     /**
