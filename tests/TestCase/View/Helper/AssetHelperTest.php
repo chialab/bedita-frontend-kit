@@ -1,19 +1,19 @@
 <?php
-namespace Chialab\Frontend\Test\TestCase\View\Helper;
+namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
-use Chialab\Frontend\View\Helper\AssetHelper;
+use Chialab\FrontendKit\View\Helper\AssetHelper;
 
 /**
- * Chialab\Frontend\View\Helper\AssetHelper Test Case
+ * Chialab\FrontendKit\View\Helper\AssetHelper Test Case
  */
 class AssetHelperTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Chialab\Frontend\View\Helper\AssetHelper
+     * @var \Chialab\FrontendKit\View\Helper\AssetHelper
      */
     public $Asset;
 

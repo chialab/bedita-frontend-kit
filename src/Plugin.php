@@ -1,11 +1,11 @@
 <?php
 
-namespace Chialab\Frontend;
+namespace Chialab\FrontendKit;
 
 use Cake\Core\BasePlugin;
 
 /**
- * Plugin for Chialab\Frontend
+ * Plugin for Chialab\FrontendKit
  */
 class Plugin extends BasePlugin
 {

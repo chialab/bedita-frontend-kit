@@ -1,5 +1,5 @@
 <?php
-namespace Chialab\Frontend\View\Helper;
+namespace Chialab\FrontendKit\View\Helper;
 
 use Cake\Core\Plugin;
 use Cake\Utility\Hash;

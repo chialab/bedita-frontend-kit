@@ -1,19 +1,19 @@
 <?php
-namespace Chialab\Frontend\Test\TestCase\View\Helper;
+namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
-use Chialab\Frontend\View\Helper\PosterHelper;
+use Chialab\FrontendKit\View\Helper\PosterHelper;
 
 /**
- * Chialab\Frontend\View\Helper\PosterHelper Test Case
+ * Chialab\FrontendKit\View\Helper\PosterHelper Test Case
  */
 class PosterHelperTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Chialab\Frontend\View\Helper\PosterHelper
+     * @var \Chialab\FrontendKit\View\Helper\PosterHelper
      */
     public $Poster;
 

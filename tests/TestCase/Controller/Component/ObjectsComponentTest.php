@@ -1,19 +1,19 @@
 <?php
-namespace Chialab\Frontend\Test\TestCase\Controller\Component;
+namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
 use Cake\TestSuite\TestCase;
-use Chialab\Frontend\Controller\Component\ObjectsComponent;
+use Chialab\FrontendKit\Controller\Component\ObjectsComponent;
 
 /**
- * Chialab\Frontend\Controller\Component\ObjectsComponent Test Case
+ * Chialab\FrontendKit\Controller\Component\ObjectsComponent Test Case
  */
 class ObjectsComponentTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Chialab\Frontend\Controller\Component\ObjectsComponent
+     * @var \Chialab\FrontendKit\Controller\Component\ObjectsComponent
      */
     public $Objects;
 

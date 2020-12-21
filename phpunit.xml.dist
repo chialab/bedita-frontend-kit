@@ -12,7 +12,7 @@
 
     <!-- Add any additional test suites you want to run here -->
     <testsuites>
-        <testsuite name="Chialab/Frontend">
+        <testsuite name="Chialab/FrontendKit">
             <directory>tests/TestCase/</directory>
         </testsuite>
     </testsuites>

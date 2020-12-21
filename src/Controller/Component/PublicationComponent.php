@@ -1,5 +1,5 @@
 <?php
-namespace Chialab\Frontend\Controller\Component;
+namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
@@ -14,13 +14,13 @@ use InvalidArgumentException;
 /**
  * Publication component
  *
- * @property-read \Chialab\Frontend\Controller\Component\ObjectsComponent $Objects
+ * @property-read \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
  */
 class PublicationComponent extends Component
 {
 
     /** {@inheritDoc} */
-    public $components = ['Chialab/Frontend.Objects'];
+    public $components = ['Chialab/FrontendKit.Objects'];
 
     /**
      * Default configuration.

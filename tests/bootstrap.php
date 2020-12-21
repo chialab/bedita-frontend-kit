@@ -1,6 +1,6 @@
 <?php
 /**
- * Test suite bootstrap for Chialab/Frontend.
+ * Test suite bootstrap for Chialab/FrontendKit.
  *
  * This function is used to find the location of CakePHP whether CakePHP
  * has been installed as a dependency of the plugin, or the plugin is itself

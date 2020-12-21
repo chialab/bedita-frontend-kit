@@ -1,10 +1,11 @@
 {
-    "name": "Chialab/Frontend",
-    "description": "Chialab/Frontend plugin for CakePHP",
+    "name": "chialab/frontend-kit",
+    "description": "BEdita 4 plugin to help with development of websites.",
     "type": "cakephp-plugin",
     "license": "MIT",
     "require": {
-        "cakephp/cakephp": "^3.5",
+        "bedita/core": "^4.2.0",
+        "cakephp/cakephp": "^3.8",
         "wyrihaximus/twig-view": "^4.3"
     },
     "require-dev": {
@@ -12,12 +13,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Chialab\\Frontend\\": "src/"
+            "Chialab\\FrontendKit\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Chialab\\Frontend\\Test\\": "tests/",
+            "Chialab\\FrontendKit\\Test\\": "tests/",
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
         }
     }

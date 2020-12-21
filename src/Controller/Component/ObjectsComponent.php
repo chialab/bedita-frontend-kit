@@ -1,5 +1,5 @@
 <?php
-namespace Chialab\Frontend\Controller\Component;
+namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
