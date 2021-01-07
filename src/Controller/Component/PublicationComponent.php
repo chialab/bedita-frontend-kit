@@ -117,6 +117,7 @@ class PublicationComponent extends Component
                 },
                 array_reverse($ancestors)
             ),
+            $object['type'] !== 'folders' ? ['object'] : [],
             ['objects']
         );
 
