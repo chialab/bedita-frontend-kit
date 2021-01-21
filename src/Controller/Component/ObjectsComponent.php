@@ -10,6 +10,8 @@ use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\Datasource\ResultSetInterface;
+use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
@@ -76,9 +78,9 @@ class ObjectsComponent extends Component
      * @param array $filter Filters.
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`)
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null): CollectionInterface
+    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null): Query
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
@@ -131,9 +133,9 @@ class ObjectsComponent extends Component
      * @param array $filter Filters.
      * @param array|null $options Options.
      * @param int $depth Depth level.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1): CollectionInterface
+    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -149,7 +151,9 @@ class ObjectsComponent extends Component
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('filter', 'lang', 'contain'));
 
-        return $this->autoHydrateAssociations($query->all(), $depth);
+        return $query->formatResults(function (iterable $results) use ($depth): iterable {
+            return $this->autoHydrateAssociations($results, $depth);
+        });
     }
 
     /**
@@ -195,7 +199,10 @@ class ObjectsComponent extends Component
      */
     protected function autoHydrateAssociations(iterable $objects, int $depth): CollectionInterface
     {
-        $objects = new Collection($objects);
+        if (!($objects instanceof CollectionInterface)) {
+            $objects = new Collection($objects);
+        }
+
         $associations = array_keys(
             array_filter(
                 $this->getConfig('autoHydrateAssociations', []),
