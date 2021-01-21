@@ -22,16 +22,12 @@ use Iterator;
  *
  * @property-read \BEdita\Core\Model\Table\ObjectsTable $Objects
  * @property-read \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
- * @property-read \Cake\Controller\Component\PaginatorComponent $Paginator
  */
 class ObjectsComponent extends Component
 {
 
     use I18nTrait;
     use ModelAwareTrait;
-
-    /** {@inheritDoc} */
-    public $components = ['Paginator'];
 
     /**
      * Default configuration.
