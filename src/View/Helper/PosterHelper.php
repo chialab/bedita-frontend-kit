@@ -95,14 +95,6 @@ class PosterHelper extends Helper
             return $this->getConfig('fallback');
         }
 
-        if (!$forceSelf) {
-            $poster = (new Collection($object->get('poster') ?: []))->first();
-
-            if ($poster !== null) {
-                return $this->getUrl($poster, true);
-            }
-        }
-
         $posters = new Collection($object->get('poster') ?: []);
         if ($variant > 0) {
             $posters = $posters->skip($variant);
