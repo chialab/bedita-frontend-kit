@@ -75,7 +75,7 @@ class PlaceholdersHelper extends Helper
         }
 
         foreach ($placeholders as $placeholder) {
-            $info = Hash::get($placeholder, ['_joinData', 'params', $field], []);
+            $info = Hash::get($placeholder, ['relation', 'params', $field], []);
             foreach ($info as $i) {
                 $offset = $i['offset'];
                 $length = $i['length'];
@@ -92,7 +92,7 @@ class PlaceholdersHelper extends Helper
 
     /**
      * Template an entity's field with placeholders.
-     * 
+     *
      * @param \Cake\Datasource\EntityInterface $entity Entity.
      * @param string $field Field to be templated.
      * @return mixed
@@ -111,10 +111,10 @@ class PlaceholdersHelper extends Helper
 
         $extract = $this->getConfig('extract', [static::class, 'defaultTemplater']);
         $template = $this->getConfig('template', [$this, 'getTemplate']);
-        
+
         return $extract($entity, $field, $placeholder, function (EntityInterface $placeholder, $params = null) use ($entity, $field, $template): string {
             $element = $template($entity, $field, $placeholder, $params);
-            
+
             return $this->getView()->element($element, [
                 'object' => $placeholder,
                 'params' => $params,
