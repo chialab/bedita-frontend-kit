@@ -26,12 +26,12 @@ class PosterHelper extends Helper
     /**
      * Check if an Object is an Image with property `mediaUrl` set and non-empty.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Object to check.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to check.
      * @return bool
      */
-    protected static function isValidImage(ObjectEntity $object): bool
+    protected static function isValidImage(?ObjectEntity $object): bool
     {
-        return ($object instanceof Media) && $object->type === 'images' && !$object->isEmpty('mediaUrl');
+        return $object !== null && ($object instanceof Media) && $object->type === 'images' && !$object->isEmpty('mediaUrl');
     }
 
     /**
@@ -53,12 +53,12 @@ class PosterHelper extends Helper
     /**
      * Check if object has a valid poster, or is an Image itself.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Object being checked.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object being checked.
      * @param bool $forceSelf Only check object itself, do not check for its `poster` relations.
      * @param int $variant Use `poster` at given index, if greater than zero.
      * @return bool
      */
-    public function check(ObjectEntity $object, bool $forceSelf = false, int $variant = 0): bool
+    public function check(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): bool
     {
         if ($forceSelf) {
             return static::isValidImage($object);
@@ -80,12 +80,12 @@ class PosterHelper extends Helper
     /**
      * Get URL for poster image.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Object to get poster for.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to get poster for.
      * @param bool $forceSelf Only use object itself, do not use its `poster` relations.
      * @param int $variant Use `poster` at given index, if greater than zero.
      * @return string|null
      */
-    public function getUrl(ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
+    public function getUrl(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
     {
         if ($forceSelf) {
             if (static::isValidImage($object) && static::hasValidStream($object)) {
