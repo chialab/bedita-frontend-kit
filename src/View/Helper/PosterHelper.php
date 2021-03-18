@@ -92,7 +92,7 @@ class PosterHelper extends Helper
                 return $object->get('mediaUrl');
             }
 
-            return $this->getConfig('fallback');
+            return $this->getConfig('fallbackImage');
         }
 
         $posters = new Collection($object->get('poster') ?: []);
