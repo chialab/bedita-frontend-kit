@@ -38,12 +38,16 @@ class PosterHelper extends Helper
     /**
      * Check if a Media's Stream actually exists.
      *
-     * @param \BEdita\Core\Model\Entity\Media $media
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object
      * @return bool
      */
-    protected static function hasValidStream(Media $media): bool
+    protected static function hasValidStream(?ObjectEntity $object): bool
     {
-        $uri = Hash::get($media, 'streams.0.uri');
+        if (!static::isValidImage($object)) {
+            return false;
+        }
+
+        $uri = Hash::get($object, 'streams.0.uri');
         if (empty($uri)) {
             return false;
         }
@@ -71,7 +75,7 @@ class PosterHelper extends Helper
         }
 
         $poster = $posters->first();
-        if ($poster === null || !static::isValidImage($poster)) {
+        if (!static::isValidImage($poster)) {
             return $this->check($object, true);
         }
 
@@ -89,7 +93,7 @@ class PosterHelper extends Helper
     public function getUrl(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
     {
         if ($object === null || $forceSelf) {
-            if (static::isValidImage($object) && static::hasValidStream($object)) {
+            if (static::hasValidStream($object)) {
                 return $object->get('mediaUrl');
             }
 
@@ -102,7 +106,7 @@ class PosterHelper extends Helper
         }
 
         $poster = $posters->first();
-        if ($poster === null || !static::isValidImage($poster)) {
+        if (!static::isValidImage($poster)) {
             return $this->getUrl($object, true);
         }
 
