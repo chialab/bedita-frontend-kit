@@ -10,6 +10,7 @@ use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
+use Cake\Datasource\ModelAwareTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
@@ -17,30 +18,92 @@ use Cake\Utility\Inflector;
 use Iterator;
 
 /**
- * Trait to help with loading objects.
+ * Objects loader.
  *
  * @package Chialab\FrontendKit\Model
+ *
+ * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
+ * @property \BEdita\Core\Model\Table\ObjectsTable $Objects
  */
-trait ObjectsAwareTrait
+class ObjectsLoader
 {
     use I18nTrait;
     use LocatorAwareTrait;
+    use ModelAwareTrait;
 
     /**
-     * Get options to be used when loading an object of the given type.
+     * Loading configuration on a per-object type basis.
      *
-     * @param string $objectType Object type name.
-     * @return array|null Array with options, or `null` to fallback to parent object type.
+     * @var array[]
      */
-    abstract protected function getOptionsForObjectType(string $objectType): ?array;
+    protected array $objectTypesConfig = [];
 
     /**
-     * Get names of associations for which related objects need to be hydrated.
+     * Map of associations that need to be hydrated to the actual object types
+     * every time they are fetched, to the maximum depth for this auto-hydration.
      *
-     * @param int $depth Depth level.
-     * @return string[]
+     * @var int[]
      */
-    abstract protected function getAssociationsToHydrate(int $depth): array;
+    protected array $autoHydrateAssociations = [];
+
+    /**
+     * Objects loader constructor.
+     *
+     * @param array $objectTypesConfig Loading configuration on a per-object type basis.
+     * @param array $autoHydrateAssociations Map of associations to be hydrated on each load.
+     */
+    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
+    {
+        $this->objectTypesConfig = $objectTypesConfig;
+        $this->autoHydrateAssociations = $autoHydrateAssociations;
+
+        $this->loadModel('ObjectTypes');
+        $this->loadModel('Objects');
+    }
+
+    /**
+     * Fetch an object by its ID or uname.
+     *
+     * @param string|int $id Object ID or uname.
+     * @param string $type Object type name.
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @return \BEdita\Core\Model\Entity\ObjectEntity
+     */
+    public function loadObject(string $id, string $type = 'objects', ?array $options = null): ObjectEntity
+    {
+        // Normalize ID, get type.
+        $id = $this->Objects->getId($id);
+        $objectType = $this->ObjectTypes->get($type);
+
+        return $this->loadSingle($id, $objectType, $options);
+    }
+
+    /**
+     * Fetch multiple objects.
+     *
+     * @param array $filter Filters.
+     * @param string $type Object type name.
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`)
+     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null): Query
+    {
+        // Get type.
+        $objectType = $this->ObjectTypes->get($type);
+
+        return $this->loadMulti($objectType, $filter, $options);
+    }
+
+    /**
+     * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
+     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    public function hydrateObjects(array $objects): CollectionInterface
+    {
+        return $this->toConcreteTypes($objects, 1);
+    }
 
     /**
      * Load a single object knowing its ID and object type.
@@ -120,7 +183,7 @@ trait ObjectsAwareTrait
                 'type'
             )
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
-                $objectType = $this->getObjectType($type);
+                $objectType = $this->ObjectTypes->get($type);
                 $filter = [
                     'id' => array_unique((new Collection($items))->extract('id')->toList()),
                 ];
@@ -162,7 +225,7 @@ trait ObjectsAwareTrait
                     if ($related instanceof ObjectEntity) {
                         $original = $related;
 
-                        $objectType = $this->getObjectType($related->type);
+                        $objectType = $this->ObjectTypes->get($related->type);
                         $related = $this->loadSingle($related->id, $objectType, null, $depth + 1);
                         if (!$original->isEmpty('_joinData')) {
                             $related->set('relation', $original->get('_joinData'));
@@ -194,20 +257,6 @@ trait ObjectsAwareTrait
     }
 
     /**
-     * Get an object type by its name.
-     *
-     * @param string $name Object type name.
-     * @return \BEdita\Core\Model\Entity\ObjectType
-     */
-    protected function getObjectType(string $name): ObjectType
-    {
-        /** @var \BEdita\Core\Model\Table\ObjectTypesTable $table */
-        $table = $this->getTableLocator()->get('ObjectTypes');
-
-        return $table->get($name);
-    }
-
-    /**
      * Get default options for an object type. If no options are set for the type,
      * options for the parent types (abstract types) are checked.
      *
@@ -216,9 +265,8 @@ trait ObjectsAwareTrait
      */
     protected function getDefaultOptions(ObjectType $objectType): array
     {
-        $options = $this->getOptionsForObjectType($objectType->name);
-        if ($options !== null) {
-            return $options;
+        if (isset($this->objectTypesConfig[$objectType->name])) {
+            return $this->objectTypesConfig[$objectType->name];
         }
         if ($objectType->parent_id === null) {
             return [];
@@ -227,6 +275,24 @@ trait ObjectsAwareTrait
         $parent = $this->ObjectTypes->get($objectType->parent_id);
 
         return $this->getDefaultOptions($parent);
+    }
+
+    /**
+     * Get names of associations for which related objects need to be hydrated.
+     *
+     * @param int $depth Depth level.
+     * @return string[]
+     */
+    protected function getAssociationsToHydrate(int $depth): array
+    {
+        return array_keys(
+            array_filter(
+                $this->autoHydrateAssociations,
+                function (int $maxDepth) use ($depth): bool {
+                    return $maxDepth === -1 || $maxDepth > $depth;
+                }
+            )
+        );
     }
 
     /**

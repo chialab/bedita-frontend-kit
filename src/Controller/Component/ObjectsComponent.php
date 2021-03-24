@@ -1,13 +1,13 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\ObjectEntity;
-use BEdita\Core\Model\Entity\ObjectType;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\ORM\Query;
-use Chialab\FrontendKit\Model\ObjectsAwareTrait;
+use Chialab\FrontendKit\Model\ObjectsLoader;
 
 /**
  * Objects component
@@ -17,9 +17,6 @@ use Chialab\FrontendKit\Model\ObjectsAwareTrait;
  */
 class ObjectsComponent extends Component
 {
-    use ModelAwareTrait;
-    use ObjectsAwareTrait;
-
     /**
      * Default configuration.
      *
@@ -33,13 +30,34 @@ class ObjectsComponent extends Component
         ],
     ];
 
-    /** {@inheritDoc} */
+    /**
+     * Objects loader instance.
+     *
+     * @var \Chialab\FrontendKit\Model\ObjectsLoader
+     */
+    protected ObjectsLoader $loader;
+
+    /**
+     * @inheritdoc
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);
 
-        $this->loadModel('Objects');
-        $this->loadModel('ObjectTypes');
+        $this->loader = new ObjectsLoader(
+            $this->getConfig('objectTypesConfig', []),
+            $this->getConfig('autoHydrateAssociations', []),
+        );
+    }
+
+    /**
+     * Return objects loader instance used by this component.
+     *
+     * @return \Chialab\FrontendKit\Model\ObjectsLoader
+     */
+    public function getLoader(): ObjectsLoader
+    {
+        return $this->loader;
     }
 
     /**
@@ -52,11 +70,7 @@ class ObjectsComponent extends Component
      */
     public function loadObject(string $id, string $type = 'objects', ?array $options = null): ObjectEntity
     {
-        // Normalize ID, get type.
-        $id = $this->Objects->getId($id);
-        $objectType = $this->ObjectTypes->get($type);
-
-        return $this->loadSingle($id, $objectType, $options);
+        return $this->loader->loadObject($id, $type, $options);
     }
 
     /**
@@ -69,10 +83,7 @@ class ObjectsComponent extends Component
      */
     public function loadObjects(array $filter, string $type = 'objects', ?array $options = null): Query
     {
-        // Get type.
-        $objectType = $this->ObjectTypes->get($type);
-
-        return $this->loadMulti($objectType, $filter, $options);
+        return $this->loader->loadObjects($filter, $type, $options);
     }
 
     /**
@@ -83,29 +94,6 @@ class ObjectsComponent extends Component
      */
     public function hydrateObjects(array $objects): CollectionInterface
     {
-        return $this->toConcreteTypes($objects, 1);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getOptionsForObjectType(string $objectType): ?array
-    {
-        return $this->getConfig(sprintf('objectTypesConfig.%s', $objectType));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getAssociationsToHydrate(int $depth): array
-    {
-        return array_keys(
-            array_filter(
-                $this->getConfig('autoHydrateAssociations', []),
-                function (int $maxDepth) use ($depth): bool {
-                    return $maxDepth === -1 || $maxDepth > $depth;
-                }
-            )
-        );
+        return $this->loader->hydrateObjects($objects);
     }
 }
