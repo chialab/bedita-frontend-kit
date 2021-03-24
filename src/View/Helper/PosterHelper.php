@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use Cake\View\Helper;
-use Cake\View\View;
 use Cake\Collection\Collection;
 use BEdita\Core\Filesystem\FilesystemRegistry;
 use BEdita\Core\Model\Entity\Media;
@@ -60,7 +61,7 @@ class PosterHelper extends Helper
      */
     public function check(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): bool
     {
-        if ($forceSelf) {
+        if ($object === null || $forceSelf) {
             return static::isValidImage($object);
         }
 
@@ -87,7 +88,7 @@ class PosterHelper extends Helper
      */
     public function getUrl(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
     {
-        if ($forceSelf) {
+        if ($object === null || $forceSelf) {
             if (static::isValidImage($object) && static::hasValidStream($object)) {
                 return $object->get('mediaUrl');
             }
