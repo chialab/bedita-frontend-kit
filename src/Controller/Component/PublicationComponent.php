@@ -42,14 +42,14 @@ class PublicationComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
-    protected TreeLoader $loader;
+    protected $loader;
 
     /**
      * Current publication
      *
      * @var \BEdita\Core\Model\Entity\Folder
      */
-    protected Folder $publication;
+    protected $publication;
 
     /**
      * Initialization hook method.

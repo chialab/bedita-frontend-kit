@@ -27,7 +27,7 @@ class TreeLoader
      *
      * @var \Chialab\FrontendKit\Model\ObjectsLoader
      */
-    protected ObjectsLoader $loader;
+    protected $loader;
 
     /**
      * Tree loader constructor.

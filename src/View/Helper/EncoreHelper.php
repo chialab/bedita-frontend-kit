@@ -33,7 +33,7 @@ class EncoreHelper extends Helper
      *
      * @var array
      */
-    protected array $cache = [];
+    protected $cache = [];
 
     /**
      * Load entrypoints for a frontend plugin.

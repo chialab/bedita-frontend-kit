@@ -36,7 +36,7 @@ class ObjectsLoader
      *
      * @var array[]
      */
-    protected array $objectTypesConfig = [];
+    protected $objectTypesConfig = [];
 
     /**
      * Map of associations that need to be hydrated to the actual object types
@@ -44,7 +44,7 @@ class ObjectsLoader
      *
      * @var int[]
      */
-    protected array $autoHydrateAssociations = [];
+    protected $autoHydrateAssociations = [];
 
     /**
      * Objects loader constructor.
