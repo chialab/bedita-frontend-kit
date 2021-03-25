@@ -51,7 +51,7 @@ class TreeLoader
     public function loadObjectPath(string $path, ?int $relativeTo = null): CollectionInterface
     {
         $parts = array_filter(explode('/', $path));
-        $path = implode($parts, '/');
+        $path = implode('/', $parts);
         $leaf = $this->loader->loadObject(array_pop($parts));
 
         $found = $this->getObjectPaths($leaf->id, $relativeTo)
