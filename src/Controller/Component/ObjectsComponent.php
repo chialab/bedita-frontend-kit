@@ -46,7 +46,7 @@ class ObjectsComponent extends Component
 
         $this->loader = new ObjectsLoader(
             $this->getConfig('objectTypesConfig', []),
-            $this->getConfig('autoHydrateAssociations', []),
+            $this->getConfig('autoHydrateAssociations', [])
         );
     }
 
