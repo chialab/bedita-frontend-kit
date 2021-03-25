@@ -174,7 +174,7 @@ class PublicationComponent extends Component
      * @param int|null $via If set, restrict paths that include this parent ID.
      * @return array
      */
-    public function getViablePaths(int $id, ?int $via): array
+    public function getViablePaths(int $id, ?int $via = null): array
     {
         return $this->loader->getViablePaths($id, $this->getPublication()->id, $via);
     }
