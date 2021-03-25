@@ -19,6 +19,17 @@ use RuntimeException;
 class ObjectRoute extends DashedRoute
 {
     /**
+     * @inheritdoc
+     */
+    public function compile(): ?string
+    {
+        $compiled = parent::compile();
+        unset($this->defaults['_filters']);
+
+        return $compiled;
+    }
+
+    /**
      * Match by entity and map its fields to the URL pattern by comparing the
      * field names with the template vars.
      *
@@ -36,13 +47,16 @@ class ObjectRoute extends DashedRoute
         if (empty($this->_compiledRoute)) {
             $this->compile();
         }
-        if (!isset($url['_entity'])) {
+
+        $entity = Hash::get($url, '_entity');
+        $filters = Hash::get($url, '_filters');
+        unset($url['_entity'], $url['_filters']);
+
+        if (!isset($entity)) {
             return parent::match($url, $context);
         }
-
-        $entity = $url['_entity'];
         $this->checkEntity($entity);
-        if (!empty($url['_filters']) && $this->checkFilters($entity, $url['_filters']) === false) {
+        if (!empty($filters) && $this->checkFilters($entity, $filters) === false) {
             return false;
         }
 
@@ -99,6 +113,19 @@ class ObjectRoute extends DashedRoute
                         return false;
                     }
                     break;
+
+                case 'uname':
+                    if (empty($entity['uname'])) {
+                        return false;
+                    }
+
+                    return array_reduce(
+                        (array)$values,
+                        function (bool $matches, string $value) use ($entity): bool {
+                            return $matches || fnmatch($value, $entity['uname']);
+                        },
+                        false
+                    );
 
                 default:
                     throw new InvalidArgumentException(sprintf(
