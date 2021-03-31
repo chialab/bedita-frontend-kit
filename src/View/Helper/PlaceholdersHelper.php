@@ -103,7 +103,7 @@ class PlaceholdersHelper extends Helper
         $placeholder = $entity->get($relation);
         if ($placeholder instanceof Iterator) {
             $placeholder = iterator_to_array($placeholder);
-        } elseif (!is_array($placeholder)) {
+        } elseif (!is_array($placeholder) && $placeholder !== null) {
             throw new \InvalidArgumentException(
                 sprintf('Expected property "%s" to be an iterable, got "%s"', $relation, is_object($placeholder) ? get_class($placeholder) : gettype($placeholder))
             );
@@ -112,7 +112,7 @@ class PlaceholdersHelper extends Helper
         $extract = $this->getConfig('extract', [static::class, 'defaultTemplater']);
         $template = $this->getConfig('template', [$this, 'getTemplate']);
 
-        return $extract($entity, $field, $placeholder, function (EntityInterface $placeholder, $params = null) use ($entity, $field, $template): string {
+        return $extract($entity, $field, (array)$placeholder, function (EntityInterface $placeholder, $params = null) use ($entity, $field, $template): string {
             $element = $template($entity, $field, $placeholder, $params);
 
             return $this->getView()->element($element, [
