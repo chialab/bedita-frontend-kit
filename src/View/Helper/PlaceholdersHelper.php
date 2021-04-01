@@ -74,16 +74,26 @@ class PlaceholdersHelper extends Helper
             return $contents;
         }
 
+        $deltas = [];
         foreach ($placeholders as $placeholder) {
             $info = Hash::get($placeholder, ['relation', 'params', $field], []);
             foreach ($info as $i) {
                 $offset = $i['offset'];
+                $delta = array_sum(array_filter(
+                    $deltas,
+                    function (int $pos) use ($offset): bool {
+                        return $pos < $offset;
+                    },
+                    ARRAY_FILTER_USE_KEY
+                ));
                 $length = $i['length'];
                 $params = $i['params'] ?? null;
 
                 $replacement = $callback($placeholder, $params);
 
-                $contents = mb_substr($contents, 0, $offset) . $replacement . mb_substr($contents, $offset + $length);
+                $contents = mb_substr($contents, 0, $offset + $delta) . $replacement . mb_substr($contents, $offset + $delta + $length);
+
+                $deltas[$offset] = mb_strlen($replacement) - $length;
             }
         }
 
