@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use Cake\Core\Plugin;
@@ -13,12 +15,13 @@ use Cake\View\Helper;
 class EncoreHelper extends Helper
 {
 
+    /**
+     * @inheritdoc
+     */
     public $helpers = ['Html'];
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritdoc
      */
     protected $_defaultConfig = [
         'buildPath' => 'webroot' . DS . 'build',
@@ -83,7 +86,7 @@ class EncoreHelper extends Helper
      * Get css assets.
      *
      * @param string $asset The assets name.
-     * @return array A list of css resources.
+     * @return string HTML to load CSS resources.
      */
     public function css(string $asset): string
     {
@@ -99,7 +102,7 @@ class EncoreHelper extends Helper
      * Get js assets.
      *
      * @param string $asset The assets name.
-     * @return array A list of js resources.
+     * @return string HTML to load JS resources.
      */
     public function script(string $asset): string
     {
