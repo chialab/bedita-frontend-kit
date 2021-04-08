@@ -121,20 +121,36 @@ class PublicationComponent extends Component
             $this->getController()->set(['children' => $object['children'], 'childrenByType' => $object['childrenByType']]);
         }
 
-        // Search template by uname, type or ancestors' uname
-        $templates = array_merge(
-            empty($path) ? ['home'] : [],
-            [$object['uname'], $object['type']],
-            array_map(
-                function (ObjectEntity $object): string {
-                    return $object['uname'];
-                },
-                array_reverse($ancestors)
-            ),
-            ['objects']
-        );
+        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
+    }
 
-        return $this->renderFirstTemplate(...$templates);
+    /**
+     * Generate a list of templates to try to use for the given object.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $object The main object.
+     * @param \BEdita\Core\Model\Entity\Folder[] $ancestors A list of ancestors.
+     * @return \Generator A generator function.
+     */
+    protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator {
+        yield $object->uname;
+
+        $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
+        foreach ($ancestors as $ancestor) {
+            foreach ($chain as $type) {
+                yield sprintf('%s.%s', $ancestor->uname, $type->name);
+            }
+        }
+
+        $type = array_shift($chain);
+        yield $type->name;
+
+        foreach ($ancestors as $ancestor) {
+            yield $ancestor->uname;
+        }
+
+        foreach ($chain as $type) {
+            yield $type->name;
+        }
     }
 
     /**
