@@ -102,13 +102,25 @@ class EncoreHelper extends Helper
      * Get js assets.
      *
      * @param string $asset The assets name.
+     * @param array $options Array of options and HTML arguments.
      * @return string HTML to load JS resources.
      */
-    public function script(string $asset): string
+    public function script(string $asset, array $options = []): string
     {
+        [$plugin, $resource] = pluginSplit($asset);
+        $map = $this->loadEntrypoints($plugin);
+        if ($map === null) {
+            return '';
+        }
+
+        $format = Hash::get($map, sprintf('entrypoints.%s.format', $resource), 'umd');
+        if ($format === 'esm') {
+            $options['type'] = 'module';
+        }
+
         return join('', array_map(
-            function (string $path): string {
-                return $this->Html->script($path);
+            function (string $path) use ($options): string {
+                return $this->Html->script($path, $options);
             },
             $this->getAssets($asset, 'js')
         ));
