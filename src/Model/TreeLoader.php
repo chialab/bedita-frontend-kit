@@ -59,8 +59,13 @@ class TreeLoader
             ->firstOrFail();
 
         $ids = explode(',', $found['path_ids']);
+        array_pop($ids);
 
         $leaf = $this->loader->loadObject((string)$leaf->id, $leaf->type);
+
+        if (empty($ids)) {
+            return collection([$leaf]);
+        }
 
         return $this->loader->loadObjects(['id' => $ids], 'folders')
             ->sortBy(function (Folder $folder) use ($ids): int {
