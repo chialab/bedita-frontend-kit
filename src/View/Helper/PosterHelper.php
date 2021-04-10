@@ -116,7 +116,7 @@ class PosterHelper extends Helper
      */
     public function check(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): bool
     {
-        deprecationWarning('PosterHelper::check() is deprecated, use PosterHelper::exists() instead.');
+        deprecationWarning('PosterHelper::check() is deprecated, use PosterHelper::exists() instead.', 2);
 
         return $this->exists($object, compact('forceSelf', 'variant'));
     }
@@ -176,7 +176,7 @@ class PosterHelper extends Helper
      */
     public function getUrl(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
     {
-        deprecationWarning('PosterHelper::getUrl() is deprecated, use PosterHelper::url() instead.');
+        deprecationWarning('PosterHelper::getUrl() is deprecated, use PosterHelper::url() instead.', 2);
 
         return $this->url($object, false, compact('forceSelf', 'variant'));
     }
