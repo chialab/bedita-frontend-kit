@@ -3,125 +3,103 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
-use Cake\View\Helper;
-use BEdita\Core\Filesystem\FilesystemRegistry;
-use BEdita\Core\Filesystem\ThumbnailRegistry;
-use BEdita\Core\Model\Entity\Media;
+use BEdita\Core\Filesystem\Thumbnail;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
+use Cake\View\Helper;
 
 /**
- * Thumb helper
+ * Thumbnails helper
  *
- * @property-read \Cake\View\Helper\HtmlHelper $Html
+ * @property \Cake\View\Helper\HtmlHelper $Html
+ * @property \Chialab\FrontendKit\View\Helper\MediaHelper $Media
  */
 class ThumbHelper extends Helper
 {
     /**
      * @inheritdoc
      */
-    public $helpers = ['Html'];
-
-    /**
-     * Thumbnail registry.
-     *
-     * @var \BEdita\Core\Filesystem\ThumbnailRegistry
-     */
-    protected static $_registry;
+    public $helpers = [
+        'Html',
+        'Chialab/FrontendKit.Media',
+    ];
 
     /**
      * @inheritdoc
      */
     protected $_defaultConfig = [
         'fallbackImage' => null,
-        'preset' => [
-            'generator' => 'default',
-        ],
     ];
 
     /**
-     * Getter for thumbnails registry.
+     * Get fallback image URL.
      *
-     * @return \BEdita\Core\Filesystem\ThumbnailRegistry
+     * @return string|null
      */
-    public static function getRegistry()
+    public function getFallbackImage(): ?string
     {
-        if (!isset(static::$_registry)) {
-            static::$_registry = new ThumbnailRegistry();
-        }
-
-        return static::$_registry;
-    }
-
-    /**
-     * Check if an Object is an Image with property `mediaUrl` set and non-empty.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to check.
-     * @return bool
-     */
-    public static function isValidImage(?ObjectEntity $object): bool
-    {
-        return $object !== null && ($object instanceof Media) && $object->type === 'images' && !$object->isEmpty('mediaUrl');
-    }
-
-    /**
-     * Check if a Media's Stream actually exists.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object
-     * @return bool
-     */
-    public static function hasValidStream(?ObjectEntity $object): bool
-    {
-        if (!static::isValidImage($object)) {
-            return false;
-        }
-
-        $uri = Hash::get($object, 'streams.0.uri');
-        if (empty($uri)) {
-            return false;
-        }
-
-        return FilesystemRegistry::getMountManager()->has($uri);
+        return $this->getConfig('fallbackImage', $this->Media->getFallbackImage());
     }
 
     /**
      * Get thumb URL for image.
      *
+     * ### Fallback options:
+     *
+     * - `allowPending`: whether to return URLs thumbnails that are not yet ready, or use a fallback instead. Default: `false`
+     * - `fallbackOriginal`: whether to return original media URL if thumbnail cannot be generated. Default: `true`
+     * - `fallbackStatic`: whether to return a static fallback image if thumbnail cannot be generated. Default: `true`
+     *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to get thumb for.
-     * @param array $preset Thumb options.
+     * @param array|string $thumbOptions Thumbnail preset name or options.
+     * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
-    public function url(?ObjectEntity $object, array $preset = []): ?string
+    public function url(?ObjectEntity $object, $thumbOptions = 'default', array $fallbackOptions = []): ?string
     {
-        if (!static::hasValidStream($object)) {
-            return $this->getConfig('fallbackImage');
+        $allowPending = filter_var(Hash::get($fallbackOptions, 'allowPending', false), FILTER_VALIDATE_BOOL);
+        $fallbackOriginal = filter_var(Hash::get($fallbackOptions, 'fallbackOriginal', true), FILTER_VALIDATE_BOOL);
+        $fallbackStatic = filter_var(Hash::get($fallbackOptions, 'fallbackStatic', true), FILTER_VALIDATE_BOOL);
+
+        $fallback = $fallbackStatic ? $this->getFallbackImage() : null;
+        if (!$this->Media->isMedia($object)) {
+            return $fallback;
         }
 
-        $options = $preset + ($this->getConfig('preset') ?: []);
-        $generatorName = Hash::get($options, 'generator', 'default');
-        $stream = Hash::get($object, 'streams.0');
-        
-        $registry = static::getRegistry();
-        $generator = $registry->has($generatorName) ? $registry->get($generatorName) : $registry->load($generatorName);
+        /** @var \BEdita\Core\Model\Entity\Media $media */
+        $media = $object;
 
-        return $generator->getUrl($stream, $options);
+        $stream = $this->Media->getStream($media);
+        if ($stream !== null) {
+            $res = Thumbnail::get($stream, $thumbOptions);
+            if (!empty($res['url']) && (!empty($res['ready']) || $allowPending)) {
+                return $res['url'];
+            }
+        }
+
+        if ($fallbackOriginal && ($this->Media->isRemote($media) || $this->Media->hasStream($media, true))) {
+            return $media->get('media_url');
+        }
+
+        return $fallback;
     }
 
     /**
-     * Create image tag for thumb.
+     * Create `<img>` HTML tag for thumbnail.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to get thumb for.
-     * @param array $preset Thumb options.
-     * @param array $options Html options.
-     * @return string|null
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @param array|string $thumbOptions Thumbnail preset name or options.
+     * @param array $attributes HTML attributes for `<img>` tag.
+     * @param array $fallbackOptions Fallback options. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
+     * @return string
      */
-    public function image(?ObjectEntity $object, array $preset = [], array $options = []): string
+    public function image(?ObjectEntity $object, $thumbOptions = 'default', array $attributes = [], array $fallbackOptions = []): string
     {
-        $url = $this->url($object, $preset);
-        if (!$url) {
+        $url = $this->url($object, $thumbOptions, $fallbackOptions);
+        if (empty($url)) {
             return '';
         }
 
-        return $this->Html->image($url, $options);
+        return $this->Html->image($url, $attributes + ['plugin' => false]);
     }
 }
