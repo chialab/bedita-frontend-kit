@@ -189,6 +189,7 @@ class PosterHelper extends Helper
      * - `forceSelf`: restrict checks to the object itself, rather than evaluating its `poster` related objects. Default: `false`
      * - `variant`: poster variant, i.e. priority of the desired poster related object. Default: 0
      * - `fallbackSelf`: whether to use object itself as a fallback in case poster related objects cannot be used. Default: `true`
+     * - `fallbackStatic`: whether to return a static fallback image if no valid poster can be found. Default: `true`
      * - additional values are passed to {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()} (unless `$thumbOptions === false`)
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to get thumb for.
