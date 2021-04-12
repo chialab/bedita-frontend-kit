@@ -61,6 +61,11 @@ class MediaHelper extends Helper
      */
     public function getStream(Media $media): ?Stream
     {
+        if (empty($media->media_url)) {
+            // Dirty workaround to load streams that are fetched only on media_url property access.
+            return null;
+        }
+
         if (!$media->has('streams') || !is_iterable($media->streams)) {
             return null;
         }
