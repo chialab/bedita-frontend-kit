@@ -69,7 +69,7 @@ class EncoreHelper extends Helper
      *
      * @param string $asset The assets name.
      * @param string $type The asset type.
-     * @return array A list of resources.
+     * @return array A list of resources with their format.
      */
     public function getAssets(string $asset, string $type): array
     {
@@ -79,7 +79,10 @@ class EncoreHelper extends Helper
             return [];
         }
 
-        return Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
+        $format = Hash::get($map, sprintf('entrypoints.%s.format', $resource), 'umd');
+        $entries = Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
+
+        return [$format, $entries];
     }
 
     /**
@@ -90,11 +93,13 @@ class EncoreHelper extends Helper
      */
     public function css(string $asset): string
     {
+        $assets = $this->getAssets($asset, 'css');
+
         return join('', array_map(
             function (string $path): string {
                 return $this->Html->css($path);
             },
-            $this->getAssets($asset, 'css')
+            $assets[1]
         ));
     }
 
@@ -107,14 +112,8 @@ class EncoreHelper extends Helper
      */
     public function script(string $asset, array $options = []): string
     {
-        [$plugin, $resource] = pluginSplit($asset);
-        $map = $this->loadEntrypoints($plugin);
-        if ($map === null) {
-            return '';
-        }
-
-        $format = Hash::get($map, sprintf('entrypoints.%s.format', $resource), 'umd');
-        if ($format === 'esm') {
+        $assets = $this->getAssets($asset, 'js');
+        if ($assets[0] === 'esm') {
             $options['type'] = 'module';
         }
 
@@ -122,7 +121,7 @@ class EncoreHelper extends Helper
             function (string $path) use ($options): string {
                 return $this->Html->script($path, $options);
             },
-            $this->getAssets($asset, 'js')
+            $assets[1]
         ));
     }
 }
