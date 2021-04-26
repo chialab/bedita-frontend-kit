@@ -14,14 +14,13 @@ use Cake\View\Helper;
  */
 class EncoreHelper extends Helper
 {
-
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $helpers = ['Html'];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'buildPath' => 'webroot' . DS . 'build',
@@ -41,7 +40,7 @@ class EncoreHelper extends Helper
      * @param string|null $plugin The frontend plugin name.
      * @return array A list of entrypoints.
      */
-    protected function loadEntrypoints(string $plugin = null): ?array
+    protected function loadEntrypoints(?string $plugin = null): ?array
     {
         if ($plugin === null) {
             $plugin = '_';
@@ -73,7 +72,7 @@ class EncoreHelper extends Helper
      */
     public function getAssets(string $asset, string $type): array
     {
-        list($plugin, $resource) = pluginSplit($asset);
+        [$plugin, $resource] = pluginSplit($asset);
         $map = $this->loadEntrypoints($plugin);
         if ($map === null) {
             return [];
@@ -95,11 +94,13 @@ class EncoreHelper extends Helper
     {
         $assets = $this->getAssets($asset, 'css');
 
-        return join('', array_map(
-            function (string $path): string {
-                return $this->Html->css($path);
-            },
-            $assets[1]
+        return join('', array_filter(
+            array_map(
+                function (string $path): ?string {
+                    return $this->Html->css($path);
+                },
+                $assets[1]
+            )
         ));
     }
 
@@ -117,11 +118,13 @@ class EncoreHelper extends Helper
             $options['type'] = 'module';
         }
 
-        return join('', array_map(
-            function (string $path) use ($options): string {
-                return $this->Html->script($path, $options);
-            },
-            $assets[1]
+        return join('', array_filter(
+            array_map(
+                function (string $path) use ($options): ?string {
+                    return $this->Html->script($path, $options);
+                },
+                $assets[1]
+            )
         ));
     }
 }
