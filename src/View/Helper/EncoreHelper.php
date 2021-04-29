@@ -92,7 +92,7 @@ class EncoreHelper extends Helper
     {
         return join('', array_map(
             function (string $path): string {
-                return $this->Html->css($path);
+                return $this->Html->css($path) ?: '';
             },
             $this->getAssets($asset, 'css')
         ));
@@ -108,7 +108,7 @@ class EncoreHelper extends Helper
     {
         return join('', array_map(
             function (string $path): string {
-                return $this->Html->script($path);
+                return $this->Html->script($path) ?: '';
             },
             $this->getAssets($asset, 'js')
         ));
