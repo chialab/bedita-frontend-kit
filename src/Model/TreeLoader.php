@@ -106,7 +106,8 @@ class TreeLoader
         $query = $this->Trees->find()
             ->select([$this->Trees->aliasField('canonical')])
             ->where([$this->Trees->aliasField('object_id') => $id])
-            ->group([$this->Trees->aliasField('id'), $this->Trees->aliasField('canonical')]);
+            ->group([$this->Trees->aliasField('id'), $this->Trees->aliasField('canonical')])
+            ->orderDesc($this->Trees->aliasField('canonical'));
 
         // Join with parent nodes, up to the requested node.
         $exp = $query->newExpr()
