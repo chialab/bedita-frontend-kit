@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
+use BEdita\Core\Filesystem\Exception\InvalidThumbnailOptionsException;
 use BEdita\Core\Model\Entity\Media;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
+use Cake\Core\Configure;
 use Iterator;
 
 /**
@@ -165,6 +167,20 @@ class PosterHelper extends Helper
         return null;
     }
 
+    protected static function getOptions($thumbOptions): array
+    {
+        if (is_array($thumbOptions)) {
+            return $thumbOptions;
+        }
+
+        $key = sprintf('Thumbnails.presets.%s', $thumbOptions);
+        if (!Configure::check($key)) {
+            throw new InvalidThumbnailOptionsException(__d('bedita', 'Preset "{0}" not found', $thumbOptions));
+        }
+
+        return Configure::read($key);
+    }
+
     /**
      * Get URL for poster image.
      *
@@ -178,7 +194,7 @@ class PosterHelper extends Helper
     {
         deprecationWarning('PosterHelper::getUrl() is deprecated, use PosterHelper::url() instead.', 2);
 
-        return $this->url($object, false, compact('forceSelf', 'variant'));
+        return $this->url($object, 'default', compact('forceSelf', 'variant'));
     }
 
     /**
@@ -202,8 +218,27 @@ class PosterHelper extends Helper
         $fallbackStatic = filter_var(Hash::get($posterOptions, 'fallbackStatic', true), FILTER_VALIDATE_BOOL);
         $thumbFallbackOptions = $posterOptions;
         $thumbFallbackOptions['fallbackStatic'] = false;
+
+        $options = static::getOptions($thumbOptions);
         foreach ($this->candidates($object, $posterOptions) as $media) {
-            $url = $this->getMediaUrl($media, $thumbOptions, $thumbFallbackOptions);
+            if (isset($object->custom_props)) {
+                $props = $object->custom_props;
+
+                if (array_key_exists('position_x', $props)) {
+                    $options += [
+                        'fit' => sprintf('crop-%d-%d', $props['position_x'], $props['position_y']),
+                    ];
+                }
+            }
+            if (isset($object->poster[0])) {
+                $pos = $object->poster[0]->custom_props;
+
+                $options += [
+                    'fit' => sprintf('crop-%d-%d', $pos['position_x'], $pos['position_y']),
+                ];
+            }
+
+            $url = $this->getMediaUrl($media, $options, $thumbFallbackOptions);
             if ($url !== null) {
                 return $url;
             }
