@@ -14,14 +14,13 @@ use Cake\View\Helper;
  */
 class EncoreHelper extends Helper
 {
-
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $helpers = ['Html'];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'buildPath' => 'webroot' . DS . 'build',
@@ -41,7 +40,7 @@ class EncoreHelper extends Helper
      * @param string|null $plugin The frontend plugin name.
      * @return array A list of entrypoints.
      */
-    protected function loadEntrypoints(string $plugin = null): ?array
+    protected function loadEntrypoints(?string $plugin = null): ?array
     {
         if ($plugin === null) {
             $plugin = '_';
@@ -69,17 +68,20 @@ class EncoreHelper extends Helper
      *
      * @param string $asset The assets name.
      * @param string $type The asset type.
-     * @return array A list of resources.
+     * @return array A list of resources with their format.
      */
     public function getAssets(string $asset, string $type): array
     {
-        list($plugin, $resource) = pluginSplit($asset);
+        [$plugin, $resource] = pluginSplit($asset);
         $map = $this->loadEntrypoints($plugin);
         if ($map === null) {
             return [];
         }
 
-        return Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
+        $format = Hash::get($map, sprintf('entrypoints.%s.format', $resource), 'umd');
+        $entries = Hash::get($map, sprintf('entrypoints.%s.%s', $resource, $type), []);
+
+        return [$format, $entries];
     }
 
     /**
@@ -90,11 +92,15 @@ class EncoreHelper extends Helper
      */
     public function css(string $asset): string
     {
-        return join('', array_map(
-            function (string $path): string {
-                return $this->Html->css($path) ?: '';
-            },
-            $this->getAssets($asset, 'css')
+        $assets = $this->getAssets($asset, 'css');
+
+        return join('', array_filter(
+            array_map(
+                function (string $path): ?string {
+                    return $this->Html->css($path);
+                },
+                $assets[1]
+            )
         ));
     }
 
@@ -102,15 +108,23 @@ class EncoreHelper extends Helper
      * Get js assets.
      *
      * @param string $asset The assets name.
+     * @param array $options Array of options and HTML arguments.
      * @return string HTML to load JS resources.
      */
-    public function script(string $asset): string
+    public function script(string $asset, array $options = []): string
     {
-        return join('', array_map(
-            function (string $path): string {
-                return $this->Html->script($path) ?: '';
-            },
-            $this->getAssets($asset, 'js')
+        $assets = $this->getAssets($asset, 'js');
+        if ($assets[0] === 'esm') {
+            $options['type'] = 'module';
+        }
+
+        return join('', array_filter(
+            array_map(
+                function (string $path) use ($options): ?string {
+                    return $this->Html->script($path, $options);
+                },
+                $assets[1]
+            )
         ));
     }
 }
