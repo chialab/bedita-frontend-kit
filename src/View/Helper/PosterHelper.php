@@ -234,4 +234,54 @@ class PosterHelper extends Helper
 
         return $this->Html->image($url, $attributes + ['plugin' => false]);
     }
+
+    /**
+     * Get position string to manage object-fit CSS property to crop the object poster image.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom crop the poster image.
+     * @return string position string in the following format: '<x-string> <y-string>'
+     */
+    public function position(?ObjectEntity $object): string
+    {
+        $props = [];
+
+        if (isset($object->custom_props)) {
+            $props = $object->custom_props;
+        }
+        if (isset($object->poster[0])) {
+            $props = $object->poster[0]->custom_props;
+        }
+        if (empty($props)) {
+            return '';
+        }
+
+        $xPos = '';
+        $yPos = '';
+
+        switch ($props->position_x) {
+            case 0:
+                $xPos = 'left';
+                break;
+            case 100:
+                $xPos = 'right';
+                break;
+            default:
+                $xPos = 'center';
+                break;
+        }
+
+        switch ($props->position_y) {
+            case 0:
+                $yPos = 'bottom';
+                break;
+            case 100:
+                $yPos = 'top';
+                break;
+            default:
+                $yPos = 'center';
+                break;
+        }
+
+        return $xPos . ' ' . $yPos;
+    }
 }
