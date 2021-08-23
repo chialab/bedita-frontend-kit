@@ -258,7 +258,7 @@ class PosterHelper extends Helper
         $xPos = '';
         $yPos = '';
 
-        switch ($props->position_x) {
+        switch ($props['position_x']) {
             case 0:
                 $xPos = 'left';
                 break;
@@ -270,7 +270,7 @@ class PosterHelper extends Helper
                 break;
         }
 
-        switch ($props->position_y) {
+        switch ($props['position_y']) {
             case 0:
                 $yPos = 'bottom';
                 break;
