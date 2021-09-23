@@ -299,14 +299,27 @@ class ObjectsLoader
      * Parse include comma-delimited string into Cake-compatible contains.
      *
      * @param string $include Included associations.
-     * @return string[]
+     * @return array
      */
     protected static function prepareContains(string $include): array
     {
         $contains = explode(',', $include);
 
-        return array_filter(array_map(function (string $assoc): string {
-            return Inflector::camelize(trim($assoc));
-        }, $contains));
+        return array_reduce($contains, function (array $contains, string $spec): array {
+            if (empty($spec)) {
+                return $contains;
+            }
+
+            [$assoc, $limit] = explode('|', $spec, 2) + [null, null];
+            $assoc = Inflector::camelize(trim($assoc));
+
+            if (empty($limit)) {
+                $contains[] = $assoc;
+                return $contains;
+            }
+
+            $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
+            return $contains;
+        }, []);
     }
 }
