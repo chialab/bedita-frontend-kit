@@ -151,13 +151,21 @@ class ObjectsLoader
 
         $table = $this->getTableLocator()->get($objectType->alias);
         $lang = $this->getLang();
-        $contain = static::prepareContains(Hash::get($options, 'include', ''));
+        $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
+        $lateContain = static::prepareContains(Hash::get($options, 'include', ''), true);
 
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('filter', 'lang', 'contain'));
+        /** @var \Cake\ORM\Table */
+        $table = $query->getRepository();
 
-        return $query->formatResults(function (iterable $results) use ($depth): iterable {
+        return $query->formatResults(function (iterable $results) use ($depth, $lateContain, $table): iterable {
+            if (!empty($lateContain)) {
+                $results = collection($results)
+                    ->map(fn (ObjectEntity $object): ObjectEntity => $table->loadInto($object, $lateContain));
+            }
+
             return $this->autoHydrateAssociations($results, $depth);
         });
     }
@@ -299,19 +307,25 @@ class ObjectsLoader
      * Parse include comma-delimited string into Cake-compatible contains.
      *
      * @param string $include Included associations.
+     * @param bool|null $limited Include only associations with or without a limit.
      * @return array
      */
-    protected static function prepareContains(string $include): array
+    protected static function prepareContains(string $include, ?bool $limited = null): array
     {
         $contains = explode(',', $include);
 
-        return array_reduce($contains, function (array $contains, string $spec): array {
+        return array_reduce($contains, function (array $contains, string $spec) use ($limited): array {
             if (empty($spec)) {
                 return $contains;
             }
 
             [$assoc, $limit] = explode('|', $spec, 2) + [null, null];
             $assoc = Inflector::camelize(trim($assoc));
+
+            if (($limited === true && empty($limit)) || ($limited === false && !empty($limit))) {
+                // Not required.
+                return $contains;
+            }
 
             if (empty($limit)) {
                 $contains[] = $assoc;
