@@ -162,8 +162,9 @@ class ObjectsLoader
 
         return $query->formatResults(function (iterable $results) use ($depth, $lateContain, $table): iterable {
             if (!empty($lateContain)) {
-                $results = collection($results)
-                    ->map(fn (ObjectEntity $object): ObjectEntity => $table->loadInto($object, $lateContain));
+                $results = collection($results)->each(function (ObjectEntity $object) use ($lateContain, $table): void {
+                    $table->loadInto($object, $lateContain);
+                });
             }
 
             return $this->autoHydrateAssociations($results, $depth);
