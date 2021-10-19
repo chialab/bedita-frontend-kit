@@ -129,7 +129,7 @@ class ObjectsLoader
         /** @var \BEdita\Core\Model\Entity\ObjectEntity $object */
         $object = $action(compact('primaryKey', 'lang', 'contain'));
 
-        return $this->autoHydrateAssociations([$object], $depth)->first();
+        return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth)->first();
     }
 
     /**
@@ -160,15 +160,57 @@ class ObjectsLoader
         /** @var \Cake\ORM\Table */
         $table = $query->getRepository();
 
-        return $query->formatResults(function (iterable $results) use ($depth, $lateContain, $table): iterable {
+        return $query->formatResults(function (iterable $results) use ($contain, $depth, $lateContain, $table): iterable {
             if (!empty($lateContain)) {
                 $results = collection($results)->each(function (ObjectEntity $object) use ($lateContain, $table): void {
                     $table->loadInto($object, $lateContain);
                 });
             }
 
-            return $this->autoHydrateAssociations($results, $depth);
+            return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth);
         });
+    }
+
+    /**
+     * Set `relation` property for contained entities, using what is stored in `_joinData`, if present.
+     *
+     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
+     * @param array $containedAssociations List of contained associations.
+     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    protected function setJoinData(iterable $objects, array $containedAssociations): CollectionInterface
+    {
+        $associations = array_keys(Hash::normalize($containedAssociations));
+        $fix = function (ObjectEntity $e): void {
+            if ($e->isEmpty('_joinData')) {
+                return;
+            }
+            $e->set('relation', $e->get('_joinData'));
+            $e->setDirty('relation', false);
+        };
+
+        return collection($objects)
+            ->each(function (ObjectEntity $object) use ($associations, $fix): void {
+                $table = $this->getTableLocator()->get($object->getSource());
+                foreach ($associations as $name) {
+                    if (!$table->associations()->has($name)) {
+                        continue;
+                    }
+                    $prop = $table->getAssociation($name)->getProperty();
+
+                    if (!$object->has($prop) || $object->isEmpty($prop)) {
+                        continue;
+                    }
+                    $related = $object->get($prop);
+                    if ($related instanceof ObjectEntity) {
+                        $fix($related);
+
+                        return;
+                    }
+
+                    (new Collection($related))->each($fix);
+                }
+            });
     }
 
     /**
@@ -184,13 +226,7 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine(
-                'id',
-                function (ObjectEntity $object): ObjectEntity {
-                    return $object;
-                },
-                'type'
-            )
+            ->combine('id', fn (ObjectEntity $object): ObjectEntity => $object, 'type')
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
                 $objectType = $this->ObjectTypes->get($type);
                 $filter = [
@@ -334,6 +370,7 @@ class ObjectsLoader
             }
 
             $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
+
             return $contains;
         }, []);
     }
