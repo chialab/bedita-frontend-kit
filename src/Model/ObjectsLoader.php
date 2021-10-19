@@ -171,7 +171,14 @@ class ObjectsLoader
         });
     }
 
-    protected function setJoinData(iterable $objects, array $containedAssociations): iterable
+    /**
+     * Set `relation` property for contained entities, using what is stored in `_joinData`, if present.
+     *
+     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
+     * @param array $containedAssociations List of contained associations.
+     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    protected function setJoinData(iterable $objects, array $containedAssociations): CollectionInterface
     {
         $associations = array_keys(Hash::normalize($containedAssociations));
         $fix = function (ObjectEntity $e): void {
