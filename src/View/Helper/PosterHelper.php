@@ -294,10 +294,10 @@ class PosterHelper extends Helper
     /**
      * Get poster image aspect ratio
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom poster .
-     * @return string aspect string in the following format: 'portrait | landscape | square'
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster ratio .
+     * @return float aspect value
      */
-    public function aspect(?ObjectEntity $object): string 
+    public function aspect(?ObjectEntity $object): float 
     {
         $streams = [];
 
@@ -318,6 +318,21 @@ class PosterHelper extends Helper
         }
 
         $aspect = $streams[0]['width'] / $streams[0]['height'];
+
+        return $aspect;
+    }
+
+
+    /**
+     * Get poster image orientation  string
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster oriemtation.
+     * @return string aspect string in the following format: 'portrait | landscape | square'
+     */
+    public function orientation(?ObjectEntity $object): string 
+    {
+        $aspect = $this->aspect($object);
+
         $aspectlabel = '';
 
         switch (true) {
