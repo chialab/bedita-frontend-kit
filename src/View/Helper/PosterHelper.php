@@ -290,14 +290,14 @@ class PosterHelper extends Helper
 
         return $xPos . ' ' . $yPos;
     }
-     
+
     /**
      * Get poster image aspect ratio
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster ratio .
-     * @return float aspect value
+     * @return float|null aspect value
      */
-    public function aspect(?ObjectEntity $object): float 
+    public function aspect(?ObjectEntity $object): float
     {
         $streams = [];
 
@@ -310,11 +310,11 @@ class PosterHelper extends Helper
         }
 
         if (empty($streams)) {
-            return '';
+            return null;
         }
 
         if (empty($streams[0]['width']) || empty($streams[0]['height'])) {
-            return '';
+            return null;
         }
 
         $aspect = $streams[0]['width'] / $streams[0]['height'];
@@ -322,32 +322,34 @@ class PosterHelper extends Helper
         return $aspect;
     }
 
-
     /**
      * Get poster image orientation  string
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster oriemtation.
-     * @return string aspect string in the following format: 'portrait | landscape | square'
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster orientation.
+     * @return string|null aspect string in the following format: 'portrait | landscape | square'
      */
-    public function orientation(?ObjectEntity $object): string 
+    public function orientation(?ObjectEntity $object): string
     {
         $aspect = $this->aspect($object);
+
+        if ($aspect == null) {
+            return null;
+        }
 
         $aspectlabel = '';
 
         switch (true) {
-            case ($aspect > 1) :
+            case ($aspect > 1):
                 $aspectlabel = 'landscape';
                 break;
-            case ($aspect < 1) :
+            case ($aspect < 1):
                 $aspectlabel = 'portrait';
                 break;
-            case ($aspect == 1) :
+            default:
                 $aspectlabel = 'square';
                 break;
         }
 
         return $aspectlabel;
-
     }
 }
