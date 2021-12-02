@@ -7,6 +7,7 @@ use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -80,10 +81,12 @@ class PublicationComponent extends Component
             );
         }
 
-        $publication = $publicationLoader->loadObject($publicationUname, 'folders');
-        if (empty($publication)) {
-            throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname));
+        try {
+            $publication = $publicationLoader->loadObject($publicationUname, 'folders');
+        } catch (RecordNotFoundException $e) {
+            throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
+
         $this->publication = $publication;
         $this->getController()->set('publication', $this->publication);
 
