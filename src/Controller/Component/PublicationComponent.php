@@ -7,10 +7,12 @@ use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
+use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 use InvalidArgumentException;
 
@@ -35,6 +37,7 @@ class PublicationComponent extends Component
     protected $_defaultConfig = [
         'menuFolders' => [],
         'publication' => null,
+        'publicationLoader' => null,
     ];
 
     /**
@@ -61,8 +64,8 @@ class PublicationComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loader = new TreeLoader($this->Objects->getLoader());
-
+        $objectsLoader = $this->Objects->getLoader();
+        $this->loader = new TreeLoader($objectsLoader);
         $this->loadModel('Trees');
 
         $publicationUname = $this->getConfig('publication');
@@ -70,25 +73,32 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $menuFolders = $this->getConfig('menuFolders', []);
-        $uname = array_merge([$publicationUname], array_values($menuFolders));
-        $folders = $this->Objects->loadObjects(compact('uname'), 'folders')
-            ->indexBy('uname')
+        $publicationLoader = $objectsLoader;
+        if ($this->getConfig('publicationLoader') !== null) {
+            $publicationLoader = new ObjectsLoader(
+                $this->getConfig('publicationLoader.objectTypesConfig', []),
+                $this->getConfig('publicationLoader.autoHydrateAssociations', [])
+            );
+        }
+
+        try {
+            $publication = $publicationLoader->loadObject($publicationUname, 'folders');
+        } catch (RecordNotFoundException $e) {
+            throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
+        }
+
+        $this->publication = $publication;
+        $this->getController()->set('publication', $this->publication);
+
+        $menuFoldersConfig = $this->getConfig('menuFolders', []);
+        if (empty($menuFoldersConfig)) {
+            return;
+        }
+
+        $menuFolders = $objectsLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
+            ->indexBy(fn (Folder $folder): string => array_search($folder->uname, $menuFoldersConfig))
             ->toArray();
 
-        if (!isset($folders[$publicationUname])) {
-            throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname));
-        }
-        $this->publication = $folders[$publicationUname];
-
-        $menuFolders = array_combine(
-            array_keys($menuFolders),
-            array_map(function (string $uname) use ($folders): ?Folder {
-                return $folders[$uname] ?? null;
-            }, array_values($menuFolders))
-        );
-
-        $this->getController()->set('publication', $this->publication);
         $this->getController()->set('menuFolders', $menuFolders);
     }
 

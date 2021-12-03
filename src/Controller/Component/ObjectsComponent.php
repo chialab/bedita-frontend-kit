@@ -66,11 +66,12 @@ class ObjectsComponent extends Component
      * @param string|int $id Object ID or uname.
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadObject(string $id, string $type = 'objects', ?array $options = null): ObjectEntity
+    public function loadObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
-        return $this->loader->loadObject($id, $type, $options);
+        return $this->loader->loadObject($id, $type, $options, $hydrate);
     }
 
     /**
@@ -78,12 +79,13 @@ class ObjectsComponent extends Component
      *
      * @param array $filter Filters.
      * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'children']`)
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
     {
-        return $this->loader->loadObjects($filter, $type, $options);
+        return $this->loader->loadObjects($filter, $type, $options, $hydrate);
     }
 
     /**
