@@ -67,4 +67,20 @@ class CategoriesComponent extends Component
 
         return $query;
     }
+
+    /**
+     * Add a filter by category id.
+     *
+     * @param \Cake\ORM\Query $query The current query.
+     * @param int $id ID of the category.
+     * @return \Cake\ORM\Query
+     */
+    public function filterById(Query $query, int $id): Query
+    {
+        return $query->distinct()->innerJoinWith('Categories', function (Query $query) use ($id) {
+            return $query
+                ->where([$this->Categories->aliasField('id') => $id])
+                ->where([$this->Categories->aliasField('enabled') => true]);
+        });
+    }
 }
