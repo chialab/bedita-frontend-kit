@@ -37,10 +37,10 @@ class CategoriesComponent extends Component
      * Load categories by object type.
      *
      * @param string|null $type Object type name.
-     * @param string|null $parentId ID of parent category.
+     * @param int|null $parentId ID of parent category.
      * @return \Cake\ORM\Query
      */
-    public function load(?string $type = null, ?string $parentId): Query
+    public function load(?string $type = null, ?int $parentId): Query
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true]);
