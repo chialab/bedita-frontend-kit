@@ -37,12 +37,24 @@ class CategoriesComponent extends Component
      * Load categories by object type.
      *
      * @param string|null $type Object type name.
+     * @param string|null $parentId ID of parent category.
      * @return \Cake\ORM\Query
      */
-    public function load(?string $type = null): Query
+    public function load(?string $type = null, ?string $parentId): Query
     {
         $query = $this->Categories->find()
-            ->where([$this->Categories->aliasField('enabled') => true])
+            ->where([$this->Categories->aliasField('enabled') => true]);
+
+        if ($parentId !== null) {
+            $query = $this->Categories->find()
+                ->where([$this->Categories->aliasField('parent_id') => $parentId]);
+        }
+
+        if ($type !== null) {
+            $query = $query->find('type', [$type]);
+        }
+
+        $query
             ->order([$this->Categories->aliasField('name')])
             ->formatResults(function (CollectionInterface $results): CollectionInterface {
                 return $results->map(function (Category $category): Category {
@@ -52,10 +64,6 @@ class CategoriesComponent extends Component
                     return $category;
                 });
             });
-
-        if ($type !== null) {
-            $query = $query->find('type', [$type]);
-        }
 
         return $query;
     }
