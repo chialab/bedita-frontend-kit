@@ -46,7 +46,7 @@ class CategoriesComponent extends Component
             ->where([$this->Categories->aliasField('enabled') => true]);
 
         if ($parentId !== null) {
-            $query = $this->Categories->find()
+            $query = $query
                 ->where([$this->Categories->aliasField('parent_id') => $parentId]);
         }
 
