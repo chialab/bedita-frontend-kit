@@ -7,7 +7,9 @@
         "ext-json": "*",
         "bedita/core": "^4.2.0",
         "cakephp/cakephp": "^3.8",
-        "wyrihaximus/twig-view": "^4.3"
+        "wyrihaximus/twig-view": "^4.3",
+        "chialab/rna-cakephp": "^0.2.1",
+        "bedita/i18n": "^3.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7.14|^6.0"
