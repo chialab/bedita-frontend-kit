@@ -110,7 +110,7 @@ class AppView extends TwigView
         $this->loadHelper('Url');
         $this->loadHelper('BEdita/I18n.I18n');
         $this->loadHelper('Chialab/Rna.Rna');
-        $this->loadHelper('Chialab/FrontendKit.DatesRanges');
+        $this->loadHelper('Chialab/FrontendKit.DateRanges');
 
         $fallbackImage = Configure::read('FallbackImage');
         $fallback = $fallbackImage ? $this->Url->image($fallbackImage) : null;
