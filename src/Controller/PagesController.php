@@ -38,6 +38,20 @@ class PagesController extends Controller
     {
         parent::initialize();
 
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+
+        $this->loadComponent('Chialab/FrontendKit.Objects', Configure::read('ObjectsLoader', [
+            'objectTypesConfig' => [
+                'objects' => ['include' => 'parents'],
+                'folders' => ['include' => 'children,parents'],
+            ],
+            'autoHydrateAssociations' => [
+                'parents' => 2,
+                'children' => 3,
+            ],
+        ]));
+
         $this->loadComponent('Chialab/FrontendKit.Publication', [
             'publication' => Configure::read('Root'),
         ]);

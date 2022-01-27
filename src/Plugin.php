@@ -3,7 +3,7 @@
 namespace Chialab\FrontendKit;
 
 use Cake\Core\BasePlugin;
-use Cake\Routing\RouteBuilder;
+use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 
 /**
  * Plugin for Chialab\FrontendKit
