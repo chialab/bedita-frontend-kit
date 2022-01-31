@@ -43,12 +43,14 @@ class PagesController extends Controller
 
         $this->loadComponent('Chialab/FrontendKit.Objects', Configure::read('ObjectsLoader', [
             'objectTypesConfig' => [
-                'objects' => ['include' => 'parents'],
-                'folders' => ['include' => 'children,parents'],
+                'objects' => ['include' => 'poster'],
+                'folders' => ['include' => 'children,parents,poster'],
             ],
             'autoHydrateAssociations' => [
-                'parents' => 2,
-                'children' => 3,
+                'parents' => [],
+                'children' => [
+                    'poster' => [],
+                ],
             ],
         ]));
 
