@@ -3,11 +3,22 @@
 namespace Chialab\FrontendKit;
 
 use Cake\Core\BasePlugin;
-use Chialab\FrontendKit\Routing\Route\ObjectRoute;
+use Cake\Core\Configure;
 
 /**
  * Plugin for Chialab\FrontendKit
  */
 class Plugin extends BasePlugin
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function initialize()
+    {
+        parent::initialize();
+
+        if (Configure::read('Status.level') === 'on') {
+            Configure::write('Publish.checkDate', true);
+        }
+    }
 }

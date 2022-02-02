@@ -66,7 +66,7 @@ class PublicationComponent extends Component
 
         $objectsLoader = $this->Objects->getLoader();
         $this->loader = new TreeLoader($objectsLoader);
-        $this->loadModel('Trees');
+        $this->loadModel('BEdita/Core.Trees');
 
         $publicationUname = $this->getConfig('publication');
         if (empty($publicationUname)) {

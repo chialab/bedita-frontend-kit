@@ -3,17 +3,17 @@ namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
-use Chialab\FrontendKit\View\Helper\AssetHelper;
+use Chialab\FrontendKit\View\Helper\MediaHelper;
 
 /**
- * Chialab\FrontendKit\View\Helper\AssetHelper Test Case
+ * Chialab\FrontendKit\View\Helper\MediaHelper Test Case
  */
-class AssetHelperTest extends TestCase
+class MediaHelperTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Chialab\FrontendKit\View\Helper\AssetHelper
+     * @var \Chialab\FrontendKit\View\Helper\MediaHelper
      */
     public $Asset;
 
@@ -26,7 +26,7 @@ class AssetHelperTest extends TestCase
     {
         parent::setUp();
         $view = new View();
-        $this->Asset = new AssetHelper($view);
+        $this->Media = new MediaHelper($view);
     }
 
     /**
@@ -36,7 +36,7 @@ class AssetHelperTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->Asset);
+        unset($this->Media);
 
         parent::tearDown();
     }

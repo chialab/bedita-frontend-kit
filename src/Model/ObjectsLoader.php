@@ -57,8 +57,8 @@ class ObjectsLoader
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
 
-        $this->loadModel('ObjectTypes');
-        $this->loadModel('Objects');
+        $this->loadModel('BEdita/Core.ObjectTypes');
+        $this->loadModel('BEdita/Core.Objects');
     }
 
     /**

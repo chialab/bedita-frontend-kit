@@ -10,6 +10,16 @@ use Chialab\FrontendKit\Controller\Component\ObjectsComponent;
  */
 class ObjectsComponentTest extends TestCase
 {
+    public $fixtures = [
+        'plugin.BEdita/Core.ObjectTypes',
+        'plugin.BEdita/Core.PropertyTypes',
+        'plugin.Chialab/FrontendKit.Properties',
+        'plugin.Chialab/FrontendKit.Relations',
+        'plugin.Chialab/FrontendKit.RelationTypes',
+        'plugin.Chialab/FrontendKit.Objects',
+        'plugin.Chialab/FrontendKit.Users',
+    ];
+
     /**
      * Test subject
      *
@@ -25,6 +35,7 @@ class ObjectsComponentTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+
         $registry = new ComponentRegistry();
         $this->Objects = new ObjectsComponent($registry);
     }
