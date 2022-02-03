@@ -88,5 +88,6 @@ class ObjectsComponentTest extends TestCase
         static::assertSame('profiles', $children[1]->type);
         static::assertSame('Alan', $children[1]->name);
         static::assertSame('Turing', $children[1]->surname);
+        static::assertEmpty($children[1]->author_of);
     }
 }

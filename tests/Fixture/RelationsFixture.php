@@ -18,5 +18,14 @@ class RelationsFixture extends BERelationsFixture
             'description' => '',
             'params' => null,
         ],
+        // 2
+        [
+            'name' => 'has_author',
+            'label' => 'Has author',
+            'inverse_name' => 'author_of',
+            'inverse_label' => 'Author of',
+            'description' => '',
+            'params' => null,
+        ],
     ];
 }

@@ -18,5 +18,14 @@ class ObjectRelationsFixture extends BEObjectRelationsFixture
             'inv_priority' => 2,
             'params' => '',
         ],
+        // 2
+        [
+            'left_id' => 10,
+            'relation_id' => 2,
+            'right_id' => 12,
+            'priority' => 1,
+            'inv_priority' => 2,
+            'params' => '',
+        ],
     ];
 }
