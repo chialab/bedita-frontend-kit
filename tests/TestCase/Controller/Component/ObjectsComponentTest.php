@@ -17,11 +17,14 @@ class ObjectsComponentTest extends TestCase
         'plugin.Chialab/FrontendKit.Relations',
         'plugin.Chialab/FrontendKit.RelationTypes',
         'plugin.Chialab/FrontendKit.Objects',
+        'plugin.Chialab/FrontendKit.Users',
         'plugin.Chialab/FrontendKit.Media',
         'plugin.Chialab/FrontendKit.Streams',
-        'plugin.Chialab/FrontendKit.Users',
+        'plugin.Chialab/FrontendKit.Profiles',
         'plugin.Chialab/FrontendKit.Trees',
         'plugin.Chialab/FrontendKit.ObjectRelations',
+        'plugin.BEdita/Core.Categories',
+        'plugin.BEdita/Core.ObjectCategories',
     ];
 
     /**
@@ -72,14 +75,18 @@ class ObjectsComponentTest extends TestCase
         static::assertSame('child-1', $object->uname);
         static::assertSame('folders', $object->type);
         static::assertNotEmpty($object->children);
-        
-        $child = $object->children->first();
-        static::assertSame('document-1', $child->uname);
-        static::assertSame('documents', $child->type);
-        static::assertNotEmpty($child->poster);
 
-        $poster = $child->poster[0];
+        $children = $object->children->toArray();
+        static::assertSame('document-1', $children[0]->uname);
+        static::assertSame('documents', $children[0]->type);
+        static::assertNotEmpty($children[0]->poster);
+        $poster = $children[0]->poster[0];
         static::assertSame('image-1', $poster->uname);
         static::assertSame('images', $poster->type);
+
+        static::assertSame('profile-1', $children[1]->uname);
+        static::assertSame('profiles', $children[1]->type);
+        static::assertSame('Alan', $children[1]->name);
+        static::assertSame('Turing', $children[1]->surname);
     }
 }

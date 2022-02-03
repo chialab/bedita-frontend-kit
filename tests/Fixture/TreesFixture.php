@@ -15,6 +15,7 @@ class TreesFixture extends BETreesFixture
                 4 => [
                     8 => [
                         10 => [],
+                        12 => [],
                     ],
                     9 => [],
                 ],

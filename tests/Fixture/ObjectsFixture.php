@@ -206,5 +206,23 @@ class ObjectsFixture extends BEObjectsFixture
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 12
+        [
+            'uname' => 'profile-1',
+            'title' => 'Profile 1',
+            'description' => "",
+            'body' => "",
+            'extra' => null,
+            'lang' => 'en',
+            'status' => 'on',
+            'locked' => 0,
+            'deleted' => 0,
+            'created_by' => 1,
+            'modified_by' => 1,
+            'object_type_id' => 3,
+            'published' => null,
+            'created' => '2022-01-01 00:00:00',
+            'modified' => '2022-01-01 00:00:00',
+        ],
     ];
 }

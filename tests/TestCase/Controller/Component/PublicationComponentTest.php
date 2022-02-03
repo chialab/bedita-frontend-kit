@@ -24,8 +24,11 @@ class PublicationComponentTest extends TestCase
         'plugin.Chialab/FrontendKit.Users',
         'plugin.Chialab/FrontendKit.Media',
         'plugin.Chialab/FrontendKit.Streams',
+        'plugin.Chialab/FrontendKit.Profiles',
         'plugin.Chialab/FrontendKit.Trees',
         'plugin.Chialab/FrontendKit.ObjectRelations',
+        'plugin.BEdita/Core.Categories',
+        'plugin.BEdita/Core.ObjectCategories',
     ];
 
     /**
