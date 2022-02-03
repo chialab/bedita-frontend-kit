@@ -138,7 +138,7 @@ class PublicationComponent extends Component
      * Generate a list of templates to try to use for the given object.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object The main object.
-     * @param \BEdita\Core\Model\Entity\Folder[] $ancestors A list of ancestors.
+     * @param \BEdita\Core\Model\Entity\Folder $ancestors A list of ancestors.
      * @return \Generator A generator function.
      */
     protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator {

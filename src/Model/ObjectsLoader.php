@@ -103,7 +103,7 @@ class ObjectsLoader
      * @param array|null $hydrate Auto-hydrate options (e.g.: `['children' => []]`).
      * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function hydrateObjects(array $objects, ?array $hydrate): CollectionInterface
+    public function hydrateObjects(array $objects, ?array $hydrate = null): CollectionInterface
     {
         return $this->toConcreteTypes($objects, $hydrate);
     }

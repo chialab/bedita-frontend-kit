@@ -55,7 +55,7 @@ class TreeLoader
         $leaf = $this->loader->loadObject(array_pop($parts));
 
         $found = $this->getObjectPaths($leaf->id, $relativeTo)
-            ->having(compact('path'))
+            ->having(compact('path'), ['path' => 'string'])
             ->firstOrFail();
 
         $ids = explode(',', $found['path_ids']);

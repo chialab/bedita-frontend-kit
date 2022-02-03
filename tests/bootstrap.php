@@ -52,18 +52,17 @@ Configure::write('App', [
 ]);
 
 Log::setConfig([
-    'queries' => [
-        'engine' => 'Cake\Log\Engine\FileLog',
-        'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
-        'file' => 'sql',
-        'path' => LOGS,
-    ],
-    'debug' => [
-        'engine' => 'Cake\Log\Engine\FileLog',
-        'levels' => ['notice', 'info', 'debug'],
-        'file' => 'debug',
-        'path' => LOGS,
-    ],
+    // 'queries' => [
+    //     'engine' => 'Cake\Log\Engine\FileLog',
+    //     'file' => 'sql',
+    //     'path' => LOGS,
+    // ],
+    // 'debug' => [
+    //     'engine' => 'Cake\Log\Engine\FileLog',
+    //     'levels' => ['notice', 'info', 'debug'],
+    //     'file' => 'debug',
+    //     'path' => LOGS,
+    // ],
     'error' => [
         'engine' => 'Cake\Log\Engine\FileLog',
         'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
