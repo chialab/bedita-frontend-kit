@@ -15,14 +15,17 @@ use Chialab\FrontendKit\Controller\Component\PublicationComponent;
 class PublicationComponentTest extends TestCase
 {
     public $fixtures = [
-        'plugin.BEdita/Core.ObjectTypes',
+        'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
         'plugin.Chialab/FrontendKit.Relations',
         'plugin.Chialab/FrontendKit.RelationTypes',
         'plugin.Chialab/FrontendKit.Objects',
         'plugin.Chialab/FrontendKit.Users',
+        'plugin.Chialab/FrontendKit.Media',
+        'plugin.Chialab/FrontendKit.Streams',
         'plugin.Chialab/FrontendKit.Trees',
+        'plugin.Chialab/FrontendKit.ObjectRelations',
     ];
 
     /**

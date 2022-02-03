@@ -76,7 +76,7 @@ class ObjectsLoader
         $id = $this->Objects->getId($id);
         $objectType = $this->ObjectTypes->get($type);
 
-        return $this->loadSingle($id, $objectType, $options, $hydrate);
+        return $this->loadSingle($id, $objectType, $options, 1, $hydrate);
     }
 
     /**
@@ -93,19 +93,18 @@ class ObjectsLoader
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
 
-        return $this->loadMulti($objectType, $filter, $options, $hydrate);
+        return $this->loadMulti($objectType, $filter, $options, 1, $hydrate);
     }
 
     /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
-     * @param array|null $hydrate Auto-hydrate options (e.g.: `['children' => []]`).
      * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function hydrateObjects(array $objects, ?array $hydrate = null): CollectionInterface
+    public function hydrateObjects(array $objects): CollectionInterface
     {
-        return $this->toConcreteTypes($objects, $hydrate);
+        return $this->toConcreteTypes($objects, 1);
     }
 
     /**
@@ -114,10 +113,11 @@ class ObjectsLoader
      * @param int $primaryKey Object ID.
      * @param \BEdita\Core\Model\Entity\ObjectType $objectType Object type.
      * @param array|null $options Options.
-     * @param array|null $hydrate Auto-hydrate options (e.g.: `['children' => []]`).
+     * @param int $depth Depth level.
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function loadSingle(int $primaryKey, ObjectType $objectType, ?array $options, ?array $hydrate = null): ObjectEntity
+    protected function loadSingle(int $primaryKey, ObjectType $objectType, ?array $options, int $depth = 1, ?array $hydrate = null): ObjectEntity
     {
         // Fetch default options.
         if ($options === null) {
@@ -132,7 +132,7 @@ class ObjectsLoader
         /** @var \BEdita\Core\Model\Entity\ObjectEntity $object */
         $object = $action(compact('primaryKey', 'lang', 'contain'));
 
-        return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $hydrate)->first();
+        return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)->first();
     }
 
     /**
@@ -141,10 +141,11 @@ class ObjectsLoader
      * @param \BEdita\Core\Model\Entity\ObjectType $objectType Object type.
      * @param array $filter Filters.
      * @param array|null $options Options.
+     * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, ?array $hydrate = null): Query
+    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -163,14 +164,14 @@ class ObjectsLoader
         /** @var \Cake\ORM\Table */
         $table = $query->getRepository();
 
-        return $query->formatResults(function (iterable $results) use ($contain, $hydrate, $lateContain, $table): iterable {
+        return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $lateContain, $table): iterable {
             if (!empty($lateContain)) {
                 $results = collection($results)->each(function (ObjectEntity $object) use ($lateContain, $table): void {
                     $table->loadInto($object, $lateContain);
                 });
             }
 
-            return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $hydrate);
+            return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate);
         });
     }
 
@@ -220,23 +221,23 @@ class ObjectsLoader
      * Given a set of objects, re-map them to their concrete type implementation.
      *
      * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to re-map to their concrete types.
-     * @param array|null $hydrate Auto-hydrate options (e.g.: `['children' => []]`).
+     * @param int $depth Depth level.
      * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    protected function toConcreteTypes(iterable $objects, ?array $hydrate): CollectionInterface
+    protected function toConcreteTypes(iterable $objects, int $depth): CollectionInterface
     {
         $objects = new Collection($objects);
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
             ->combine('id', fn (ObjectEntity $object): ObjectEntity => $object, 'type')
-            ->unfold(function (iterable $items, string $type) use ($hydrate): Iterator {
+            ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
                 $objectType = $this->ObjectTypes->get($type);
                 $filter = [
                     'id' => array_unique((new Collection($items))->extract('id')->toList()),
                 ];
 
-                yield from $this->loadMulti($objectType, $filter, null, $hydrate);
+                yield from $this->loadMulti($objectType, $filter, null, $depth);
             })
             ->sortBy(function (ObjectEntity $object) use ($sortedIds): int {
                 return array_search($object->id, $sortedIds);
@@ -248,26 +249,24 @@ class ObjectsLoader
      * Automatically hydrate related objects, up to the configured maximum depth.
      *
      * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects whose related resources must be hydrated.
-     * @param array|null $hydrate Auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param int $depth Maximum depth.
+     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    protected function autoHydrateAssociations(iterable $objects, ?array $hydrate = null): CollectionInterface
+    protected function autoHydrateAssociations(iterable $objects, int $depth, ?array $options = null): CollectionInterface
     {
         if (!($objects instanceof CollectionInterface)) {
             $objects = new Collection($objects);
         }
 
-        if ($hydrate === null) {
-            $hydrate = $this->autoHydrateAssociations;
-        }
-
-        if ($hydrate == null) {
+        $associations = $this->getAssociationsToHydrate($depth, $options);
+        if (empty($associations)) {
             return $objects;
         }
 
         return $objects
-            ->each(function (ObjectEntity $object) use ($hydrate): void {
-                foreach ($hydrate as $prop => $deepHydrate) {
+            ->each(function (ObjectEntity $object) use ($associations, $depth, $options): void {
+                foreach ($associations as $prop) {
                     if (!$object->has($prop) || $object->isEmpty($prop)) {
                         continue;
                     }
@@ -277,7 +276,7 @@ class ObjectsLoader
                         $original = $related;
 
                         $objectType = $this->ObjectTypes->get($related->type);
-                        $related = $this->loadSingle($related->id, $objectType, $deepHydrate);
+                        $related = $this->loadSingle($related->id, $objectType, null, $depth + 1, $options);
                         if (!$original->isEmpty('_joinData')) {
                             $related->set('relation', $original->get('_joinData'));
                             $related->clean();
@@ -290,7 +289,7 @@ class ObjectsLoader
 
                     $original = (new Collection($related))->indexBy('id')->toArray();
 
-                    $related = $this->toConcreteTypes($related, $deepHydrate)
+                    $related = $this->toConcreteTypes($related, $depth + 1)
                         ->each(function (ObjectEntity $rel) use ($original): void {
                             $orig = Hash::get($original, $rel->id);
                             if ($orig === null || $orig->isEmpty('_joinData')) {
@@ -308,6 +307,30 @@ class ObjectsLoader
     }
 
     /**
+     * Get names of associations for which related objects need to be hydrated.
+     *
+     * @param int $depth Depth level.
+     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return string[]
+     */
+    protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
+    {
+        $hydrateAssociations = $this->autoHydrateAssociations;
+        if ($options !== null) {
+            $hydrateAssociations = $options;
+        }
+
+        return array_keys(
+            array_filter(
+                $hydrateAssociations,
+                function (int $maxDepth) use ($depth): bool {
+                    return $maxDepth === -1 || $maxDepth > $depth;
+                }
+            )
+        );
+    }
+
+    /**
      * Get default options for an object type. If no options are set for the type,
      * options for the parent types (abstract types) are checked.
      *
@@ -320,6 +343,10 @@ class ObjectsLoader
             return $this->objectTypesConfig[$objectType->name];
         }
         if ($objectType->parent_id === null) {
+            if (isset($this->objectTypesConfig['objects'])) {
+                return $this->objectTypesConfig['objects'];
+            }
+
             return [];
         }
 

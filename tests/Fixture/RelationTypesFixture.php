@@ -8,5 +8,16 @@ use BEdita\Core\Test\Fixture\RelationTypesFixture as BERelationTypesFixture;
  */
 class RelationTypesFixture extends BERelationTypesFixture
 {
-    public $records = [];
+    public $records = [
+        [
+            'relation_id' => 1,
+            'object_type_id' => 1,
+            'side' => 'left',
+        ],
+        [
+            'relation_id' => 1,
+            'object_type_id' => 11,
+            'side' => 'right',
+        ],
+    ];
 }

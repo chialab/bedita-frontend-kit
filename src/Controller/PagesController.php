@@ -47,10 +47,8 @@ class PagesController extends Controller
                 'folders' => ['include' => 'children,parents,poster'],
             ],
             'autoHydrateAssociations' => [
-                'parents' => [],
-                'children' => [
-                    'poster' => [],
-                ],
+                'parents' => 2,
+                'children' => 3,
             ],
         ]));
 

@@ -13,7 +13,9 @@ class TreesFixture extends BETreesFixture
         $trees = [
             2 => [
                 4 => [
-                    8 => [],
+                    8 => [
+                        10 => [],
+                    ],
                     9 => [],
                 ],
                 5 => [],

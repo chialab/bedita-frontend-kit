@@ -1,58 +1,16 @@
 <?php
 namespace Chialab\FrontendKit\Test\Fixture;
 
-use Cake\TestSuite\Fixture\TestFixture;
+use BEdita\Core\Test\Fixture\ObjectsFixture as BEObjectsFixture;
 
 /**
  * Objects test fixture.
  */
-class ObjectsFixture extends TestFixture
+class ObjectsFixture extends BEObjectsFixture
 {
-    public $fields = [
-        'id' => ['type' => 'integer', 'null' => false, 'length' => 10, 'unsigned' => true, 'precision' => null, 'autoIncrement' => true],
-        'object_type_id' => ['type' => 'integer', 'null' => false, 'length' => 5, 'unsigned' => true],
-        'status' => ['type' => 'string', 'null' => false, 'values' => ['on', 'off', 'draft'], 'default' => 'draft'],
-        'uname' => ['type' => 'string', 'length' => 255, 'null' => false],
-        'locked' => ['type' => 'boolean', 'null' => false, 'default' => false],
-        'deleted' => ['type' => 'boolean', 'null' => false, 'default' => false],
-        'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
-        'modified' => ['type' => 'datetime', 'null' => true, 'default' => null],
-        'title' => ['type' => 'text', 'null' => true],
-        'description' => ['type' => 'text', 'null' => true],
-        'body' => ['type' => 'text', 'null' => true],
-        'custom_props' => ['type' => 'text', 'null' => true],
-        'extra' => ['type' => 'text', 'null' => true],
-        'lang' => ['type' => 'string', 'length' => 64, 'null' => true],
-        'created_by' => ['type' => 'integer', 'null' => true, 'length' => 10, 'unsigned' => true],
-        'modified_by' => ['type' => 'integer', 'null' => true, 'length' => 10, 'unsigned' => true],
-        'publish_start' => ['type' => 'datetime', 'null' => true, 'default' => null],
-        'publish_end' => ['type' => 'datetime', 'null' => true, 'default' => null],
-        '_constraints' => [
-            'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
-            'objects_createdby_fk' => [
-                'type' => 'foreign',
-                'columns' => ['created_by'],
-                'references' => ['users', 'id'],
-            ],
-            'objects_modifiedby_fk' => [
-                'type' => 'foreign',
-                'columns' => ['modified_by'],
-                'references' => ['users', 'id'],
-            ],
-            'objects_objtype_fk' => [
-                'type' => 'foreign',
-                'columns' => ['object_type_id'],
-                'references' => ['object_types', 'id'],
-            ],
-        ],
-        '_indexes' => [
-            'objects_uname_uq' => ['type' => 'index', 'columns' => ['uname'], 'unique' => true],
-        ],
-    ];
-
     public $records = [
+        // 1
         [
-            'id' => 1,
             'uname' => 'bedita',
             'title' => 'BEdita',
             'description' => null,
@@ -63,12 +21,13 @@ class ObjectsFixture extends TestFixture
             'locked' => 1,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 3,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 2
         [
-            'id' => 2,
             'uname' => 'root-1',
             'title' => 'Root 1',
             'description' => null,
@@ -79,13 +38,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 3
         [
-            'id' => 3,
             'uname' => 'root-2',
             'title' => 'Root 2',
             'description' => null,
@@ -94,6 +54,7 @@ class ObjectsFixture extends TestFixture
             'lang' => 'en',
             'status' => 'on',
             'created_by' => 1,
+            'modified_by' => 1,
             'locked' => 0,
             'deleted' => 0,
             'object_type_id' => 10,
@@ -101,8 +62,8 @@ class ObjectsFixture extends TestFixture
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 4
         [
-            'id' => 4,
             'uname' => 'parent-1',
             'title' => 'Parent 1',
             'description' => null,
@@ -113,13 +74,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 5
         [
-            'id' => 5,
             'uname' => 'parent-2',
             'title' => 'Parent 2',
             'description' => null,
@@ -130,13 +92,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 6
         [
-            'id' => 6,
             'uname' => 'parent-3',
             'title' => 'Parent 3',
             'description' => null,
@@ -147,13 +110,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 7
         [
-            'id' => 7,
             'uname' => 'parent-4',
             'title' => 'Parent 4',
             'description' => null,
@@ -164,13 +128,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 8
         [
-            'id' => 8,
             'uname' => 'child-1',
             'title' => 'Child 1',
             'description' => null,
@@ -181,13 +146,14 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
         ],
+        // 9
         [
-            'id' => 9,
             'uname' => 'child-2',
             'title' => 'Child 2',
             'description' => null,
@@ -198,7 +164,44 @@ class ObjectsFixture extends TestFixture
             'locked' => 0,
             'deleted' => 0,
             'created_by' => 1,
+            'modified_by' => 1,
             'object_type_id' => 10,
+            'published' => null,
+            'created' => '2022-01-01 00:00:00',
+            'modified' => '2022-01-01 00:00:00',
+        ],
+        // 10
+        [
+            'uname' => 'document-1',
+            'title' => 'Document 1',
+            'description' => "<p>Hello there</p>",
+            'body' => "<p>Hello world</p>",
+            'extra' => null,
+            'lang' => 'en',
+            'status' => 'on',
+            'locked' => 0,
+            'deleted' => 0,
+            'created_by' => 1,
+            'modified_by' => 1,
+            'object_type_id' => 2,
+            'published' => null,
+            'created' => '2022-01-01 00:00:00',
+            'modified' => '2022-01-01 00:00:00',
+        ],
+        // 11
+        [
+            'uname' => 'image-1',
+            'title' => 'Image 1',
+            'description' => "",
+            'body' => "",
+            'extra' => null,
+            'lang' => 'en',
+            'status' => 'on',
+            'locked' => 0,
+            'deleted' => 0,
+            'created_by' => 1,
+            'modified_by' => 1,
+            'object_type_id' => 11,
             'published' => null,
             'created' => '2022-01-01 00:00:00',
             'modified' => '2022-01-01 00:00:00',
