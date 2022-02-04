@@ -44,7 +44,7 @@ class ObjectsComponentTest extends TestCase
         parent::setUp();
 
         $registry = new ComponentRegistry();
-        $this->Objects = new ObjectsComponent($registry, [
+        $this->Objects = $registry->load('Chialab/FrontendKit.Objects', [
             'objectTypesConfig' => [
                 'objects' => ['include' => 'poster'],
                 'folders' => ['include' => 'children,parents,poster'],
