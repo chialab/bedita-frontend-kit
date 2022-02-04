@@ -64,8 +64,6 @@ class PublicationComponent extends Component
     {
         parent::initialize($config);
 
-        $objectsLoader = $this->Objects->getLoader();
-        $this->loader = new TreeLoader($objectsLoader);
         $this->loadModel('BEdita/Core.Trees');
 
         $publicationUname = $this->getConfig('publication');
@@ -73,13 +71,14 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $publicationLoader = $objectsLoader;
+        $publicationLoader = $this->Objects->getLoader();
         if ($this->getConfig('publicationLoader') !== null) {
             $publicationLoader = new ObjectsLoader(
                 $this->getConfig('publicationLoader.objectTypesConfig', []),
                 $this->getConfig('publicationLoader.autoHydrateAssociations', [])
             );
         }
+        $this->loader = new TreeLoader($publicationLoader);
 
         try {
             $publication = $publicationLoader->loadObject($publicationUname, 'folders');
@@ -95,7 +94,7 @@ class PublicationComponent extends Component
             return;
         }
 
-        $menuFolders = $objectsLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
+        $menuFolders = $publicationLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
             ->indexBy(fn (Folder $folder): string => array_search($folder->uname, $menuFoldersConfig))
             ->toArray();
 

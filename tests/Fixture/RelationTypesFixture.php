@@ -25,7 +25,7 @@ class RelationTypesFixture extends BERelationTypesFixture
             'side' => 'left',
         ],
         [
-            'relation_id' => 1,
+            'relation_id' => 2,
             'object_type_id' => 3,
             'side' => 'right',
         ],

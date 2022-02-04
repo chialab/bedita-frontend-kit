@@ -61,7 +61,12 @@ class TreeLoader
         $ids = explode(',', $found['path_ids']);
         array_pop($ids);
 
-        $leaf = $this->loader->loadObject((string)$leaf->id, $leaf->type);
+        $leaf = $this->loader->loadObject(
+            (string)$leaf->id,
+            $leaf->type,
+            ['include' => implode(',', $leaf->object_type->relations)],
+            array_reduce($leaf->object_type->relations, fn ($acc, $rel) => $acc + [$rel => 2], [])
+        );
 
         if (empty($ids)) {
             return collection([$leaf]);

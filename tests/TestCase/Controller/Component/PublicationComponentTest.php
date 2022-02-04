@@ -65,7 +65,17 @@ class PublicationComponentTest extends TestCase
         $this->controller->viewBuilder()->setTemplatePath('Pages');
 
         $registry = new ComponentRegistry($this->controller);
-        $this->Publication = new PublicationComponent($registry, [
+        $registry->load('Chialab/FrontendKit.Objects', [
+            'objectTypesConfig' => [
+                'objects' => ['include' => 'poster'],
+                'folders' => ['include' => 'children,parents,poster'],
+            ],
+            'autoHydrateAssociations' => [
+                'parents' => 2,
+                'children' => 3,
+            ],
+        ]);
+        $this->Publication = $registry->load('Chialab/FrontendKit.Publication', [
             'publication' => 'root-1',
             'menuFolders' => [
                 'main' => 'root-1',
@@ -128,5 +138,41 @@ class PublicationComponentTest extends TestCase
         static::assertSame(1, count($ancestors));
         static::assertSame('parent-1', $ancestors[0]->uname);
         static::assertSame('folders', (string)$response->getBody());
+    }
+
+    public function testGenericTreeActionWithObject()
+    {
+        $response = $this->Publication->genericTreeAction('parent-1/child-1/profile-1');
+
+        /** @var \BEdita\Core\Model\Entity\Folder */
+        $object = $this->controller->viewVars['object'];
+
+        static::assertNotNull($object);
+        static::assertSame('profile-1', $object->uname);
+        static::assertSame('profiles', $object->type);
+        static::assertSame('Alan', $object->name);
+        static::assertSame('Turing', $object->surname);
+        static::assertNotEmpty($object->author_of);
+        static::assertNotEmpty($object->author_of->first()->poster);
+        static::assertSame('objects', (string)$response->getBody());
+    }
+
+    public function testGenericTreeActionWithDocument()
+    {
+        $this->Publication->genericTreeAction('parent-1/child-1/document-1');
+
+        /** @var \BEdita\Core\Model\Entity\Folder */
+        $object = $this->controller->viewVars['object'];
+
+        static::assertNotNull($object);
+        static::assertSame('document-1', $object->uname);
+        static::assertSame('documents', $object->type);
+        static::assertNotEmpty($object->poster);
+        static::assertNotEmpty($object->has_author);
+        $author = $object->has_author->first();
+        static::assertSame('profile-1', $author->uname);
+        static::assertSame('profiles', $author->type);
+        static::assertSame('Alan', $author->name);
+        static::assertSame('Turing', $author->surname);
     }
 }
