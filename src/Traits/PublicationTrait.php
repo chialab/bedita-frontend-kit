@@ -65,7 +65,7 @@ trait PublicationTrait
             ],
         ]);
 
-        $this->PublicationComponent = $this->loadComponent('Chialab/FrontendKit.Publication', [
+        $this->Publication = $this->loadComponent('Chialab/FrontendKit.Publication', [
             'publication' => $rootId,
             'menuFolders' => $menuFolders ?? [],
         ]);
