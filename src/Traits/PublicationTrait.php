@@ -31,7 +31,7 @@ trait PublicationTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    public abstract function getRequest();
+    abstract public function getRequest();
 
     /**
      * Add a component to the controller's registry.
@@ -40,7 +40,7 @@ trait PublicationTrait
      * @param array $config The config for the component.
      * @return \Cake\Controller\Component
      */
-    public abstract function loadComponent($name, array $config = []);
+    abstract public function loadComponent($name, array $config = []);
 
     /**
      * Load objects and publication components into the controller.
