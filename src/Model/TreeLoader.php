@@ -87,7 +87,7 @@ class TreeLoader
         $query = $this->getObjectPaths($id, $relativeTo);
         if ($via !== null) {
             $query = $query->having(new FunctionExpression('BIT_OR', [
-                new Comparison($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '=')
+                new Comparison($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '='),
             ]));
         }
 

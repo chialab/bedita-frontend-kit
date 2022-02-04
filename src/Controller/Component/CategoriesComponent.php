@@ -15,7 +15,6 @@ use Cake\Utility\Text;
  */
 class CategoriesComponent extends Component
 {
-
     use ModelAwareTrait;
 
     /**

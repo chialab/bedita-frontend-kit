@@ -28,7 +28,6 @@ use WyriHaximus\TwigView\View\TwigView;
  */
 class AppView extends TwigView
 {
-
     /**
      * Initialization hook method.
      *

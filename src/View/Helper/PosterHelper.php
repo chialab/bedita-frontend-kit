@@ -49,7 +49,7 @@ class PosterHelper extends Helper
     /**
      * Get poster at the requested position.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity $object
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $object The object.
      * @param int $pos Position.
      * @return \BEdita\Core\Model\Entity\Media|null
      */
@@ -76,7 +76,7 @@ class PosterHelper extends Helper
     /**
      * Yield candidates to be the poster.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object The object.
      * @param array $options Poster options.
      * @return \Iterator|\BEdita\Core\Model\Entity\Media[]
      */
@@ -149,8 +149,8 @@ class PosterHelper extends Helper
      * Get media URL, optionally generating a thumbnail.
      *
      * @param \BEdita\Core\Model\Entity\Media $media Media entity.
-     * @param $thumbOptions
-     * @param array $fallbackOptions
+     * @param mixed $thumbOptions Thumb options.
+     * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
     protected function getMediaUrl(Media $media, $thumbOptions, array $fallbackOptions): ?string

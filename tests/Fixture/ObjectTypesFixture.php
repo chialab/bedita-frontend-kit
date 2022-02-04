@@ -10,7 +10,8 @@ class ObjectTypesFixture extends BEObjectTypesFixture
 {
     public function init()
     {
-        array_push($this->records,
+        array_push(
+            $this->records,
             // 11
             [
                 'singular' => 'image',

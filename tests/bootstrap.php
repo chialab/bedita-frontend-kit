@@ -48,7 +48,7 @@ Configure::write('App', [
     'paths' => [
         'plugins' => [ROOT . 'Plugin' . DS],
         'templates' => [APP . 'Template' . DS],
-    ]
+    ],
 ]);
 
 Log::setConfig([

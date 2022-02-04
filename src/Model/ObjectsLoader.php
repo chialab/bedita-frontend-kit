@@ -85,6 +85,7 @@ class ObjectsLoader
      * @param string|int $id Object ID or uname.
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
     public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
@@ -102,7 +103,7 @@ class ObjectsLoader
         if ($hydrate === null) {
             $hydrate = array_reduce($objectType->relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
         }
-        
+
         return $this->loadObject($id, $type, $options, $hydrate);
     }
 
@@ -408,6 +409,7 @@ class ObjectsLoader
 
             if (empty($limit)) {
                 $contains[] = $assoc;
+
                 return $contains;
             }
 

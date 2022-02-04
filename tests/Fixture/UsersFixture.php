@@ -1,8 +1,8 @@
 <?php
 namespace Chialab\FrontendKit\Test\Fixture;
 
-use Cake\Auth\WeakPasswordHasher;
 use BEdita\Core\Test\Fixture\UsersFixture as BEUsersFixture;
+use Cake\Auth\WeakPasswordHasher;
 
 /**
  * Users test fixture.
