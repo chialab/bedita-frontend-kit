@@ -153,10 +153,6 @@ class PublicationComponent extends Component
         $type = array_shift($chain);
         yield $type->name;
 
-        foreach ($ancestors as $ancestor) {
-            yield $ancestor->uname;
-        }
-
         foreach ($chain as $type) {
             yield $type->name;
         }
