@@ -14,9 +14,7 @@
 namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
-use Cake\Utility\Hash;
-use Cake\Utility\Inflector;
-use Twig\TwigFilter;
+use Chialab\FrontendKit\Twig\SortByExtension;
 use WyriHaximus\TwigView\View\TwigView;
 
 /**
@@ -41,65 +39,7 @@ class AppView extends TwigView
     {
         parent::initialize();
 
-        $this->getTwig()
-            ->addFilter(new TwigFilter(
-                'sort_by_multi',
-                function (iterable $it, array $attributes, bool $desc = false): iterable {
-                    if (!is_array($it)) {
-                        $it = iterator_to_array($it);
-                    }
-
-                    usort($it, function ($a, $b) use ($attributes) {
-                        $aVals = array_filter(array_map(fn($attr) => Hash::get($a, $attr), $attributes));
-                        $bVals = array_filter(array_map(fn($attr) => Hash::get($b, $attr), $attributes));
-
-                        while (true) {
-                            $aVal = array_shift($aVals);
-                            $bVal = array_shift($bVals);
-
-                            if ($aVal === null && $bVal === null) {
-                                return 0;
-                            }
-
-                            if ($aVal === null) {
-                                return -1;
-                            }
-
-                            if ($bVal === null) {
-                                return 1;
-                            }
-
-                            $comparison = $aVal <=> $bVal;
-                            if (is_string($aVal) && is_string($bVal)) {
-                                $comparison = strcasecmp($aVal, $bVal);
-                            }
-
-                            if ($comparison !== 0) {
-                                return $comparison;
-                            }
-                        }
-                    });
-
-                    if ($desc) {
-                        $it = array_reverse($it);
-                    }
-
-                    return collection($it);
-                }
-            ));
-
-        $this->getTwig()
-            ->addFilter(new TwigFilter(
-                'sort_by',
-                fn(iterable $it, string $attribute, bool $desc = false, bool $numeric = false): iterable => collection($it)
-                    ->sortBy($attribute, $desc ? SORT_DESC : SORT_ASC, $numeric ? SORT_NATURAL : SORT_LOCALE_STRING)
-            ));
-
-        $this->getTwig()
-            ->addFilter(new TwigFilter(
-                'asset',
-                fn(string $path, $plugin): string => Inflector::dasherize($plugin) . '/' . $path
-            ));
+        $this->getTwig()->addExtension(new SortByExtension());
 
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
