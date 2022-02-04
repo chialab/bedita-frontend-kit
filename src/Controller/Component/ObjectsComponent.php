@@ -24,7 +24,10 @@ class ObjectsComponent extends Component
      */
     protected $_defaultConfig = [
         'objectTypesConfig' => [],
-        'autoHydrateAssociations' => [],
+        'autoHydrateAssociations' => [
+            // property name => max depth,
+            'children' => 2,
+        ],
     ];
 
     /**

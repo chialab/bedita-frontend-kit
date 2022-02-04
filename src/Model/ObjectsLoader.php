@@ -307,30 +307,6 @@ class ObjectsLoader
     }
 
     /**
-     * Get names of associations for which related objects need to be hydrated.
-     *
-     * @param int $depth Depth level.
-     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return string[]
-     */
-    protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
-    {
-        $hydrateAssociations = $this->autoHydrateAssociations;
-        if ($options !== null) {
-            $hydrateAssociations = $options;
-        }
-
-        return array_keys(
-            array_filter(
-                $hydrateAssociations,
-                function (int $maxDepth) use ($depth): bool {
-                    return $maxDepth === -1 || $maxDepth > $depth;
-                }
-            )
-        );
-    }
-
-    /**
      * Get default options for an object type. If no options are set for the type,
      * options for the parent types (abstract types) are checked.
      *
@@ -353,6 +329,30 @@ class ObjectsLoader
         $parent = $this->ObjectTypes->get($objectType->parent_id);
 
         return $this->getDefaultOptions($parent);
+    }
+
+    /**
+     * Get names of associations for which related objects need to be hydrated.
+     *
+     * @param int $depth Depth level.
+     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return string[]
+     */
+    protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
+    {
+        $hydrateAssociations = $this->autoHydrateAssociations;
+        if ($options !== null) {
+            $hydrateAssociations = $options;
+        }
+
+        return array_keys(
+            array_filter(
+                $hydrateAssociations,
+                function (int $maxDepth) use ($depth): bool {
+                    return $maxDepth === -1 || $maxDepth > $depth;
+                }
+            )
+        );
     }
 
     /**
