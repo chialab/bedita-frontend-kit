@@ -12,37 +12,49 @@ declare(strict_types=1);
  *
  * See LICENSE.LGPL or <http://gnu.org/licenses/lgpl-3.0.html> for more details.
  */
-namespace Chialab\FrontendKit\Controller;
+namespace Chialab\FrontendKit\Traits;
 
-use Cake\Controller\Controller;
-use Cake\Core\Configure;
 use Cake\Http\Response;
 use Cake\Routing\Router;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 
 /**
- * Static & folder content controller
- *
- * This controller will render views from templates/Pages/
- *
- * @link https://book.cakephp.org/4/en/controllers/pages-controller.html
+ * Trait with BEdita tree navigation for controllers.
  *
  * @property \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
  * @property \Chialab\FrontendKit\Controller\Component\PublicationComponent $Publication
  */
-class PagesController extends Controller
+trait PublicationTrait
 {
     /**
-     * @inheritDoc
+     * Gets the request instance.
+     *
+     * @return \Cake\Http\ServerRequest
      */
-    public function initialize(): void
+    public abstract function getRequest();
+
+    /**
+     * Add a component to the controller's registry.
+     *
+     * @param string $name The name of the component to load.
+     * @param array $config The config for the component.
+     * @return \Cake\Controller\Component
+     */
+    public abstract function loadComponent($name, array $config = []);
+
+    /**
+     * Load objects and publication components into the controller.
+     *
+     * @param string|int $rootId The id of the root folder.
+     * @param string[]|null $menuFolders List of folders in the menu.
+     * @param array|null $config ObjectsLoader config.
+     * @return void
+     */
+    public function loadPublication($rootId, ?array $menuFolders, ?array $config): void
     {
-        parent::initialize();
-
         $this->loadComponent('RequestHandler');
-        $this->loadComponent('Flash');
 
-        $this->loadComponent('Chialab/FrontendKit.Objects', Configure::read('ObjectsLoader', [
+        $this->Objects = $this->loadComponent('Chialab/FrontendKit.Objects', $config ?? [
             'objectTypesConfig' => [
                 'objects' => ['include' => 'poster'],
                 'folders' => ['include' => 'children,parents,poster'],
@@ -51,10 +63,11 @@ class PagesController extends Controller
                 'parents' => 2,
                 'children' => 3,
             ],
-        ]));
+        ]);
 
-        $this->loadComponent('Chialab/FrontendKit.Publication', [
-            'publication' => Configure::read('Root'),
+        $this->PublicationComponent = $this->loadComponent('Chialab/FrontendKit.Publication', [
+            'publication' => $rootId,
+            'menuFolders' => $menuFolders ?? [],
         ]);
     }
 
@@ -91,7 +104,7 @@ class PagesController extends Controller
     public function object(string $uname): Response
     {
         $object = $this->Objects->loadObject($uname);
-        $currentRoute = $this->request->getParam('_matchedRoute');
+        $currentRoute = $this->getRequest()->getParam('_matchedRoute');
         foreach (Router::routes() as $route) {
             if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
                 continue;
