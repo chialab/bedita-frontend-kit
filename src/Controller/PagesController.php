@@ -27,6 +27,7 @@ use Chialab\FrontendKit\Routing\Route\ObjectRoute;
  *
  * @link https://book.cakephp.org/4/en/controllers/pages-controller.html
  *
+ * @property \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
  * @property \Chialab\FrontendKit\Controller\Component\PublicationComponent $Publication
  */
 class PagesController extends Controller
@@ -106,7 +107,7 @@ class PagesController extends Controller
             return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
         }
 
-        $object = $this->Objects->loadObject((string)$object->id, $object->type);
+        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
         $this->set(compact('object'));
 
         $types = collection($object->object_type->getFullInheritanceChain())

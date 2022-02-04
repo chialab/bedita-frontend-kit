@@ -80,6 +80,33 @@ class ObjectsLoader
     }
 
     /**
+     * Fetch an object by its ID or uname and hydrate all its relations.
+     *
+     * @param string|int $id Object ID or uname.
+     * @param string $type Object type name.
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @return \BEdita\Core\Model\Entity\ObjectEntity
+     */
+    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    {
+        $objectType = $this->ObjectTypes->get($type);
+
+        if ($options === null) {
+            $options = [];
+        }
+
+        if (!isset($options['include'])) {
+            $options['include'] = implode(',', $objectType->relations);
+        }
+
+        if ($hydrate === null) {
+            $hydrate = array_reduce($objectType->relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
+        }
+        
+        return $this->loadObject($id, $type, $options, $hydrate);
+    }
+
+    /**
      * Fetch multiple objects.
      *
      * @param array $filter Filters.
