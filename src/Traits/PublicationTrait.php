@@ -46,11 +46,11 @@ trait PublicationTrait
      * Load objects and publication components into the controller.
      *
      * @param string|int $rootId The id of the root folder.
-     * @param string[]|null $menuFolders List of folders in the menu.
+     * @param string[] $menuFolders List of folders in the menu.
      * @param array|null $config ObjectsLoader config.
      * @return void
      */
-    public function loadPublication($rootId, ?array $menuFolders, ?array $config): void
+    public function loadPublication($rootId, array $menuFolders = [], ?array $config = null): void
     {
         $this->loadComponent('RequestHandler');
 
@@ -67,7 +67,7 @@ trait PublicationTrait
 
         $this->Publication = $this->loadComponent('Chialab/FrontendKit.Publication', [
             'publication' => $rootId,
-            'menuFolders' => $menuFolders ?? [],
+            'menuFolders' => $menuFolders,
         ]);
     }
 
