@@ -14,6 +14,7 @@
 namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
+use Chialab\FrontendKit\Twig\LocalizeExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
 use WyriHaximus\TwigView\View\TwigView;
 
@@ -40,6 +41,7 @@ class AppView extends TwigView
         parent::initialize();
 
         $this->getTwig()->addExtension(new SortByExtension());
+        $this->getTwig()->addExtension(new LocalizeExtension());
 
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
