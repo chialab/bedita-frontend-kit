@@ -97,11 +97,17 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $options['include'] = implode(',', $objectType->relations);
+            $relations = $objectType->relations;
+            if ($type === 'folders') {
+                $relations = array_merge($relations, ['children']);
+            }
+            $options['include'] = implode(',', $relations);
+        } else {
+            $relations = explode(',', $options['include']);
         }
 
         if ($hydrate === null) {
-            $hydrate = array_reduce($objectType->relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
+            $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
         }
 
         return $this->loadObject($id, $type, $options, $hydrate);
