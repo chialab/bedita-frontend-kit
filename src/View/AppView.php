@@ -46,7 +46,7 @@ class AppView extends TwigView
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
         $this->loadHelper('Html');
-        $this->loadHelper('Paginator', ['templates' => 'paginator-templates']);
+        $this->loadHelper('Paginator');
         $this->loadHelper('Time');
         $this->loadHelper('Url');
         $this->loadHelper('BEdita/I18n.I18n');
