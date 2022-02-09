@@ -98,7 +98,7 @@ class ObjectsLoader
 
         if (!isset($options['include'])) {
             $relations = $objectType->relations;
-            if ($type === 'folders' && Hash::get($options, 'children', false) === true) {
+            if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
                 $relations = array_merge($relations, ['children']);
             }
             $options['include'] = implode(',', $relations);
