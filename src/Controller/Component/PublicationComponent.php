@@ -81,7 +81,9 @@ class PublicationComponent extends Component
         $this->loader = new TreeLoader($publicationLoader);
 
         try {
-            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
+            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders', [
+                'children' => true,
+            ]);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
@@ -112,6 +114,34 @@ class PublicationComponent extends Component
     }
 
     /**
+     * Load paginated children.
+     *
+     * @param \BEdita\Core\Model\Entity\Folder $folder Folder.
+     * @return void
+     */
+    protected function loadChildren(Folder $folder): void
+    {
+        $query = $this->getController()->getRequest()->getQuery('q');
+        $filters = [
+            'ancestor' => [$folder->id],
+        ];
+        if (!empty($query)) {
+            $filters['query'] = [$query];
+        }
+
+        $children = $this->getController()->paginate(
+            $this->Objects->loadObjects($filters)->order([], true),
+            [
+                'order' => ['TreeNodes.tree_left'],
+            ],
+        );
+        $children = $this->Objects->hydrateObjects($children->toList());
+        $object['children'] = $children;
+
+        $this->getController()->set(compact('children'));
+    }
+
+    /**
      * Handle specific views/methods according to object tree structure
      *
      * @param string $path Full object path, relative to current publication.
@@ -126,8 +156,8 @@ class PublicationComponent extends Component
         $parent = end($ancestors) ?: null;
 
         $this->getController()->set(compact('object', 'parent', 'ancestors'));
-        if (!empty($object['children'])) {
-            $this->getController()->set(['children' => $object['children'], 'childrenByType' => $object['childrenByType']]);
+        if ($object->type === 'folders') {
+            $this->loadChildren($object);
         }
 
         return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
