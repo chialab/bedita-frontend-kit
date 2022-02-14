@@ -9,7 +9,8 @@
         "cakephp/cakephp": "^3.8",
         "wyrihaximus/twig-view": "^4.3",
         "chialab/rna-cakephp": "^0.2.1",
-        "bedita/i18n": "^3.2"
+        "bedita/i18n": "^3.2",
+        "cakephp/authentication": "^1.0"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.0",
