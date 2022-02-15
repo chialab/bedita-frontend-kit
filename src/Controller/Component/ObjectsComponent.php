@@ -23,10 +23,13 @@ class ObjectsComponent extends Component
      * @var array
      */
     protected $_defaultConfig = [
-        'objectTypesConfig' => [],
+        'objectTypesConfig' => [
+            'objects' => ['include' => 'poster'],
+            'folders' => ['include' => 'children,parents,poster'],
+        ],
         'autoHydrateAssociations' => [
-            // property name => max depth,
-            'children' => 2,
+            'parents' => 2,
+            'children' => 3,
         ],
     ];
 

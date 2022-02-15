@@ -24,7 +24,7 @@ use Chialab\FrontendKit\Routing\Route\ObjectRoute;
  * @property \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
  * @property \Chialab\FrontendKit\Controller\Component\PublicationComponent $Publication
  */
-trait PublicationTrait
+trait GenericActionsTrait
 {
     /**
      * Gets the request instance.
@@ -32,53 +32,6 @@ trait PublicationTrait
      * @return \Cake\Http\ServerRequest
      */
     abstract public function getRequest();
-
-    /**
-     * Add a component to the controller's registry.
-     *
-     * @param string $name The name of the component to load.
-     * @param array $config The config for the component.
-     * @return \Cake\Controller\Component
-     */
-    abstract public function loadComponent($name, array $config = []);
-
-    /**
-     * Load objects and publication components into the controller.
-     *
-     * @param string|int $rootId The id of the root folder.
-     * @param string[] $menuFolders List of folders in the menu.
-     * @param array|null $config ObjectsLoader config.
-     * @return void
-     */
-    public function loadPublication($rootId, array $menuFolders = [], ?array $config = null): void
-    {
-        $this->loadComponent('RequestHandler');
-
-        $this->Objects = $this->loadComponent('Chialab/FrontendKit.Objects', $config ?? [
-            'objectTypesConfig' => [
-                'objects' => ['include' => 'poster'],
-                'folders' => ['include' => 'children,parents,poster'],
-            ],
-            'autoHydrateAssociations' => [
-                'parents' => 2,
-                'children' => 3,
-            ],
-        ]);
-
-        $this->Publication = $this->loadComponent('Chialab/FrontendKit.Publication', [
-            'publication' => $rootId,
-            'menuFolders' => $menuFolders,
-        ]);
-    }
-
-    /**
-     * Home page.
-     *
-     * @return void
-     */
-    public function home(): void
-    {
-    }
 
     /**
      * Generic objects route.
