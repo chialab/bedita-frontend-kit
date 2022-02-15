@@ -50,7 +50,6 @@ class CalendarComponent extends Component
                     }
                 })
                 ->groupBy('day')
-                ->map(fn (array $items): array => array_column($items, 'event'))
-            );
+                ->map(fn (array $items): array => array_column($items, 'event')));
     }
 }
