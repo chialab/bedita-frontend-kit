@@ -63,6 +63,7 @@ class AppView extends TwigView
         ]);
 
         $isStaging = Configure::read('StagingSite', false);
+        $this->set('StagingSite', $isStaging);
         if ($isStaging) {
             $this->loadHelper('Authentication.Identity');
             $this->loadHelper('Chialab/FrontendKit.Manager', [
