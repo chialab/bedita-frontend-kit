@@ -14,15 +14,16 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
 {
     /**
      * The auth service instance.
-     * 
+     *
      * @var \Authentication\AuthenticationService
      */
     protected AuthenticationService $authService;
 
     /**
      * Create auth service provider.
-     * 
-     * @param string|null $loginurl The url of the login page.
+     *
+     * @param string|null $loginUrl The url of the login page.
+     * @return void
      */
     public function __construct($loginUrl = '/login')
     {

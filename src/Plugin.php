@@ -38,14 +38,15 @@ class Plugin extends BasePlugin
     /**
      * Check if a middleware is already in the middlewares queue.
      *
-     * @param \Cake\Http\MiddlewareQueue $middlewares The middlewares queue.
+     * @param \Cake\Http\MiddlewareQueue $queue The middlewares queue.
      * @param string $class The middleware class name to check.
      * @return bool
      */
     protected static function isInMiddelwareQueue(MiddlewareQueue $queue, string $class): bool
     {
         $queue = clone $queue;
-        for ($i = 0; $i < count($queue); $i++) {
+        $len = count($queue);
+        for ($i = 0; $i < $len; $i++) {
             if ($queue->get($i) instanceof $class) {
                 return true;
             }
