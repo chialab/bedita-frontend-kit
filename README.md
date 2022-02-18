@@ -20,7 +20,7 @@ Then, you have to load it as plugin in your Cake application:
 $this->addPlugin('Chialab/FrontendKit');
 ```
 
-## Instruction
+## Instructions
 
 Please read the [Wiki](https://github.com/chialab/bedita-frontend-kit/wiki) to correctly setup the frontend.
 
