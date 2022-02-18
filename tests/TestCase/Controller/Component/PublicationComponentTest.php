@@ -5,8 +5,8 @@ use BEdita\Core\Model\Entity\Folder;
 use Cake\Controller\ComponentRegistry;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
+use Cake\I18n\FrozenDate;
 use Cake\TestSuite\TestCase;
-use Chialab\FrontendKit\Controller\Component\PublicationComponent;
 
 /**
  * Chialab\FrontendKit\Controller\Component\PublicationComponent Test Case
