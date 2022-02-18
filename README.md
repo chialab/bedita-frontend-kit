@@ -1,15 +1,32 @@
-# Chialab/FrontendKit plugin for BEdita 4
+# Chialab/FrontendKit
 
-## Installation
+The **Frontend Kit** is a [BEdita 4](https://www.bedita.com/) plugin designed to help in developing frontends.  
+It covers objects routing and loading, views composition and auth-based staging sites.
 
-You can install this plugin into your CakePHP application using [Composer](https://getcomposer.org).
+## Usage
+
+You can install the plugin using [Composer](https://getcomposer.org).
 
 The recommended way to install Composer packages is:
 
-```
-composer require chialab/frontend-kit
+```sh
+$ composer require chialab/frontend-kit
 ```
 
-## Instructions
+Then, you have to load it as plugin in your Cake application:
 
-[Read some wiki before asking](https://github.com/chialab/bedita-frontend-kit/wiki/Istruzioni-varie-all'uso-di-Frontendkit:-rotte,-scaricamento-relazioni-e-amici)
+**src/Application.php**
+```php
+$this->addPlugin('Chialab/FrontendKit');
+```
+
+## Instruction
+
+Please read the [Wiki](https://github.com/chialab/bedita-frontend-kit/wiki) to correctly setup the frontend.
+
+---
+
+## License
+
+**Chialab/FrontendKit** is released under the [MIT](https://gitlab.com/chialab/bedita-frontend-kit/-/blob/main/LICENSE) license.
+
