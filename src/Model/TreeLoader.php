@@ -55,13 +55,13 @@ class TreeLoader
         $leaf = $this->loader->loadObject(array_pop($parts));
 
         $found = $this->getObjectPaths($leaf->id, $relativeTo)
-            ->having(compact('path'))
+            ->having(compact('path'), ['path' => 'string'])
             ->firstOrFail();
 
         $ids = explode(',', $found['path_ids']);
         array_pop($ids);
 
-        $leaf = $this->loader->loadObject((string)$leaf->id, $leaf->type);
+        $leaf = $this->loader->loadFullObject((string)$leaf->id, $leaf->type, ['children' => false]);
 
         if (empty($ids)) {
             return collection([$leaf]);
@@ -87,7 +87,7 @@ class TreeLoader
         $query = $this->getObjectPaths($id, $relativeTo);
         if ($via !== null) {
             $query = $query->having(new FunctionExpression('BIT_OR', [
-                new Comparison($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '=')
+                new Comparison($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '='),
             ]));
         }
 

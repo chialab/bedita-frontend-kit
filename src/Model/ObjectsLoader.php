@@ -57,8 +57,8 @@ class ObjectsLoader
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
 
-        $this->loadModel('ObjectTypes');
-        $this->loadModel('Objects');
+        $this->loadModel('BEdita/Core.ObjectTypes');
+        $this->loadModel('BEdita/Core.Objects');
     }
 
     /**
@@ -77,6 +77,40 @@ class ObjectsLoader
         $objectType = $this->ObjectTypes->get($type);
 
         return $this->loadSingle($id, $objectType, $options, 1, $hydrate);
+    }
+
+    /**
+     * Fetch an object by its ID or uname and hydrate all its relations.
+     *
+     * @param string|int $id Object ID or uname.
+     * @param string $type Object type name.
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return \BEdita\Core\Model\Entity\ObjectEntity
+     */
+    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    {
+        $objectType = $this->ObjectTypes->get($type);
+
+        if ($options === null) {
+            $options = [];
+        }
+
+        if (!isset($options['include'])) {
+            $relations = $objectType->relations;
+            if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
+                $relations = array_merge($relations, ['children']);
+            }
+            $options['include'] = implode(',', $relations);
+        } else {
+            $relations = explode(',', $options['include']);
+        }
+
+        if ($hydrate === null) {
+            $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
+        }
+
+        return $this->loadObject($id, $type, $options, $hydrate);
     }
 
     /**
@@ -319,6 +353,10 @@ class ObjectsLoader
             return $this->objectTypesConfig[$objectType->name];
         }
         if ($objectType->parent_id === null) {
+            if (isset($this->objectTypesConfig['objects'])) {
+                return $this->objectTypesConfig['objects'];
+            }
+
             return [];
         }
 
@@ -377,6 +415,7 @@ class ObjectsLoader
 
             if (empty($limit)) {
                 $contains[] = $assoc;
+
                 return $contains;
             }
 

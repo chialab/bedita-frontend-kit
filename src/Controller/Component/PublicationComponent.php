@@ -64,25 +64,24 @@ class PublicationComponent extends Component
     {
         parent::initialize($config);
 
-        $objectsLoader = $this->Objects->getLoader();
-        $this->loader = new TreeLoader($objectsLoader);
-        $this->loadModel('Trees');
+        $this->loadModel('BEdita/Core.Trees');
 
         $publicationUname = $this->getConfig('publication');
         if (empty($publicationUname)) {
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $publicationLoader = $objectsLoader;
+        $publicationLoader = $this->Objects->getLoader();
         if ($this->getConfig('publicationLoader') !== null) {
             $publicationLoader = new ObjectsLoader(
                 $this->getConfig('publicationLoader.objectTypesConfig', []),
                 $this->getConfig('publicationLoader.autoHydrateAssociations', [])
             );
         }
+        $this->loader = new TreeLoader($publicationLoader);
 
         try {
-            $publication = $publicationLoader->loadObject($publicationUname, 'folders');
+            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
@@ -95,7 +94,7 @@ class PublicationComponent extends Component
             return;
         }
 
-        $menuFolders = $objectsLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
+        $menuFolders = $publicationLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
             ->indexBy(fn (Folder $folder): string => array_search($folder->uname, $menuFoldersConfig))
             ->toArray();
 
@@ -113,6 +112,32 @@ class PublicationComponent extends Component
     }
 
     /**
+     * Load paginated children.
+     *
+     * @param \BEdita\Core\Model\Entity\Folder $folder Folder.
+     * @return \Cake\Collection\CollectionInterface
+     */
+    protected function loadChildren(Folder &$folder): CollectionInterface
+    {
+        $query = $this->getController()->getRequest()->getQuery('q');
+        $filters = [
+            'parent' => [$folder->id],
+        ];
+        if (!empty($query)) {
+            $filters['query'] = [$query];
+        }
+
+        $children = $this->getController()->paginate(
+            $this->Objects->loadObjects($filters)->order([], true),
+            [
+                'order' => ['TreeNodes.tree_left'],
+            ],
+        );
+
+        return $this->Objects->hydrateObjects($children->toList());
+    }
+
+    /**
      * Handle specific views/methods according to object tree structure
      *
      * @param string $path Full object path, relative to current publication.
@@ -127,8 +152,11 @@ class PublicationComponent extends Component
         $parent = end($ancestors) ?: null;
 
         $this->getController()->set(compact('object', 'parent', 'ancestors'));
-        if (!empty($object['children'])) {
-            $this->getController()->set(['children' => $object['children'], 'childrenByType' => $object['childrenByType']]);
+        if ($object->type === 'folders') {
+            $children = $this->loadChildren($object);
+            $object['children'] = $children;
+
+            $this->getController()->set(compact('children'));
         }
 
         return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
@@ -138,10 +166,11 @@ class PublicationComponent extends Component
      * Generate a list of templates to try to use for the given object.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object The main object.
-     * @param \BEdita\Core\Model\Entity\Folder[] $ancestors A list of ancestors.
+     * @param \BEdita\Core\Model\Entity\Folder $ancestors A list of ancestors.
      * @return \Generator A generator function.
      */
-    protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator {
+    protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator
+    {
         yield $object->uname;
 
         $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
@@ -153,10 +182,6 @@ class PublicationComponent extends Component
 
         $type = array_shift($chain);
         yield $type->name;
-
-        foreach ($ancestors as $ancestor) {
-            yield $ancestor->uname;
-        }
 
         foreach ($chain as $type) {
             yield $type->name;
