@@ -22,7 +22,7 @@ class Plugin extends BasePlugin
         parent::initialize();
 
         if (Configure::read('Status.level') === 'on') {
-            // ensure the published filter
+            // Ensure BEdita to load objects using `published` filter
             Configure::write('Publish.checkDate', true);
         }
     }
@@ -47,7 +47,7 @@ class Plugin extends BasePlugin
         $queue = clone $queue;
         $len = count($queue);
         for ($i = 0; $i < $len; $i++) {
-            if ($queue->get($i) instanceof $class) {
+            if (is_a($queue->get($i), $class)) {
                 return true;
             }
         }
