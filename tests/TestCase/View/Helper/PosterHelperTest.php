@@ -1,6 +1,9 @@
 <?php
 namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
+use BEdita\Core\Model\Entity\Media;
+use BEdita\Core\Model\Entity\ObjectEntity;
+use BEdita\Core\Model\Entity\Stream;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\PosterHelper;
@@ -25,6 +28,7 @@ class PosterHelperTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+
         $view = new View();
         $this->Poster = new PosterHelper($view);
     }
@@ -41,13 +45,53 @@ class PosterHelperTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * Test initial setup
-     *
-     * @return void
-     */
-    public function testInitialization()
+    protected function createObject(): ObjectEntity
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        return new ObjectEntity([
+            'type' => 'documents',
+        ]);
+    }
+
+    protected function createStream(): Stream
+    {
+        return new Stream([
+            'uri' => 'default://6aceb0eb-bd30-4f60-ac74-273083b921b6-bedita-logo-gray.gif',
+            'file_name' => 'bedita-logo-gray.gif',
+            'mime_type' => 'image/gif',
+            'file_size' => 927,
+        ]);
+    }
+
+    protected function createImage(int $width, int $height): Media
+    {
+        $image = new Media([
+            'type' => 'images',
+            'width' => $width,
+            'height' => $height,
+        ]);
+
+        $image->set('stream', $this->createStream());
+
+        return $image;
+    }
+
+    public function testOrientationWithPosterArray()
+    {
+        $object = $this->createObject();
+        $image = $this->createImage(150, 100);
+        $object->set('poster', [$image]);
+
+        $orientation = $this->Poster->orientation($object);
+        $this->assertSame('landscape', $orientation);
+    }
+
+    public function testOrientationWithPosterCollection()
+    {
+        $object = $this->createObject();
+        $image = $this->createImage(150, 100);
+        $object->set('poster', collection([$image]));
+
+        $orientation = $this->Poster->orientation($object);
+        $this->assertSame('landscape', $orientation);
     }
 }
