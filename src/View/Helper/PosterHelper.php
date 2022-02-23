@@ -306,8 +306,9 @@ class PosterHelper extends Helper
         }
 
         $poster = collection($object->poster)->first();
-
-        $streams = $poster->streams;
+        if ($poster !== null) {
+            $streams = $poster->streams;
+        }
 
         if (empty($streams)) {
             return 0.0;
