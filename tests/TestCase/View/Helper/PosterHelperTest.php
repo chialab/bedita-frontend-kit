@@ -52,13 +52,15 @@ class PosterHelperTest extends TestCase
         ]);
     }
 
-    protected function createStream(): Stream
+    protected function createStream(int $width, int $height): Stream
     {
         return new Stream([
             'uri' => 'default://6aceb0eb-bd30-4f60-ac74-273083b921b6-bedita-logo-gray.gif',
             'file_name' => 'bedita-logo-gray.gif',
             'mime_type' => 'image/gif',
             'file_size' => 927,
+            'width' => $width,
+            'height' => $height,
         ]);
     }
 
@@ -70,7 +72,7 @@ class PosterHelperTest extends TestCase
             'height' => $height,
         ]);
 
-        $image->set('stream', $this->createStream());
+        $image->set('stream', $this->createStream($width, $height));
 
         return $image;
     }
