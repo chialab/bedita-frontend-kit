@@ -3,7 +3,6 @@ namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
 use Cake\TestSuite\TestCase;
-use Chialab\FrontendKit\Controller\Component\ObjectsComponent;
 
 /**
  * Chialab\FrontendKit\Controller\Component\ObjectsComponent Test Case
