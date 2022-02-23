@@ -13,6 +13,14 @@ use Chialab\FrontendKit\View\Helper\PosterHelper;
  */
 class PosterHelperTest extends TestCase
 {
+    public $fixtures = [
+        'plugin.Chialab/FrontendKit.ObjectTypes',
+        'plugin.BEdita/Core.PropertyTypes',
+        'plugin.Chialab/FrontendKit.Properties',
+        'plugin.Chialab/FrontendKit.Relations',
+        'plugin.Chialab/FrontendKit.RelationTypes',
+    ];
+
     /**
      * Test subject
      *
@@ -72,7 +80,7 @@ class PosterHelperTest extends TestCase
             'height' => $height,
         ]);
 
-        $image->set('stream', $this->createStream($width, $height));
+        $image->set('streams', [$this->createStream($width, $height)]);
 
         return $image;
     }
