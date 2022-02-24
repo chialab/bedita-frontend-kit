@@ -14,6 +14,8 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Routing\Router;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
@@ -41,11 +43,15 @@ trait GenericActionsTrait
      */
     public function objects(string $id): Response
     {
-        $object = $this->Objects->loadObject($id);
-        $object = $this->Objects->loadObject((string)$object->id, $object->type);
-        $this->set(compact('object'));
+        try {
+            $object = $this->Objects->loadObject($id);
+            $object = $this->Objects->loadObject((string)$object->id, $object->type);
+            $this->set(compact('object'));
 
-        return $this->Publication->renderFirstTemplate($object->uname, $object->type, 'objects');
+            return $this->Publication->renderFirstTemplate($object->uname, $object->type, 'objects');
+        } catch (RecordNotFoundException $e) {
+            throw new NotFoundException(__('Page not found'), null, $e);
+        }
     }
 
     /**
@@ -56,31 +62,35 @@ trait GenericActionsTrait
      */
     public function object(string $uname): Response
     {
-        $object = $this->Objects->loadObject($uname);
-        $currentRoute = $this->getRequest()->getParam('_matchedRoute');
-        foreach (Router::routes() as $route) {
-            if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
-                continue;
+        try {
+            $object = $this->Objects->loadObject($uname);
+            $currentRoute = $this->getRequest()->getParam('_matchedRoute');
+            foreach (Router::routes() as $route) {
+                if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
+                    continue;
+                }
+
+                $out = $route->match(['_entity' => $object] + $route->defaults, []);
+                if ($out !== false) {
+                    return $this->redirect($out);
+                }
+            }
+            $paths = $this->Publication->getViablePaths($object->id);
+            if (!empty($paths)) {
+                return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
             }
 
-            $out = $route->match(['_entity' => $object] + $route->defaults, []);
-            if ($out !== false) {
-                return $this->redirect($out);
-            }
+            $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+            $this->set(compact('object'));
+
+            $types = collection($object->object_type->getFullInheritanceChain())
+                ->extract('name')
+                ->toList();
+
+            return $this->Publication->renderFirstTemplate(...$types);
+        } catch (RecordNotFoundException $e) {
+            throw new NotFoundException(__('Page not found'), null, $e);
         }
-        $paths = $this->Publication->getViablePaths($object->id);
-        if (!empty($paths)) {
-            return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
-        }
-
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
-        $this->set(compact('object'));
-
-        $types = collection($object->object_type->getFullInheritanceChain())
-            ->extract('name')
-            ->toList();
-
-        return $this->Publication->renderFirstTemplate(...$types);
     }
 
     /**
@@ -91,6 +101,10 @@ trait GenericActionsTrait
      */
     public function fallback(string $path): Response
     {
-        return $this->Publication->genericTreeAction($path);
+        try {
+            return $this->Publication->genericTreeAction($path);
+        } catch (RecordNotFoundException $e) {
+            throw new NotFoundException(__('Page not found'), null, $e);
+        }
     }
 }
