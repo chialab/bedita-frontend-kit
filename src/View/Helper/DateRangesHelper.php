@@ -115,7 +115,7 @@ class DateRangesHelper extends Helper
         $best = null;
         $bestIsFuture = false;
         foreach ($ranges as $range) {
-            $start = static::normalize($range->start_date);
+            $start = $range->start_date !== null ? static::normalize($range->start_date) : $now;
             $end = $range->end_date !== null ? static::normalize($range->end_date) : null;
 
             if ($start->lessThanOrEquals($now) && $end !== null && $end->greaterThanOrEquals($now)) {
