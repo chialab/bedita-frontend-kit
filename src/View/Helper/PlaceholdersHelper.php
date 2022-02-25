@@ -5,8 +5,7 @@ use Cake\Datasource\EntityInterface;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
-use Cake\View\View;
-use \Iterator;
+use Iterator;
 
 /**
  * Placeholders helper.
@@ -28,6 +27,9 @@ class PlaceholdersHelper extends Helper
         'template' => null,
     ];
 
+    /**
+     * @inheritDoc
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);
