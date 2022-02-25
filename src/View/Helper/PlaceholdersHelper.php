@@ -38,6 +38,28 @@ class PlaceholdersHelper extends Helper
     }
 
     /**
+     * Get a list of template paths to check.
+     *
+     * @param \Cake\Datasource\EntityInterface $entity Parent entity.
+     * @param string $field Field.
+     * @param \Cake\Datasource\EntityInterface $placeholder Entity referenced in the placeholder.
+     * @param mixed $params Placeholder custom params.
+     * @return string[]
+     */
+    public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): array
+    {
+        $type = $placeholder->get('type') ?: 'objects';
+        $objectType = $this->ObjectTypes->get($type);
+
+        $paths = [];
+        foreach ($objectType->getFullInheritanceChain() as $type) {
+            $paths[] = sprintf('Placeholders/%s', $type->name);
+        }
+
+        return $paths;
+    }
+
+    /**
      * Get template for placeholder rendering.
      *
      * @param \Cake\Datasource\EntityInterface $entity Parent entity.
@@ -48,10 +70,7 @@ class PlaceholdersHelper extends Helper
      */
     public function getTemplate(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): ?string
     {
-        $type = $placeholder->get('type') ?: 'objects';
-        $objectType = $this->ObjectTypes->get($type);
-        foreach ($objectType->getFullInheritanceChain() as $type) {
-            $element = sprintf('Placeholders/%s', $type->name);
+        foreach ($this->getTemplatePaths($entity, $field, $placeholder, $params) as $element) {
             if ($this->getView()->elementExists($element)) {
                 return $element;
             }
