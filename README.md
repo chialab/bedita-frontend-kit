@@ -20,9 +20,22 @@ Then, you have to load it as plugin in your Cake application:
 $this->addPlugin('Chialab/FrontendKit');
 ```
 
-## Instructions
-
 Please read the [Wiki](https://github.com/chialab/bedita-frontend-kit/wiki) to correctly setup the frontend.
+
+
+## Testing
+
+Since some FrontendKit queries uses specific MySQL syntax, you must provide a DSN url for a test database before running tests:
+
+```sh
+$ export db_dsn='mysql://root:****@localhost/bedita4_frontendkit'
+```
+
+Then, you can launch tests using the `test` composer command:
+
+```sh
+$ composer run test
+```
 
 ---
 
