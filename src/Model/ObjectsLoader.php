@@ -142,7 +142,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadRelatedObjects(string $id, string $type = 'objects', string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -251,18 +251,16 @@ class ObjectsLoader
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('primaryKey', 'filter', 'lang'));
 
-        return $query->formatResults(fn (iterable $results): iterable =>
-            $this->toConcreteTypes($results, $depth + 1)
-                ->map(function (ObjectEntity $related) use ($results): ObjectEntity {
-                    $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
-                    if (!$original->isEmpty('_joinData')) {
-                        $related->set('relation', $original->get('_joinData'));
-                        $related->clean();
-                    }
+        return $query->formatResults(fn (iterable $results): iterable => $this->toConcreteTypes($results, $depth + 1)
+            ->map(function (ObjectEntity $related) use ($results): ObjectEntity {
+                $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
+                if (!$original->isEmpty('_joinData')) {
+                    $related->set('relation', $original->get('_joinData'));
+                    $related->clean();
+                }
 
-                    return $related;
-                })
-        );
+                return $related;
+            }));
     }
 
     /**

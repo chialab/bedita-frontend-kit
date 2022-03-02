@@ -127,7 +127,7 @@ class ObjectsComponent extends Component
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadRelatedObjects(string $id, string $type = 'objects', string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
     {
         return $this->loader->loadRelatedObjects($id, $type, $relation, $filter, $options, $hydrate);
     }
