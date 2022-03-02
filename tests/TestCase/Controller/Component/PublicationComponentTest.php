@@ -189,4 +189,30 @@ class PublicationComponentTest extends TestCase
         static::assertSame(1, count($children));
         static::assertSame('Document 1', $children[0]->title);
     }
+
+    public function testSortedChildren()
+    {
+        $this->Publication->genericTreeAction('parent-1/child-1');
+        $children = $this->controller->viewVars['children']->toList();
+        static::assertSame('Document 1', $children[0]->title);
+        static::assertSame('Profile 1', $children[1]->title);
+
+        $this->controller->request = $this->controller->request->withQueryParams([
+            'sort' => 'title',
+            'direction' => 'desc',
+        ]);
+        $this->Publication->genericTreeAction('parent-1/child-1');
+        $children = $this->controller->viewVars['children']->toList();
+        static::assertSame('Profile 1', $children[0]->title);
+        static::assertSame('Document 1', $children[1]->title);
+    }
+
+    public function testChildrenParams()
+    {
+        $this->Publication->genericTreeAction('parent-1/child-1');
+        $children = $this->controller->viewVars['children']->toList();
+
+        static::assertSame(true, $children[0]->relation['menu']);
+        static::assertSame(false, $children[0]->relation['canonical']);
+    }
 }

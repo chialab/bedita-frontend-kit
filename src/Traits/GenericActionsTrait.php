@@ -103,11 +103,12 @@ trait GenericActionsTrait
     {
         try {
             $query = $this->getRequest()->getQuery('q');
+            $filter = [];
             if (!empty($query)) {
-                $filters['query'] = [$query];
+                $filter['query'] = [$query];
             }
 
-            return $this->Publication->genericTreeAction($path, $filters);
+            return $this->Publication->genericTreeAction($path, $filter);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Page not found'), null, $e);
         }

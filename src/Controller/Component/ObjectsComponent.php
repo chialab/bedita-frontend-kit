@@ -115,4 +115,20 @@ class ObjectsComponent extends Component
     {
         return $this->loader->hydrateObjects($objects);
     }
+
+    /**
+     * Fetch related objects.
+     *
+     * @param string|int $id Object ID or uname.
+     * @param string $type Object type name.
+     * @param string $relation The relation name.
+     * @param array|null $filters Relation objects filter (e.g. `['query' => 'doc']`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    public function loadRelatedObjects(string $id, string $type = 'objects', string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    {
+        return $this->loader->loadRelatedObjects($id, $type, $relation, $filter, $options, $hydrate);
+    }
 }
