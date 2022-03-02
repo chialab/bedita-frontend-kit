@@ -175,4 +175,18 @@ class PublicationComponentTest extends TestCase
         static::assertSame('Alan', $author->name);
         static::assertSame('Turing', $author->surname);
     }
+
+    public function testFilteredChildren()
+    {
+        $this->Publication->genericTreeAction('parent-1/child-1');
+        $children = $this->controller->viewVars['children']->toList();
+        static::assertSame(2, count($children));
+        static::assertSame('Document 1', $children[0]->title);
+        static::assertSame('Profile 1', $children[1]->title);
+
+        $this->Publication->genericTreeAction('parent-1/child-1', ['query' => 'Document']);
+        $children = $this->controller->viewVars['children']->toList();
+        static::assertSame(1, count($children));
+        static::assertSame('Document 1', $children[0]->title);
+    }
 }

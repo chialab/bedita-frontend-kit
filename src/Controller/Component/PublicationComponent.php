@@ -115,18 +115,12 @@ class PublicationComponent extends Component
      * Load paginated children.
      *
      * @param \BEdita\Core\Model\Entity\Folder $folder Folder.
+     * @param array $filters Children filters.
      * @return \Cake\Collection\CollectionInterface
      */
-    protected function loadChildren(Folder &$folder): CollectionInterface
+    protected function loadChildren(Folder $folder, array $filters = []): CollectionInterface
     {
-        $query = $this->getController()->getRequest()->getQuery('q');
-        $filters = [
-            'parent' => [$folder->id],
-        ];
-        if (!empty($query)) {
-            $filters['query'] = [$query];
-        }
-
+        $filters = ['parent' => $folder->id] + $filters;
         $children = $this->getController()->paginate(
             $this->Objects->loadObjects($filters)->order([], true),
             [
@@ -141,9 +135,10 @@ class PublicationComponent extends Component
      * Handle specific views/methods according to object tree structure
      *
      * @param string $path Full object path, relative to current publication.
+     * @param array $childrenFilters Children filters.
      * @return \Cake\Http\Response
      */
-    public function genericTreeAction(string $path = ''): Response
+    public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
     {
         $items = $this->loadObjectPath($path)->toList();
 
@@ -153,7 +148,7 @@ class PublicationComponent extends Component
 
         $this->getController()->set(compact('object', 'parent', 'ancestors'));
         if ($object->type === 'folders') {
-            $children = $this->loadChildren($object);
+            $children = $this->loadChildren($object, $childrenFilters);
             $object['children'] = $children;
 
             $this->getController()->set(compact('children'));

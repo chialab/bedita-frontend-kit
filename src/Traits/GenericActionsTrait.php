@@ -102,7 +102,12 @@ trait GenericActionsTrait
     public function fallback(string $path): Response
     {
         try {
-            return $this->Publication->genericTreeAction($path);
+            $query = $this->getRequest()->getQuery('q');
+            if (!empty($query)) {
+                $filters['query'] = [$query];
+            }
+
+            return $this->Publication->genericTreeAction($path, $filters);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Page not found'), null, $e);
         }
