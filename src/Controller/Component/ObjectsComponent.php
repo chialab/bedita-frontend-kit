@@ -122,7 +122,7 @@ class ObjectsComponent extends Component
      * @param string|int $id Object ID or uname.
      * @param string $type Object type name.
      * @param string $relation The relation name.
-     * @param array|null $filters Relation objects filter (e.g. `['query' => 'doc']`).
+     * @param null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]

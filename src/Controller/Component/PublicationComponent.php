@@ -115,10 +115,10 @@ class PublicationComponent extends Component
      * Load paginated children.
      *
      * @param \BEdita\Core\Model\Entity\Folder $folder Folder.
-     * @param array|null $filters Children filter (e.g. `['query' => 'doc']`).
+     * @param array|null $filter Children filter (e.g. `['query' => 'doc']`).
      * @return \Cake\Collection\CollectionInterface
      */
-    protected function loadChildren(Folder $folder, ?array $filter = null): CollectionInterface
+    protected function loadChildren(Folder $folder, ?array $filter): CollectionInterface
     {
         return $this->getController()->paginate(
             $this->Objects->loadRelatedObjects($folder->uname, 'folders', 'children', $filter)->order([], true),
