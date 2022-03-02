@@ -98,7 +98,7 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = $objectType->relations;
+            $relations = array_merge($objectType->relations, ['parents', 'translations']);
             if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
                 $relations = array_merge($relations, ['children']);
             }
