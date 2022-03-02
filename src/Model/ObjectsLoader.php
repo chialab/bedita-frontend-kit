@@ -252,27 +252,17 @@ class ObjectsLoader
         $query = $action(compact('primaryKey', 'filter', 'lang'));
 
         return $query->formatResults(fn (iterable $results): iterable =>
-            collection($results)->map(function (ObjectEntity $related) use ($options, $depth, $hydrate): ObjectEntity {
-                $objectType = $related->object_type;
-                if ($options === null) {
-                    $options = $this->getDefaultOptions($objectType);
-                }
+            $this->toConcreteTypes($results, $depth + 1)
+                ->map(function (ObjectEntity $related) use ($results): ObjectEntity {
+                    $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
+                    if (!$original->isEmpty('_joinData')) {
+                        $related->set('relation', $original->get('_joinData'));
+                        $related->clean();
+                    }
 
-                $object = $this->loadSingle(
-                    $related->id,
-                    $objectType,
-                    $options,
-                    $depth + 1,
-                    $hydrate
-                );
-
-                if ($object !== null && !$related->isEmpty('_joinData')) {
-                    $object->set('relation', $related->get('_joinData'));
-                    $object->clean();
-                }
-
-                return $object;
-            }));
+                    return $related;
+                })
+        );
     }
 
     /**
