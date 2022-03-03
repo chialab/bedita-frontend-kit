@@ -33,13 +33,6 @@ class ObjectsLoader
     use ModelAwareTrait;
 
     /**
-     * List of available relations that are not part of the object schema.
-     *
-     * @var string[]
-     */
-    protected const EXTRA_RELATTIONS = ['parents', 'translations'];
-
-    /**
      * Loading configuration on a per-object type basis.
      *
      * @var array[]
@@ -55,15 +48,24 @@ class ObjectsLoader
     protected $autoHydrateAssociations = [];
 
     /**
+     * List of available relations that are not part of the object schema.
+     *
+     * @var string[]
+     */
+    protected $extraRelations = [];
+
+    /**
      * Objects loader constructor.
      *
      * @param array $objectTypesConfig Loading configuration on a per-object type basis.
      * @param array $autoHydrateAssociations Map of associations to be hydrated on each load.
+     * @param array $extraRelations List of available relations that are not part of the object schema.
      */
-    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
+    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [], array $extraRelations = [])
     {
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
+        $this->extraRelations = $extraRelations;
 
         $this->loadModel('BEdita/Core.ObjectTypes');
         $this->loadModel('BEdita/Core.Objects');
@@ -105,7 +107,7 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, static::EXTRA_RELATTIONS);
+            $relations = array_merge($objectType->relations, $this->extraRelations);
             if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
                 $relations = array_merge($relations, ['children']);
             }

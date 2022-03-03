@@ -31,6 +31,7 @@ class ObjectsComponent extends Component
             'parents' => 2,
             'children' => 3,
         ],
+        'extraRelations' => ['parents'],
     ];
 
     /**
@@ -49,7 +50,8 @@ class ObjectsComponent extends Component
 
         $this->loader = new ObjectsLoader(
             $this->getConfig('objectTypesConfig', []),
-            $this->getConfig('autoHydrateAssociations', [])
+            $this->getConfig('autoHydrateAssociations', []),
+            $this->getConfig('extraRelations', [])
         );
     }
 
