@@ -33,6 +33,13 @@ class ObjectsLoader
     use ModelAwareTrait;
 
     /**
+     * List of available relations that are not part of the object schema.
+     *
+     * @var string[]
+     */
+    protected const EXTRA_RELATTIONS = ['parents', 'translations'];
+
+    /**
      * Loading configuration on a per-object type basis.
      *
      * @var array[]
@@ -98,7 +105,7 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, ['parents', 'translations']);
+            $relations = array_merge($objectType->relations, static::EXTRA_RELATTIONS);
             if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
                 $relations = array_merge($relations, ['children']);
             }
