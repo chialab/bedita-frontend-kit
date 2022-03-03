@@ -5,11 +5,11 @@ use BEdita\Core\Model\Entity\Folder;
 use Cake\Controller\ComponentRegistry;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
-use Cake\I18n\FrozenDate;
 use Cake\TestSuite\TestCase;
 
 /**
- * Chialab\FrontendKit\Controller\Component\PublicationComponent Test Case
+ * {@see \Chialab\FrontendKit\Controller\Component\PublicationComponent} Test Case
+ *
  * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\PublicationComponent
  */
 class PublicationComponentTest extends TestCase
@@ -95,6 +95,12 @@ class PublicationComponentTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Test {@see PublicationComponent::initialize()}.
+     *
+     * @covers ::initialize()
+     * @covers ::getPublication()
+     */
     public function testInitialization()
     {
         $publication = $this->Publication->getPublication();
@@ -103,6 +109,11 @@ class PublicationComponentTest extends TestCase
         static::assertSame('root-1', $publication->uname);
     }
 
+    /**
+     * Test {@see PublicationComponent::initialize()}.
+     *
+     * @covers ::initialize()
+     */
     public function testMenuFolders()
     {
         /** @var \BEdita\Core\Model\Entity\Folder[] */
@@ -110,6 +121,11 @@ class PublicationComponentTest extends TestCase
         static::assertNotEmpty($menuFolders);
     }
 
+    /**
+     * Test {@see PublicationComponent::initialize()}.
+     *
+     * @covers ::initialize()
+     */
     public function testTemplateVars()
     {
         static::assertNotNull($this->controller->viewVars['publication']);
@@ -117,7 +133,12 @@ class PublicationComponentTest extends TestCase
     }
 
     /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
      * @covers ::genericTreeAction()
+     * @covers ::loadObjectPath()
+     * @covers ::getViablePaths()
+     * @covers ::renderFirstTemplate()
      */
     public function testGenericTreeAction()
     {
@@ -140,6 +161,14 @@ class PublicationComponentTest extends TestCase
         static::assertSame('folders', (string)$response->getBody());
     }
 
+    /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
+     * @covers ::genericTreeAction()
+     * @covers ::loadObjectPath()
+     * @covers ::getViablePaths()
+     * @covers ::renderFirstTemplate()
+     */
     public function testGenericTreeActionWithObject()
     {
         $response = $this->Publication->genericTreeAction('parent-1/child-1/profile-1');
@@ -157,6 +186,13 @@ class PublicationComponentTest extends TestCase
         static::assertSame('objects', (string)$response->getBody());
     }
 
+    /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
+     * @covers ::genericTreeAction()
+     * @covers ::loadObjectPath()
+     * @covers ::getViablePaths()
+     */
     public function testGenericTreeActionWithDocument()
     {
         $this->Publication->genericTreeAction('parent-1/child-1/document-1');
@@ -176,6 +212,12 @@ class PublicationComponentTest extends TestCase
         static::assertSame('Turing', $author->surname);
     }
 
+    /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
+     * @covers ::genericTreeAction()
+     * @covers ::loadChildren()
+     */
     public function testFilteredChildren()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');
@@ -190,6 +232,12 @@ class PublicationComponentTest extends TestCase
         static::assertSame('Document 1', $children[0]->title);
     }
 
+    /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
+     * @covers ::genericTreeAction()
+     * @covers ::loadChildren()
+     */
     public function testSortedChildren()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');
@@ -207,6 +255,12 @@ class PublicationComponentTest extends TestCase
         static::assertSame('Document 1', $children[1]->title);
     }
 
+    /**
+     * Test {@see PublicationComponent::genericTreeAction()}.
+     *
+     * @covers ::genericTreeAction()
+     * @covers ::loadChildren()
+     */
     public function testChildrenParams()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');

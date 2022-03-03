@@ -9,7 +9,9 @@ use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\PosterHelper;
 
 /**
- * Chialab\FrontendKit\View\Helper\PosterHelper Test Case
+ * {@see \Chialab\FrontendKit\View\Helper\PosterHelper} Test Case
+ *
+ * @coversDefaultClass \Chialab\FrontendKit\View\Helper\PosterHelper
  */
 class PosterHelperTest extends TestCase
 {
@@ -85,6 +87,13 @@ class PosterHelperTest extends TestCase
         return $image;
     }
 
+    /**
+     * Test {@see PosterHelper::orientation()}.
+     *
+     * @return void
+     *
+     * @covers ::orientation()
+     */
     public function testOrientationWithPosterArray()
     {
         $object = $this->createObject();
@@ -95,6 +104,13 @@ class PosterHelperTest extends TestCase
         $this->assertSame('landscape', $orientation);
     }
 
+    /**
+     * Test {@see PosterHelper::orientation()}.
+     *
+     * @return void
+     *
+     * @covers ::orientation()
+     */
     public function testOrientationWithPosterCollection()
     {
         $object = $this->createObject();
