@@ -115,35 +115,27 @@ class PublicationComponent extends Component
      * Load paginated children.
      *
      * @param \BEdita\Core\Model\Entity\Folder $folder Folder.
+     * @param array|null $filter Children filter (e.g. `['query' => 'doc']`).
      * @return \Cake\Collection\CollectionInterface
      */
-    protected function loadChildren(Folder &$folder): CollectionInterface
+    protected function loadChildren(Folder $folder, ?array $filter): CollectionInterface
     {
-        $query = $this->getController()->getRequest()->getQuery('q');
-        $filters = [
-            'parent' => [$folder->id],
-        ];
-        if (!empty($query)) {
-            $filters['query'] = [$query];
-        }
-
-        $children = $this->getController()->paginate(
-            $this->Objects->loadObjects($filters)->order([], true),
+        return $this->getController()->paginate(
+            $this->Objects->loadRelatedObjects($folder->uname, 'folders', 'children', $filter)->order([], true),
             [
-                'order' => ['TreeNodes.tree_left'],
+                'order' => ['Trees.tree_left'],
             ],
         );
-
-        return $this->Objects->hydrateObjects($children->toList());
     }
 
     /**
      * Handle specific views/methods according to object tree structure
      *
      * @param string $path Full object path, relative to current publication.
+     * @param array $childrenFilters Children filters.
      * @return \Cake\Http\Response
      */
-    public function genericTreeAction(string $path = ''): Response
+    public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
     {
         $items = $this->loadObjectPath($path)->toList();
 
@@ -153,7 +145,7 @@ class PublicationComponent extends Component
 
         $this->getController()->set(compact('object', 'parent', 'ancestors'));
         if ($object->type === 'folders') {
-            $children = $this->loadChildren($object);
+            $children = $this->loadChildren($object, $childrenFilters);
             $object['children'] = $children;
 
             $this->getController()->set(compact('children'));

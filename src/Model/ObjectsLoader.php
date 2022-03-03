@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Model;
 
 use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
+use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\I18n\Core\I18nTrait;
@@ -131,6 +132,26 @@ class ObjectsLoader
     }
 
     /**
+     * Fetch related objects.
+     *
+     * @param string|int $id Object ID or uname.
+     * @param string $type Object type name.
+     * @param string $relation The relation name.
+     * @param array|null $filter Relation objects filter (e.g. `['query' => 'doc']`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     */
+    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    {
+        // Normalize ID, get type.
+        $id = $this->Objects->getId($id);
+        $objectType = $this->ObjectTypes->get($type);
+
+        return $this->loadRelated($id, $objectType, $relation, $filter, $options, 1, $hydrate);
+    }
+
+    /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
@@ -207,6 +228,39 @@ class ObjectsLoader
 
             return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate);
         });
+    }
+
+    /**
+     * Load and hydrate related objects.
+     *
+     * @param int $primaryKey Object ID.
+     * @param \BEdita\Core\Model\Entity\ObjectType $objectType Object type.
+     * @param string $relation The relation name to load.
+     * @param array|null $filter Filters.
+     * @param array|null $options Options.
+     * @param int $depth Depth level.
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     */
+    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
+    {
+        $lang = $this->getLang();
+
+        $table = $this->getTableLocator()->get($objectType->alias);
+        $association = $table->getAssociation($relation);
+        $action = new ListRelatedObjectsAction(compact('association'));
+        /** @var \Cake\ORM\Query $query */
+        $query = $action(compact('primaryKey', 'filter', 'lang'));
+
+        return $query->formatResults(fn (iterable $results): iterable => $this->toConcreteTypes($results, $depth + 1)
+            ->map(function (ObjectEntity $related) use ($results): ObjectEntity {
+                $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
+                if (!$original->isEmpty('_joinData')) {
+                    $related->set('relation', $original->get('_joinData'));
+                    $related->clean();
+                }
+
+                return $related;
+            }));
     }
 
     /**
