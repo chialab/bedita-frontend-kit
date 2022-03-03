@@ -45,7 +45,7 @@ trait GenericActionsTrait
     {
         try {
             $object = $this->Objects->loadObject($id);
-            $object = $this->Objects->loadObject((string)$object->id, $object->type);
+            $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
             $this->set(compact('object'));
 
             return $this->Publication->renderFirstTemplate($object->uname, $object->type, 'objects');
