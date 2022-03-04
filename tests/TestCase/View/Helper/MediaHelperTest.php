@@ -7,7 +7,7 @@ use Chialab\FrontendKit\View\Helper\MediaHelper;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\MediaHelper} Test Case
- * 
+ *
  * @coversDefaultClass \Chialab\FrontendKit\View\Helper\MediaHelper
  */
 class MediaHelperTest extends TestCase
