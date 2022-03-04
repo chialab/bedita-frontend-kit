@@ -6,7 +6,9 @@ use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Controller\Component\CategoriesComponent;
 
 /**
- * Chialab\FrontendKit\Controller\Component\CategoriesComponent Test Case
+ * {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent} Test Case
+ *
+ * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\CategoriesComponent
  */
 class CategoriesComponentTest extends TestCase
 {

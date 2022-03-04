@@ -8,7 +8,8 @@ use Cake\I18n\FrozenDate;
 use Cake\TestSuite\TestCase;
 
 /**
- * Chialab\FrontendKit\Controller\Component\CalendarComponent Test Case
+ * {@see \Chialab\FrontendKit\Controller\Component\CalendarComponent} Test Case
+ *
  * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\CalendarComponent
  */
 class CalendarComponentTest extends TestCase
@@ -88,6 +89,11 @@ class CalendarComponentTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Test {@see CalendarComponent::groupByDay()}.
+     *
+     * @covers ::groupByDay()
+     */
     public function testGroupByDayWithStart()
     {
         $start = new FrozenDate('2022-02-15 00:00:00');
@@ -119,6 +125,11 @@ class CalendarComponentTest extends TestCase
         ], array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
     }
 
+    /**
+     * Test {@see CalendarComponent::groupByDay()}.
+     *
+     * @covers ::groupByDay()
+     */
     public function testGroupByDayWithRange()
     {
         $start = new FrozenDate('2022-02-15 00:00:00');

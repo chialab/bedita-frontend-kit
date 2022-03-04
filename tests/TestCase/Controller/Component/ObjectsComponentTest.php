@@ -5,7 +5,9 @@ use Cake\Controller\ComponentRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * Chialab\FrontendKit\Controller\Component\ObjectsComponent Test Case
+ * {@see \Chialab\FrontendKit\Controller\Component\ObjectsComponent} Test Case
+ *
+ * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\ObjectsComponent
  */
 class ObjectsComponentTest extends TestCase
 {
@@ -67,6 +69,12 @@ class ObjectsComponentTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Test {@see ObjectsComponent::loadObject()}.
+     *
+     * @covers ::initialize()
+     * @covers ::loadObject()
+     */
     public function testLoadObjectFolder()
     {
         $object = $this->Objects->loadObject('child-1', 'folders', ['include' => 'children']);

@@ -25,6 +25,9 @@ Please read the [Wiki](https://github.com/chialab/bedita-frontend-kit/wiki) to c
 
 ## Testing
 
+[![GitHub Actions tests](https://github.com/chialab/bedita-frontend-kit/actions/workflows/test.yml/badge.svg?event=push&branch=main)](https://github.com/chialab/bedita-frontend-kit/actions/workflows/test.yml?query=event%3Apush+branch%3Amain)
+[![codecov](https://codecov.io/gh/chialab/bedita-frontend-kit/branch/main/graph/badge.svg)](https://codecov.io/gh/chialab/bedita-frontend-kit)
+
 Since some FrontendKit queries uses specific MySQL syntax, you must provide a DSN url for a test database before running tests:
 
 ```sh

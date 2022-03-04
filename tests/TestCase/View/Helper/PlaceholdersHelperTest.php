@@ -8,7 +8,9 @@ use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\PlaceholdersHelper;
 
 /**
- * Chialab\FrontendKit\View\Helper\PlaceholdersHelper Test Case
+ * {@see \Chialab\FrontendKit\View\Helper\PlaceholdersHelper} Test Case
+ *
+ * @coversDefaultClass \Chialab\FrontendKit\View\Helper\PlaceholdersHelper
  */
 class PlaceholdersHelperTest extends TestCase
 {
@@ -115,9 +117,11 @@ class PlaceholdersHelperTest extends TestCase
     }
 
     /**
-     * Test getTemplatePaths method
+     * Test {@see PlaceholdersHelper::getTemplatePaths()}.
      *
      * @return void
+     *
+     * @covers ::getTemplatePaths()
      */
     public function testGetTemplatePaths()
     {
@@ -129,9 +133,11 @@ class PlaceholdersHelperTest extends TestCase
     }
 
     /**
-     * Test getTemplate method
+     * Test {@see PlaceholdersHelper::getTemplate()}.
      *
      * @return void
+     *
+     * @covers ::getTemplate()
      */
     public function testGetTemplate()
     {
@@ -139,9 +145,11 @@ class PlaceholdersHelperTest extends TestCase
     }
 
     /**
-     * Test testDefaultTemplater method
+     * Test {@see PlaceholdersHelper::defaultTemplater()}.
      *
      * @return void
+     *
+     * @covers ::defaultTemplater()
      */
     public function testDefaultTemplater()
     {
@@ -150,9 +158,11 @@ class PlaceholdersHelperTest extends TestCase
     }
 
     /**
-     * Test template method
+     * Test {@see PlaceholdersHelper::template()}.
      *
      * @return void
+     *
+     * @covers ::template()
      */
     public function testTemplate()
     {
