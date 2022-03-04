@@ -91,7 +91,7 @@ class CalendarComponentTest extends TestCase
 
     /**
      * Test {@see CalendarComponent::groupByDay()}.
-     * 
+     *
      * @covers ::groupByDay()
      */
     public function testGroupByDayWithStart()
@@ -127,7 +127,7 @@ class CalendarComponentTest extends TestCase
 
     /**
      * Test {@see CalendarComponent::groupByDay()}.
-     * 
+     *
      * @covers ::groupByDay()
      */
     public function testGroupByDayWithRange()

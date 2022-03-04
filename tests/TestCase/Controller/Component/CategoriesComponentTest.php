@@ -7,7 +7,7 @@ use Chialab\FrontendKit\Controller\Component\CategoriesComponent;
 
 /**
  * {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent} Test Case
- * 
+ *
  * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\CategoriesComponent
  */
 class CategoriesComponentTest extends TestCase

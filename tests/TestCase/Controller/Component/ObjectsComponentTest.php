@@ -6,7 +6,7 @@ use Cake\TestSuite\TestCase;
 
 /**
  * {@see \Chialab\FrontendKit\Controller\Component\ObjectsComponent} Test Case
- * 
+ *
  * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\ObjectsComponent
  */
 class ObjectsComponentTest extends TestCase
@@ -71,7 +71,7 @@ class ObjectsComponentTest extends TestCase
 
     /**
      * Test {@see ObjectsComponent::loadObject()}.
-     * 
+     *
      * @covers ::initialize()
      * @covers ::loadObject()
      */
