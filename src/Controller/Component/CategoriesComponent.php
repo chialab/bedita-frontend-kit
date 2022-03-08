@@ -107,8 +107,7 @@ class CategoriesComponent extends Component
                     }
 
                     return $exp;
-                })
-            );
+                }));
     }
 
     /**
@@ -117,6 +116,7 @@ class CategoriesComponent extends Component
      * @param \Cake\ORM\Query $query The current query.
      * @param (string|int)[] $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
+     * @return \Cake\ORM\Query
      */
     public function filterByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
@@ -150,6 +150,7 @@ class CategoriesComponent extends Component
      * @param \Cake\ORM\Query $query The current query.
      * @param (string|int)[] $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
+     * @return \Cake\ORM\Query
      */
     public function filterExcludeByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
