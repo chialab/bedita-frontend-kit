@@ -4,7 +4,7 @@ namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
-use Cake\I18n\FrozenDate;
+use Cake\I18n\FrozenTime;
 use Cake\TestSuite\TestCase;
 
 /**
@@ -90,14 +90,14 @@ class CalendarComponentTest extends TestCase
     }
 
     /**
-     * Test {@see CalendarComponent::groupByDay()}.
+     * Test {@see CalendarComponent::findGroupedByDay()}.
      *
-     * @covers ::groupByDay()
+     * @covers ::findGroupedByDay()
      */
-    public function testGroupByDayWithStart()
+    public function testFindGroupByDayWithStart()
     {
-        $start = new FrozenDate('2022-02-15 00:00:00');
-        $events = $this->Calendar->groupByDay($this->Objects->loadObjects([], 'events'), $start)
+        $start = new FrozenTime('2022-02-15 00:00:00');
+        $events = $this->Calendar->findGroupedByDay($this->Objects->loadObjects([], 'events'), $start)
             ->toArray();
 
         static::assertEquals([
@@ -132,8 +132,8 @@ class CalendarComponentTest extends TestCase
      */
     public function testGroupByDayWithRange()
     {
-        $start = new FrozenDate('2022-02-15 00:00:00');
-        $events = $this->Calendar->groupByDay($this->Objects->loadObjects([], 'events'), $start, $start->addDays(2))
+        $start = new FrozenTime('2022-02-15 00:00:00');
+        $events = $this->Calendar->findGroupedByDay($this->Objects->loadObjects([], 'events'), $start, $start->addDays(2))
             ->toArray();
 
         static::assertEquals([

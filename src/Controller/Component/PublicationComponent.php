@@ -26,7 +26,9 @@ class PublicationComponent extends Component
 {
     use ModelAwareTrait;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public $components = ['Chialab/FrontendKit.Objects'];
 
     /**
