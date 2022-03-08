@@ -249,6 +249,7 @@ class ObjectsLoader
      * @param array|null $options Options.
      * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @return \Cake\ORM\Query
      */
     protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
