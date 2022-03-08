@@ -143,8 +143,8 @@ class CalendarComponent extends Component
      * Load calendar items from a folder.
      *
      * @param string $parent The parent folder uname.
-     * @return \Cake\I18n\FrozenTime $from Range start.
-     * @return \Cake\I18n\FrozenTime|null $to Range end.
+     * @param \Cake\I18n\FrozenTime $from Range start.
+     * @param \Cake\I18n\FrozenTime|null $to Range end.
      * @return \Cake\ORM\Query
      */
     public function calendarFolder(string $parent, FrozenTime $from, ?FrozenTime $to): Query
