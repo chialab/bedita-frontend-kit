@@ -11,6 +11,7 @@ use Cake\I18n\FrozenDate;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
+use DateTime;
 use InvalidArgumentException;
 
 /**
@@ -128,7 +129,7 @@ class CalendarComponent extends Component
 
                         $start = $start->max($from);
                         while ($start->lte($end) && $start->lte($to)) {
-                            $day = $start->toIso8601String();
+                            $day = $start->format('Y-m-d');
                             $start = $start->addDay();
 
                             yield compact('event', 'day');

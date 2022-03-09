@@ -99,25 +99,25 @@ class CalendarComponentTest extends TestCase
         return [
             'test' => [
                 [
-                    '2022-02-15T00:00:00+00:00' => [
+                    '2022-02-15' => [
                         'event-1',
                         'event-2',
                     ],
-                    '2022-02-16T00:00:00+00:00' => [
+                    '2022-02-16' => [
                         'event-2',
                         'event-3',
                     ],
-                    '2022-02-17T00:00:00+00:00' => [
+                    '2022-02-17' => [
                         'event-2',
                         'event-3',
                     ],
-                    '2022-02-18T00:00:00+00:00' => [
+                    '2022-02-18' => [
                         'event-3',
                     ],
-                    '2022-02-21T00:00:00+00:00' => [
+                    '2022-02-21' => [
                         'event-3',
                     ],
-                    '2022-02-22T00:00:00+00:00' => [
+                    '2022-02-22' => [
                         'event-3',
                     ],
                 ],
@@ -143,7 +143,7 @@ class CalendarComponentTest extends TestCase
             new FrozenTime($start)
         )->toArray();
 
-        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
+        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events), '', 0, 10, true);
     }
 
     /**
@@ -156,15 +156,15 @@ class CalendarComponentTest extends TestCase
         return [
             'test' => [
                 [
-                    '2022-02-15T00:00:00+00:00' => [
+                    '2022-02-15' => [
                         'event-1',
                         'event-2',
                     ],
-                    '2022-02-16T00:00:00+00:00' => [
+                    '2022-02-16' => [
                         'event-2',
                         'event-3',
                     ],
-                    '2022-02-17T00:00:00+00:00' => [
+                    '2022-02-17' => [
                         'event-2',
                         'event-3',
                     ],
@@ -195,6 +195,6 @@ class CalendarComponentTest extends TestCase
             new FrozenTime($end)
         )->toArray();
 
-        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
+        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events), '', 0, 10, true);
     }
 }
