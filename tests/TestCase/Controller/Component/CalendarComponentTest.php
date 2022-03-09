@@ -90,65 +90,111 @@ class CalendarComponentTest extends TestCase
     }
 
     /**
-     * Test {@see CalendarComponent::findGroupedByDay()}.
+     * Data provider for {@see CalendarComponentTest::testFindGroupByDayWithStart()} test case.
      *
-     * @covers ::findGroupedByDay()
+     * @return array[]
      */
-    public function testFindGroupByDayWithStart()
+    public function findGroupByDayWithStartProvider()
     {
-        $start = new FrozenTime('2022-02-15 00:00:00');
-        $events = $this->Calendar->findGroupedByDay($this->Objects->loadObjects([], 'events'), $start)
-            ->toArray();
-
-        static::assertEquals([
-            '2022-02-15T00:00:00+00:00' => [
-                'event-1',
-                'event-2',
+        return [
+            'test' => [
+                [
+                    '2022-02-15T00:00:00+00:00' => [
+                        'event-1',
+                        'event-2',
+                    ],
+                    '2022-02-16T00:00:00+00:00' => [
+                        'event-2',
+                        'event-3',
+                    ],
+                    '2022-02-17T00:00:00+00:00' => [
+                        'event-2',
+                        'event-3',
+                    ],
+                    '2022-02-18T00:00:00+00:00' => [
+                        'event-3',
+                    ],
+                    '2022-02-21T00:00:00+00:00' => [
+                        'event-3',
+                    ],
+                    '2022-02-22T00:00:00+00:00' => [
+                        'event-3',
+                    ],
+                ],
+                '2022-02-15 00:00:00',
             ],
-            '2022-02-16T00:00:00+00:00' => [
-                'event-2',
-                'event-3',
-            ],
-            '2022-02-17T00:00:00+00:00' => [
-                'event-2',
-                'event-3',
-            ],
-            '2022-02-18T00:00:00+00:00' => [
-                'event-3',
-            ],
-            '2022-02-21T00:00:00+00:00' => [
-                'event-3',
-            ],
-            '2022-02-22T00:00:00+00:00' => [
-                'event-3',
-            ],
-        ], array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
+        ];
     }
 
     /**
-     * Test {@see CalendarComponent::groupByDay()}.
+     * Test {@see CalendarComponent::findGroupedByDay()}.
      *
-     * @covers ::groupByDay()
+     * @param array $expected Expected objects.
+     * @param string $start Start date.
+     * @return void
+     *
+     * @covers ::findGroupedByDay()
+     * @dataProvider findGroupByDayWithStartProvider()
      */
-    public function testGroupByDayWithRange()
+    public function testFindGroupByDayWithStart(array $expected, $start)
+    {
+        $events = $this->Calendar->findGroupedByDay(
+            $this->Objects->loadObjects([], 'events'),
+            new FrozenTime($start)
+        )->toArray();
+
+        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
+    }
+
+    /**
+     * Data provider for {@see CalendarComponentTest::testFindGroupedByDayWithRange()} test case.
+     *
+     * @return array[]
+     */
+    public function findGroupedByDayWithRangeProvider()
+    {
+        return [
+            'test' => [
+                [
+                    '2022-02-15T00:00:00+00:00' => [
+                        'event-1',
+                        'event-2',
+                    ],
+                    '2022-02-16T00:00:00+00:00' => [
+                        'event-2',
+                        'event-3',
+                    ],
+                    '2022-02-17T00:00:00+00:00' => [
+                        'event-2',
+                        'event-3',
+                    ],
+                ],
+                '2022-02-15 00:00:00',
+                '2022-02-17 00:00:00',
+            ],
+        ];
+    }
+
+    /**
+     * Test {@see CalendarComponent::findGroupedByDay()}.
+     *
+     * @param array $expected Expected objects.
+     * @param string $start Start date.
+     * @param string $end End date.
+     * @return void
+     *
+     * @covers ::findGroupedByDay()
+     * @dataProvider findGroupedByDayWithRangeProvider()
+     */
+    public function testFindGroupedByDayWithRange(array $expected, string $start, string $end)
     {
         $start = new FrozenTime('2022-02-15 00:00:00');
-        $events = $this->Calendar->findGroupedByDay($this->Objects->loadObjects([], 'events'), $start, $start->addDays(2))
-            ->toArray();
+        $events = $this->Calendar->findGroupedByDay(
+            $this->Objects->loadObjects([], 'events'),
+            new FrozenTime($start),
+            new FrozenTime($end)
+        )->toArray();
 
-        static::assertEquals([
-            '2022-02-15T00:00:00+00:00' => [
-                'event-1',
-                'event-2',
-            ],
-            '2022-02-16T00:00:00+00:00' => [
-                'event-2',
-                'event-3',
-            ],
-            '2022-02-17T00:00:00+00:00' => [
-                'event-2',
-                'event-3',
-            ],
-        ], array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
+        static::assertEquals($expected, array_map(fn ($items) => array_map(fn ($event) => $event->uname, $items), $events));
     }
 }
