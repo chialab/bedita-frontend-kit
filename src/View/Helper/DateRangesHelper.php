@@ -108,50 +108,19 @@ class DateRangesHelper extends Helper
      * @param \BEdita\Core\Model\Entity\DateRange[] $ranges Date ranges.
      * @return \BEdita\Core\Model\Entity\DateRange|null
      */
-    public function getClosestRange(array $ranges): ?DateRange
+    public function getClosestRange(array $ranges, string $now = null): ?DateRange
     {
-        $now = FrozenTime::now();
-
-        $best = null;
-        $bestIsFuture = false;
-        foreach ($ranges as $range) {
-            $start = $range->start_date !== null ? static::normalize($range->start_date) : $now;
-            $end = $range->end_date !== null ? static::normalize($range->end_date) : null;
-
-            if ($start->lessThanOrEquals($now) && $end !== null && $end->greaterThanOrEquals($now)) {
-                // Found an overlapping range. We're done.
-                return $range;
-            }
-
-            $isFuture = $start->greaterThan($now);
-            if ($best === null || ($isFuture && !$bestIsFuture)) {
-                // First range encountered, or first future range encountered. In either case, it is the best match.
-                $best = $range;
-                $bestIsFuture = $isFuture;
-
-                continue;
-            } // From now on, we can assume that `$best !== null`, otherwise it would have matched the `if` branch.
-
-            if ($isFuture) { // INSIDE this branch, we can assume that `$bestIsFuture === true`, or it would have matched the previous `if` branch.
-                if ($start->lessThan(static::normalize($best->start_date))) {
-                    // Found a closer range.
-                    $best = $range;
-                }
-
-                continue;
-            }
-
-            if ($bestIsFuture) { // INSIDE this branch, we can assume that `$isFuture === false` or it would have matched a previous `if` branch.
-                // We ignore past ranges at this point.
-                continue;
-            }
-
-            // Here we can assume that `$isFuture === $bestIsFuture === false`.
-            if (static::normalize($best->end_date ?: $best->start_date)->lessThan($end ?: $start)) {
-                $best = $range;
-            }
+        $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
+        $sorted = collection($ranges)
+            ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
+        $currentOrFuture = $sorted
+            ->filter(fn (DateRange $dr): bool => $dr->start_date->gte($now) || ($dr->end_date !== null && $dr->end_date->gte($now)))
+            ->first();
+        if ($currentOrFuture !== null) {
+            // Found an event overlapping `$now` point in time, or the closest one in the future.
+            return $currentOrFuture;
         }
 
-        return $best;
+        return $sorted->last(); // Get closest event in the past, relative to `$now`.
     }
 }
