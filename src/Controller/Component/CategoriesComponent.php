@@ -71,6 +71,34 @@ class CategoriesComponent extends Component
     }
 
     /**
+     * Load a category by its name and type
+     *
+     * @param string|null $name Category name.
+     * @param string|null $type Category type.
+     * @return \Cake\ORM\Query
+     */
+    public function loadByName(string $name = null, string $type = null): Query
+    {
+        $query = $this->Categories->find()
+            ->where([$this->Categories->aliasField('enabled') => true])
+            ->where([$this->Categories->aliasField('name') => $name]);
+
+        $query = $query->find('type', [$type]);
+
+        $query
+            ->formatResults(function (CollectionInterface $results): CollectionInterface {
+                return $results->map(function (Category $category): Category {
+                    $category->set('slug', Text::slug($category->name));
+                    $category->clean();
+
+                    return $category;
+                });
+            });
+
+        return $query;
+    }
+
+    /**
      * Add a filter by category id.
      *
      * @param \Cake\ORM\Query $query The current query.
