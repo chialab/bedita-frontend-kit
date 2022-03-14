@@ -77,7 +77,7 @@ class CategoriesComponent extends Component
      * @param string|null $type Category type.
      * @return \Cake\ORM\Query
      */
-    public function loadByName(string $name = null, string $type = null): Query
+    public function loadByName(string $name, string $type): Query
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true])
