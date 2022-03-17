@@ -141,7 +141,7 @@ class PublicationComponent extends Component
      * @param \BEdita\Core\Model\Entity\Folder[] $ancestors A list of ancestors.
      * @return \Generator A generator function.
      */
-    protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator {
+    public function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator {
         yield $object->uname;
 
         $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
