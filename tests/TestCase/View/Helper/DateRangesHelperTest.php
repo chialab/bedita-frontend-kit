@@ -9,16 +9,16 @@ use Cake\TestSuite\TestCase;
 use Cake\View\View;
 
 /**
- * {@see \BolognaCultura\View\Helper\DateRangesHelper} Test Case
+ * {@see \Chialab\FrontendKit\View\Helper\DateRangesHelper} Test Case
  *
- * @coversDefaultClass \BolognaCultura\View\Helper\DateRangesHelper
+ * @coversDefaultClass \Chialab\FrontendKit\View\Helper\DateRangesHelper
  */
 class DateRangesHelperTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \BolognaCultura\View\Helper\DateRangesHelper
+     * @var \Chialab\FrontendKit\View\Helper\DateRangesHelper
      */
     protected DateRangesHelper $DateRanges;
 

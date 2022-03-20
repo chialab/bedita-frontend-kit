@@ -3,43 +3,53 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
-use BEdita\Core\Model\Entity\DateRange;
 use Cake\I18n\FrozenTime;
 
 /**
  * Calendar helper
+ *
+ * @property \Cake\View\Helper\HtmlHelper $Html
+ * @property \Cake\View\Helper\UrlHelper $Url
  */
 class CalendarHelper extends DateRangesHelper
 {
     /**
-     * Get the date instance for given year, month and day.
-     *
-     * @param int $year Year
-     * @param int $month Month
-     * @param int $day Day
-     * @return \Cake\I18n\FrozenTime
+     * @inheritdoc
      */
-    public function getDate(int $year, int $month, int $day)
-    {
-        return FrozenTime::create($year, $month, $day, 0, 0, 0);
-    }
+    public $helpers = ['Html', 'Url'];
+
+    /**
+     * Default configuration.
+     *
+     * @var array
+     */
+    protected $_defaultConfig = [
+        'dayParam' => 'day',
+        'monthParam' => 'month',
+        'yearParam' => 'year',
+    ];
 
     /**
      * Get a range of years.
+     * It can be used with absolute values, eg 2019 and 2022
+     * or relative values to the $from value, eg "-2 years" and "+2 years"
      *
-     * @param string|int $start The start year.
-     * @param int $sub Number of years to remove for the start.
-     * @param int $add Number of years to add to the start.
+     * @param int|string $startRange The initial value of the range, it can be absolute or relative.
+     * @param int|string $endRange The initial value of the range, it can be absolute or relative.
+     * @param \Cake\I18n\FrozenTime|string $from The start date for relative values.
      * @return array
      */
-    public function getYears($start, $sub = 0, $add = 2): array
+    public function getYears($startRange, $endRange, $from = 'now'): array
     {
-        if (is_string($start)) {
-            $date = new FrozenTime($start);
-            $start = (int)$date->year;
+        if (is_int($startRange)) {
+            return range($startRange, $endRange);
         }
 
-        return range($start - $sub, $start + $add);
+        $from = new FrozenTime($from);
+        $start = $from->modify($startRange)->year;
+        $end = $from->modify($endRange)->year;
+
+        return range($start, $end);
     }
 
     /**
@@ -69,5 +79,92 @@ class CalendarHelper extends DateRangesHelper
         $last = FrozenTime::create($year, $month, 1);
 
         return range(1, $last->lastOfMonth()->day);
+    }
+
+    /**
+     * Get the request date, if available.
+     *
+     * @return \Cake\I18n\FrozenTime|null
+     */
+    protected function getRequestDate()
+    {
+        $dayParam = $this->getConfig('dayParam');
+        $monthParam = $this->getConfig('monthParam');
+        $yearParam = $this->getConfig('yearParam');
+        $request = $this->_View->getRequest();
+
+        if ($request->getQuery($monthParam) === null || $request->getQuery($yearParam) === null) {
+            return null;
+        }
+
+        return FrozenTime::create($request->getQuery($yearParam), $request->getQuery($monthParam), $request->getQuery($dayParam) ?? 1, 0, 0, 0);
+    }
+
+    /**
+     * Convert s string input to a date.
+     * If the given input is a relative date, it will apply the modifer to the current request date.
+     *
+     * @param string $date The date to convert.
+     * @param mixed $start The start date for relative dates.
+     * @return \Cake\I18n\FrozenTime
+     */
+    protected function prepareLinkDate($date, $start = null)
+    {
+        if (is_string($date) && ($date[0] === '+' || $date[0] === '-')) {
+            $start = ($start ? new FrozenTime($start) : null) ?? $this->getRequestDate() ?? FrozenTime::now()->startOfDay();
+            return $start->modify($date);
+        }
+
+        return new FrozenTime($date);
+    }
+
+    /**
+     * Generate an url to a day in the calendar.
+     * It accept absolute and relative dates eg "+1 month" "2022-04-25" "-7 days"
+     *
+     * @param string $title Link title.
+     * @param mixed $date The absolute or relative date.
+     * @param array $options Link options.
+     * @param mixed $start The start date for relative urls.
+     * @return string The url to the calendar date.
+     */
+    public function url($date, array $options = [], $start = null)
+    {
+        $dayParam = $this->getConfig('dayParam');
+        $monthParam = $this->getConfig('monthParam');
+        $yearParam = $this->getConfig('yearParam');
+        $date = $this->prepareLinkDate($date, $start);
+        $query = array_merge($options['?'] ?? [], [
+            $dayParam => $date->day,
+            $monthParam => $date->month,
+            $yearParam => $date->year,
+        ]);
+
+        return $this->Url->build(['?' => $query] + $options);
+    }
+
+    /**
+     * Generate a link to a day in the calendar.
+     * It accept absolute and relative dates eg "+1 month" "2022-04-25" "-7 days"
+     *
+     * @param string $title Link title.
+     * @param mixed $date The absolute or relative date.
+     * @param array $options Link options.
+     * @param mixed $start The start date for relative urls.
+     * @return string The anchor element with a link to the calendar date.
+     */
+    public function link($title, $date, array $options = [], $start = null)
+    {
+        $dayParam = $this->getConfig('dayParam');
+        $monthParam = $this->getConfig('monthParam');
+        $yearParam = $this->getConfig('yearParam');
+        $date = $this->prepareLinkDate($date, $start);
+        $query = array_merge($options['?'] ?? [], [
+            $dayParam => $date->day,
+            $monthParam => $date->month,
+            $yearParam => $date->year,
+        ]);
+
+        return $this->Html->link($title, ['?' => $query] + $options);
     }
 }
