@@ -23,8 +23,8 @@ class DateRangesHelper extends Helper
         'wholeDay' => '{0,date,long}',
         'sameDay' => '{0,date,long}, dalle {0,time,short} alle {1,time,short}',
         'sameMonth' => 'dal {0,date,d} al {1,date,long}',
-        'sameYear' => 'dal {0,date,d MMM} al {1,date,d MMM Y}',
-        'other' => 'dal {0,date,d MMM Y} al {1,date,d MMM Y}',
+        'sameYear' => 'dal {0,date,d MMMM} al {1,date,d MMMM Y}',
+        'other' => 'dal {0,date,d MMMM Y} al {1,date,d MMMM Y}',
     ];
 
     /**
@@ -114,7 +114,7 @@ class DateRangesHelper extends Helper
         $sorted = collection($ranges)
             ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
-            ->filter(fn (DateRange $dr): bool => $dr->start_date->gte($now) || ($dr->end_date !== null && $dr->end_date->gte($now)))
+            ->filter(fn (DateRange $dr): bool => (new FrozenTime($dr->start_date))->gte($now) || ($dr->end_date !== null && (new FrozenTime($dr->end_date))->gte($now)))
             ->first();
         if ($currentOrFuture !== null) {
             // Found an event overlapping `$now` point in time, or the closest one in the future.
