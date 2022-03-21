@@ -8,6 +8,7 @@ use Cake\I18n\FrozenTime;
 /**
  * Calendar helper
  *
+ * @property \Cake\View\Helper\FormHelper $Form
  * @property \Cake\View\Helper\HtmlHelper $Html
  * @property \Cake\View\Helper\UrlHelper $Url
  */
@@ -16,7 +17,7 @@ class CalendarHelper extends DateRangesHelper
     /**
      * @inheritdoc
      */
-    public $helpers = ['Html', 'Url'];
+    public $helpers = ['Form', 'Html', 'Url'];
 
     /**
      * Default configuration.
@@ -49,7 +50,9 @@ class CalendarHelper extends DateRangesHelper
         $start = $from->modify($startRange)->year;
         $end = $from->modify($endRange)->year;
 
-        return range($start, $end);
+        $years = range($start, $end);
+
+        return array_combine($years, $years);
     }
 
     /**
@@ -77,28 +80,25 @@ class CalendarHelper extends DateRangesHelper
     public function getDaysInMonth(int $year, int $month): array
     {
         $last = FrozenTime::create($year, $month, 1);
+        $days = range(1, $last->lastOfMonth()->day);
 
-        return range(1, $last->lastOfMonth()->day);
+        return array_combine($days, $days);
     }
 
     /**
      * Get the request date, if available.
      *
-     * @return \Cake\I18n\FrozenTime|null
+     * @return \Cake\I18n\FrozenTime
      */
-    public function getDate(?int $year = null, ?int $month = null, ?int $day = null): ?FrozenTime
+    public function getDate(): FrozenTime
     {
         $dayParam = $this->getConfig('dayParam');
         $monthParam = $this->getConfig('monthParam');
         $yearParam = $this->getConfig('yearParam');
         $request = $this->_View->getRequest();
 
-        if ($year !== null && $month !== null) {
-            return FrozenTime::create($year, $month, $day ?? 1);
-        }
-
         if ($request->getQuery($monthParam) === null || $request->getQuery($yearParam) === null) {
-            return null;
+            return FrozenTime::now();
         }
 
         return FrozenTime::create($request->getQuery($yearParam), $request->getQuery($monthParam), $request->getQuery($dayParam) ?? 1, 0, 0, 0);
@@ -170,5 +170,82 @@ class CalendarHelper extends DateRangesHelper
         ]);
 
         return $this->Html->link($title, ['?' => $query] + $options);
+    }
+
+    /**
+     * A JavaScript to update days select on month/year changes.
+     *
+     * @return string JavaScript code.
+     */
+    protected function onChangeScript()
+    {
+        $dayParam = $this->getConfig('dayParam');
+        $monthParam = $this->getConfig('monthParam');
+        $yearParam = $this->getConfig('yearParam');
+
+        $code = 'var form = event.target.closest(\'form\');';
+        $code .= 'if (form) {';
+        $code .= sprintf('var days = form.querySelector(\'[name=%s]\');', $dayParam);
+        $code .= 'if (days) {';
+        $code .= 'var data = new FormData(form);';
+        $code .= sprintf('var month = data.get(\'%s\');', $monthParam);
+        $code .= sprintf('var year = data.get(\'%s\');', $yearParam);
+        $code .= 'var date = new Date(year, month, 0);';
+        $code .= 'days.innerHTML = \'\';';
+        $code .= 'var num = date.getDate(); while (num--) {';
+        $code .= 'var option = document.createElement(\'option\');';
+        $code .= 'option.value = num + 1;';
+        $code .= 'option.textContent = num + 1;';
+        $code .= 'option.selected = num === 0;';
+        $code .= 'days.insertBefore(option, days.firstChild);';
+        $code .= '}';
+        $code .= '}';
+        $code .= '}';
+
+        return $code;
+    }
+
+    /**
+     * Genrate a <select> element for days.
+     *
+     * @return string The <select> element.
+     */
+    public function daysControl()
+    {
+        $date = $this->getDate();
+
+        return $this->Form->select($this->getConfig('dayParam'), $this->getDaysInMonth($date->year, $date->month), [
+            'value' => $date->day,
+        ]);
+    }
+
+    /**
+     * Genrate a <select> element for months.
+     *
+     * @return string The <select> element.
+     */
+    public function monthsControl()
+    {
+        $date = $this->getDate();
+
+        return $this->Form->select($this->getConfig('monthParam'), $this->getMonths(), [
+            'onchange' => $this->onChangeScript(),
+            'value' => $date->month,
+        ]);
+    }
+
+    /**
+     * Genrate a <select> element for years.
+     *
+     * @return string The <select> element.
+     */
+    public function yearsControl($start = '-2 years', $end = '+2 years')
+    {
+        $date = $this->getDate();
+
+        return $this->Form->select($this->getConfig('yearParam'), $this->getYears($start, $end), [
+            'onchange' => $this->onChangeScript(),
+            'value' => $date->year,
+        ]);
     }
 }
