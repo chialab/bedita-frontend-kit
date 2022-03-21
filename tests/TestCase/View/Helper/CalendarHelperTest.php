@@ -137,23 +137,23 @@ class CalendarHelperTest extends TestCase
         return [
             'november' => [
                 30,
-                11,
                 2022,
+                11,
             ],
             'march' => [
                 31,
-                3,
                 2022,
+                3,
             ],
             'february' => [
                 28,
-                2,
                 2022,
+                2,
             ],
             'leap' => [
                 29,
-                2,
                 2024,
+                2,
             ],
         ];
     }
@@ -162,16 +162,16 @@ class CalendarHelperTest extends TestCase
      * Test {@see CalendarHelperTest::getDaysInMonth()} method.
      *
      * @param int $expected Expected result.
-     * @param int $month The month.
      * @param int $year The year.
+     * @param int $month The month.
      * @return void
      *
      * @dataProvider getDaysInMonthProvider()
      * @covers ::getDaysInMonth()
      */
-    public function testGetDaysInMonth(int $expected, int $month, int $year): void
+    public function testGetDaysInMonth(int $expected, int $year, int $month): void
     {
-        $actual = $this->Calendar->getDaysInMonth($month, $year);
+        $actual = $this->Calendar->getDaysInMonth($year, $month);
 
         static::assertSame($expected, count($actual));
     }

@@ -70,11 +70,11 @@ class CalendarHelper extends DateRangesHelper
     /**
      * Get a list of available days in a month for a given year.
      *
-     * @param int $month Month
      * @param int $year Year
+     * @param int $month Month
      * @return array
      */
-    public function getDaysInMonth(int $month, int $year): array
+    public function getDaysInMonth(int $year, int $month): array
     {
         $last = FrozenTime::create($year, $month, 1);
 
@@ -86,12 +86,16 @@ class CalendarHelper extends DateRangesHelper
      *
      * @return \Cake\I18n\FrozenTime|null
      */
-    protected function getRequestDate()
+    public function getDate(?int $year = null, ?int $month = null, ?int $day = null): ?FrozenTime
     {
         $dayParam = $this->getConfig('dayParam');
         $monthParam = $this->getConfig('monthParam');
         $yearParam = $this->getConfig('yearParam');
         $request = $this->_View->getRequest();
+
+        if ($year !== null && $month !== null) {
+            return FrozenTime::create($year, $month, $day ?? 1);
+        }
 
         if ($request->getQuery($monthParam) === null || $request->getQuery($yearParam) === null) {
             return null;
@@ -111,7 +115,7 @@ class CalendarHelper extends DateRangesHelper
     protected function prepareLinkDate($date, $start = null)
     {
         if (is_string($date) && ($date[0] === '+' || $date[0] === '-')) {
-            $start = ($start ? new FrozenTime($start) : null) ?? $this->getRequestDate() ?? FrozenTime::now()->startOfDay();
+            $start = ($start ? new FrozenTime($start) : null) ?? $this->getDate() ?? FrozenTime::now()->startOfDay();
             return $start->modify($date);
         }
 
