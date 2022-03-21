@@ -94,7 +94,7 @@ class CalendarHelperTest extends TestCase
     {
         $actual = $this->Calendar->getYears($start, $end, $from);
 
-        static::assertEquals($expected, $actual);
+        static::assertEquals($expected, array_values($actual));
     }
 
     /**
