@@ -181,7 +181,7 @@ class CalendarHelperTest extends TestCase
      *
      * @return array[]
      */
-    public function getUrlProvider(): array
+    public function urlProvider(): array
     {
         return [
             'absolute' => [
@@ -208,7 +208,7 @@ class CalendarHelperTest extends TestCase
     }
 
     /**
-     * Test {@see CalendarHelperTest::getUrl()} method.
+     * Test {@see CalendarHelperTest::url()} method.
      *
      * @param string $expected Expected result.
      * @param mixed $date The absolute or relative date.
@@ -216,12 +216,62 @@ class CalendarHelperTest extends TestCase
      * @param mixed $start The start date for relative urls.
      * @return void
      *
-     * @dataProvider getUrlProvider()
-     * @covers ::getUrl()
+     * @dataProvider urlProvider()
+     * @covers ::url()
      */
-    public function testGetUrl(string $expected, $date, $start): void
+    public function testUrl(string $expected, $date, $start): void
     {
         $actual = $this->Calendar->url($date, [], $start);
+
+        static::assertEquals($expected, html_entity_decode($actual));
+    }
+
+    /**
+     * Data provider for {@see CalendarHelperTest::testLink()} test case.
+     *
+     * @return array[]
+     */
+    public function linkProvider(): array
+    {
+        return [
+            'absolute' => [
+                '<a href="/?day=25&month=4&year=2022">Link</a>',
+                '2022-04-25',
+                null,
+            ],
+            'data' => [
+                '<a href="/?day=25&month=4&year=2022">Link</a>',
+                FrozenTime::create(2022, 4, 25),
+                null,
+            ],
+            'relative' => [
+                '<a href="/?day=25&month=4&year=2022">Link</a>',
+                '+1 month',
+                null,
+            ],
+            'from' => [
+                '<a href="/?day=1&month=9&year=2022">Link</a>',
+                '+1 month',
+                '2022-08-01',
+            ],
+        ];
+    }
+
+    /**
+     * Test {@see CalendarHelperTest::link()} method.
+     *
+     * @param string $expected Expected result.
+     * @param mixed $date The absolute or relative date.
+     * @param array $options Link options.
+     * @param mixed $start The start date for relative urls.
+     * @return void
+     *
+     * @dataProvider linkProvider()
+     * @covers ::link()
+     */
+    public function testLink(string $expected, $date, $start): void
+    {
+        $actual = $this->Calendar->link('Link', $date, [], $start);
 
         static::assertEquals($expected, html_entity_decode($actual));
     }
