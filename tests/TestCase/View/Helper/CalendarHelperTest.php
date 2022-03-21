@@ -5,9 +5,9 @@ use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\I18n\FrozenTime;
 use Cake\Routing\Router;
-use Chialab\FrontendKit\View\Helper\CalendarHelper;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
+use Chialab\FrontendKit\View\Helper\CalendarHelper;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\CalendarHelper} Test Case

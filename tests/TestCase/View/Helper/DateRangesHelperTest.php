@@ -4,9 +4,9 @@ namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 use BEdita\Core\Model\Entity\DateRange;
 use Cake\I18n\FrozenTime;
 use Cake\I18n\I18n;
-use Chialab\FrontendKit\View\Helper\DateRangesHelper;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
+use Chialab\FrontendKit\View\Helper\DateRangesHelper;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\DateRangesHelper} Test Case

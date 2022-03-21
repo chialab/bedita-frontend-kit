@@ -116,6 +116,7 @@ class CalendarHelper extends DateRangesHelper
     {
         if (is_string($date) && ($date[0] === '+' || $date[0] === '-')) {
             $start = ($start ? new FrozenTime($start) : null) ?? $this->getDate() ?? FrozenTime::now()->startOfDay();
+
             return $start->modify($date);
         }
 
@@ -126,7 +127,6 @@ class CalendarHelper extends DateRangesHelper
      * Generate an url to a day in the calendar.
      * It accept absolute and relative dates eg "+1 month" "2022-04-25" "-7 days"
      *
-     * @param string $title Link title.
      * @param mixed $date The absolute or relative date.
      * @param array $options Link options.
      * @param mixed $start The start date for relative urls.
