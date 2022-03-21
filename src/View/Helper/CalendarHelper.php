@@ -185,11 +185,11 @@ class CalendarHelper extends DateRangesHelper
 
         $code = 'var form = event.target.closest(\'form\');';
         $code .= 'if (form) {';
-        $code .= sprintf('var days = form.querySelector(\'[name=%s]\');', $dayParam);
+        $code .= sprintf('var days = form.querySelector(%s);', json_encode(sprintf('[name=%s]', $dayParam)));
         $code .= 'if (days) {';
         $code .= 'var data = new FormData(form);';
-        $code .= sprintf('var month = data.get(\'%s\');', $monthParam);
-        $code .= sprintf('var year = data.get(\'%s\');', $yearParam);
+        $code .= sprintf('var month = data.get(%s);', json_encode($monthParam));
+        $code .= sprintf('var year = data.get(%s);', json_encode($yearParam));
         $code .= 'var date = new Date(year, month, 0);';
         $code .= 'days.innerHTML = \'\';';
         $code .= 'var num = date.getDate(); while (num--) {';
