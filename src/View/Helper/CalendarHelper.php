@@ -297,7 +297,7 @@ class CalendarHelper extends DateRangesHelper
     /**
      * Genrate a reset link for the calendar view.
      *
-     * @param string The title of the link.
+     * @param string $title The title of the link.
      * @param array|null $options Options for the link element.
      * @return string The <a> element.
      */
