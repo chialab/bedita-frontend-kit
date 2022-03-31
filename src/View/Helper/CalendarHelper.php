@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
+use BEdita\Core\Model\Entity\DateRange;
 use Cake\I18n\FrozenTime;
 
 /**
@@ -25,6 +26,7 @@ class CalendarHelper extends DateRangesHelper
      * @var array
      */
     protected $_defaultConfig = [
+        'searchParam' => 'q',
         'dayParam' => 'day',
         'monthParam' => 'month',
         'yearParam' => 'year',
@@ -105,6 +107,18 @@ class CalendarHelper extends DateRangesHelper
     }
 
     /**
+     * Get the request search text, if available.
+     *
+     * @return string|null
+     */
+    public function getSearchText(): ?string
+    {
+        $request = $this->_View->getRequest();
+
+        return $request->getQuery($this->getConfig('searchParam'));
+    }
+
+    /**
      * Convert s string input to a date.
      * If the given input is a relative date, it will apply the modifer to the current request date.
      *
@@ -112,7 +126,7 @@ class CalendarHelper extends DateRangesHelper
      * @param mixed $start The start date for relative dates.
      * @return \Cake\I18n\FrozenTime
      */
-    protected function prepareLinkDate($date, $start = null)
+    protected function prepareLinkDate($date, $start = null): FrozenTime
     {
         if (is_string($date) && ($date[0] === '+' || $date[0] === '-')) {
             $start = ($start ? new FrozenTime($start) : null) ?? $this->getDate() ?? FrozenTime::now()->startOfDay();
@@ -132,7 +146,7 @@ class CalendarHelper extends DateRangesHelper
      * @param mixed $start The start date for relative urls.
      * @return string The url to the calendar date.
      */
-    public function url($date, array $options = [], $start = null)
+    public function url($date, array $options = [], $start = null): string
     {
         $dayParam = $this->getConfig('dayParam');
         $monthParam = $this->getConfig('monthParam');
@@ -157,7 +171,7 @@ class CalendarHelper extends DateRangesHelper
      * @param mixed $start The start date for relative urls.
      * @return string The anchor element with a link to the calendar date.
      */
-    public function link($title, $date, array $options = [], $start = null)
+    public function link(string $title, $date, array $options = [], $start = null): string
     {
         $dayParam = $this->getConfig('dayParam');
         $monthParam = $this->getConfig('monthParam');
@@ -177,7 +191,7 @@ class CalendarHelper extends DateRangesHelper
      *
      * @return string JavaScript code.
      */
-    protected function onChangeScript()
+    protected function onChangeScript(): string
     {
         $dayParam = $this->getConfig('dayParam');
         $monthParam = $this->getConfig('monthParam');
@@ -206,46 +220,106 @@ class CalendarHelper extends DateRangesHelper
     }
 
     /**
+     * Genrate a <input> element for search.
+     *
+     * @param array|null $options Options for the input element.
+     * @return string The <input> element.
+     */
+    public function searchControl($options = null): string
+    {
+        $text = $this->getSearchText();
+        $options = $options ?? [];
+
+        return $this->Form->text($this->getConfig('searchParam'), [
+            'value' => $text,
+        ] + $options);
+    }
+
+    /**
      * Genrate a <select> element for days.
      *
+     * @param array|null $options Options for the select element.
      * @return string The <select> element.
      */
-    public function daysControl()
+    public function daysControl($options = null): string
     {
         $date = $this->getDate();
+        $options = $options ?? [];
 
-        return $this->Form->select($this->getConfig('dayParam'), $this->getDaysInMonth($date->year, $date->month), [
+        return $this->Form->control($this->getConfig('dayParam'), [
+            'label' => '',
+            'type' => 'select',
+            'options' => $this->getDaysInMonth($date->year, $date->month),
             'value' => $date->day,
-        ]);
+        ] + $options);
     }
 
     /**
      * Genrate a <select> element for months.
      *
+     * @param array|null $options Options for the select element.
      * @return string The <select> element.
      */
-    public function monthsControl()
+    public function monthsControl($options = null): string
     {
         $date = $this->getDate();
+        $options = $options ?? [];
 
-        return $this->Form->select($this->getConfig('monthParam'), $this->getMonths(), [
+        return $this->Form->control($this->getConfig('monthParam'), [
+            'label' => '',
+            'type' => 'select',
+            'options' => $this->getMonths(),
             'onchange' => $this->onChangeScript(),
             'value' => $date->month,
-        ]);
+        ] + $options);
     }
 
     /**
      * Genrate a <select> element for years.
      *
+     * @param array|null $options Options for the select element.
      * @return string The <select> element.
      */
-    public function yearsControl($start = '-2 years', $end = '+2 years')
+    public function yearsControl($options = null, $start = '-2 years', $end = '+2 years'): string
     {
         $date = $this->getDate();
+        $options = $options ?? [];
 
-        return $this->Form->select($this->getConfig('yearParam'), $this->getYears($start, $end), [
+        return $this->Form->control($this->getConfig('yearParam'), [
+            'label' => '',
+            'type' => 'select',
+            'options' => $this->getYears($start, $end),
             'onchange' => $this->onChangeScript(),
             'value' => $date->year,
+        ] + $options);
+    }
+
+    /**
+     * Genrate a reset link for the calendar view.
+     *
+     * @return string The title of the link.
+     * @param array|null $options Options for the link element.
+     * @return string The <a> element.
+     */
+    public function resetControl(string $title, $options = null): string
+    {
+        $searchParam = $this->getConfig('searchParam');
+        $dayParam = $this->getConfig('dayParam');
+        $monthParam = $this->getConfig('monthParam');
+        $yearParam = $this->getConfig('yearParam');
+
+        $url = $this->_View->getRequest()->url;
+        $query = $this->_View->getRequest()->getQueryParams();
+        $query = array_diff_key($query, [
+            $searchParam => null,
+            $dayParam => null,
+            $monthParam => null,
+            $yearParam => null,
         ]);
+        if (!empty($query)) {
+            $url = sprintf('%s?%s', $url, http_build_query($query));
+        }
+
+        return $this->Html->link($title, $url, $options);
     }
 }
