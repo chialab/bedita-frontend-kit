@@ -9,7 +9,7 @@ use Cake\Auth\WeakPasswordHasher;
  */
 class UsersFixture extends BEUsersFixture
 {
-    public function init()
+    public function init(): void
     {
         $this->records = [
             [

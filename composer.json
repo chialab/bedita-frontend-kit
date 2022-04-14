@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "ext-json": "*",
-        "bedita/core": "^4.2.0",
+        "bedita/core": "^4.7.0",
         "cakephp/cakephp": "^3.8",
         "wyrihaximus/twig-view": "^4.3",
         "chialab/rna-cakephp": "^0.2.1",

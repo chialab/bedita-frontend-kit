@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\TreesFixture as BETreesFixture;
  */
 class TreesFixture extends BETreesFixture
 {
-    public function init()
+    public function init(): void
     {
         $trees = [
             2 => [
