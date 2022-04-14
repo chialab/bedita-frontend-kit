@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\ObjectTypesFixture as BEObjectTypesFixture;
  */
 class ObjectTypesFixture extends BEObjectTypesFixture
 {
-    public function init()
+    public function init(): void
     {
         array_push(
             $this->records,

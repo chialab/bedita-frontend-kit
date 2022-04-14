@@ -29,6 +29,8 @@ class PublicationComponentTest extends TestCase
         'plugin.Chialab/FrontendKit.ObjectRelations',
         'plugin.BEdita/Core.Categories',
         'plugin.BEdita/Core.ObjectCategories',
+        'plugin.BEdita/Core.Tags',
+        'plugin.BEdita/Core.ObjectTags',
     ];
 
     /**
