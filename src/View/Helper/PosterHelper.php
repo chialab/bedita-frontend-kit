@@ -260,7 +260,11 @@ class PosterHelper extends Helper
             return '';
         }
 
-        if (empty($props) || !isset($props['position_x']) || !isset($props['position_y'])) {
+        if (!empty($props['position'])) {
+            return $props['position'];
+        }
+
+        if (!isset($props['position_x']) || !isset($props['position_y'])) {
             return '';
         }
 
