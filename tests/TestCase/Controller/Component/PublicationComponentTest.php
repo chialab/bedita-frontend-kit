@@ -218,7 +218,6 @@ class PublicationComponentTest extends TestCase
      * Test {@see PublicationComponent::genericTreeAction()}.
      *
      * @covers ::genericTreeAction()
-     * @covers ::loadChildren()
      */
     public function testFilteredChildren()
     {
@@ -238,7 +237,6 @@ class PublicationComponentTest extends TestCase
      * Test {@see PublicationComponent::genericTreeAction()}.
      *
      * @covers ::genericTreeAction()
-     * @covers ::loadChildren()
      */
     public function testSortedChildren()
     {
@@ -261,7 +259,6 @@ class PublicationComponentTest extends TestCase
      * Test {@see PublicationComponent::genericTreeAction()}.
      *
      * @covers ::genericTreeAction()
-     * @covers ::loadChildren()
      */
     public function testChildrenParams()
     {
