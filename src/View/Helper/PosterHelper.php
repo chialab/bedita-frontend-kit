@@ -249,8 +249,11 @@ class PosterHelper extends Helper
             $props = $object->custom_props;
         }
 
-        if (isset($object->poster[0])) {
-            $props = $object->poster[0]->custom_props;
+        if (isset($object->poster)) {
+            $poster = collection($object->poster)->first();
+            if ($poster !== null) {
+                $props = $poster->custom_props;
+            }
         }
 
         if (empty($props)) {
