@@ -31,7 +31,7 @@ trait RenderTrait
      * @param string|null $layout Layout to use
      * @return \Cake\Http\Response A response object containing the rendered view.
      */
-    public abstract function render($view = null, $layout = null);
+    abstract public function render($view = null, $layout = null);
 
     /**
      * Generate a list of templates to try to use for the given object.
