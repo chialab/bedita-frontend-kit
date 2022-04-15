@@ -182,7 +182,7 @@ class PublicationComponent extends Component
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $items List of objects.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null The leaf object.
      */
-    public function getLeaf(array $items): ObjectEntity|null
+    public function getLeaf(array $items): ?ObjectEntity
     {
         return $items[count($items) - 1] ?? null;
     }
@@ -204,7 +204,7 @@ class PublicationComponent extends Component
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $items List of objects.
      * @return \BEdita\Core\Model\Entity\Folder|null The parent object.
      */
-    public function getParent(array $items): Folder|null
+    public function getParent(array $items): ?Folder
     {
         $ancestors = $this->getAncestors($items);
 
