@@ -11,9 +11,9 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
-use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
+use Chialab\FrontendKit\Traits\RenderTrait;
 use InvalidArgumentException;
 
 /**
@@ -25,6 +25,7 @@ use InvalidArgumentException;
 class PublicationComponent extends Component
 {
     use ModelAwareTrait;
+    use RenderTrait;
 
     /**
      * {@inheritDoc}
@@ -105,6 +106,14 @@ class PublicationComponent extends Component
     }
 
     /**
+     * Render a view using the bound controller.
+     */
+    public function render($view = null, $layout = null)
+    {
+        return $this->getController()->render($view, $layout);
+    }
+
+    /**
      * Getter for publication.
      *
      * @return \BEdita\Core\Model\Entity\Folder
@@ -154,52 +163,8 @@ class PublicationComponent extends Component
             $this->getController()->set(compact('children'));
         }
 
+
         return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
-    }
-
-    /**
-     * Generate a list of templates to try to use for the given object.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity $object The main object.
-     * @param \BEdita\Core\Model\Entity\Folder $ancestors A list of ancestors.
-     * @return \Generator A generator function.
-     */
-    protected function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator
-    {
-        yield $object->uname;
-
-        $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
-        foreach ($ancestors as $ancestor) {
-            foreach ($chain as $type) {
-                yield sprintf('%s.%s', $ancestor->uname, $type->name);
-            }
-        }
-
-        $type = array_shift($chain);
-        yield $type->name;
-
-        foreach ($chain as $type) {
-            yield $type->name;
-        }
-    }
-
-    /**
-     * Render first found template.
-     *
-     * @param string ...$templates Templates to search.
-     * @return \Cake\Http\Response
-     */
-    public function renderFirstTemplate(string ...$templates): Response
-    {
-        foreach ($templates as $template) {
-            try {
-                return $this->getController()->render($template);
-            } catch (MissingTemplateException $e) {
-                continue;
-            }
-        }
-
-        throw new MissingTemplateException(__('None of the searched templates was found'));
     }
 
     /**

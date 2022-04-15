@@ -28,6 +28,8 @@ use Chialab\FrontendKit\Routing\Route\ObjectRoute;
  */
 trait GenericActionsTrait
 {
+    use RenderTrait;
+
     /**
      * Gets the request instance.
      *
@@ -48,7 +50,7 @@ trait GenericActionsTrait
             $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
             $this->set(compact('object'));
 
-            return $this->Publication->renderFirstTemplate($object->uname, $object->type, 'objects');
+            return $this->renderFirstTemplate($object->uname, $object->type, 'objects');
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Page not found'), null, $e);
         }
@@ -87,7 +89,7 @@ trait GenericActionsTrait
                 ->extract('name')
                 ->toList();
 
-            return $this->Publication->renderFirstTemplate(...$types);
+            return $this->renderFirstTemplate(...$types);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Page not found'), null, $e);
         }
