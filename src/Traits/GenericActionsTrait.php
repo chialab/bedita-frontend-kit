@@ -104,13 +104,23 @@ trait GenericActionsTrait
     public function fallback(string $path): Response
     {
         try {
-            $query = $this->getRequest()->getQuery('q');
-            $filter = [];
-            if (!empty($query)) {
-                $filter['query'] = [$query];
+            $items = $this->Publication->loadObjectPath($path)->toList();
+
+            $object = $this->Publication->getLeaf($items);
+            $ancestors = $this->Publication->getAncestors($items);
+            $parent = $this->Publication->getParent($items);
+
+            if ($object->type === 'folders') {
+                $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $this->Filters->fromQuery());
+                $children = $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']]);
+                $object['children'] = $children;
+
+                $this->set(compact('children'));
             }
 
-            return $this->Publication->genericTreeAction($path, $filter);
+            $this->set(compact('object', 'parent', 'ancestors'));
+
+            return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Page not found'), null, $e);
         }
