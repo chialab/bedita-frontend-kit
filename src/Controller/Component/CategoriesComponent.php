@@ -12,7 +12,7 @@ use Cake\Utility\Text;
 use InvalidArgumentException;
 
 /**
- * Objects component
+ * Categories component
  *
  * @property-read \BEdita\Core\Model\Table\CategoriesTable $Categories
  */
