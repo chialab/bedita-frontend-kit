@@ -38,6 +38,15 @@ trait GenericActionsTrait
     abstract public function getRequest();
 
     /**
+     * Handles pagination of records in Table objects.
+     *
+     * @param \Cake\ORM\Table|string|\Cake\ORM\Query|null $object Table to paginate
+     * @param array $settings The settings/configuration used for pagination.
+     * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
+     */
+    abstract public function paginate($object = null, array $settings = []);
+
+    /**
      * Generic objects route.
      *
      * @param string $id Object id
@@ -110,7 +119,7 @@ trait GenericActionsTrait
 
             if ($object->type === 'folders') {
                 $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $this->Filters->fromQuery());
-                $children = $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']]);
+                $children = $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
                 $object['children'] = $children;
 
                 $this->set(compact('children'));

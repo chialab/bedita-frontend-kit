@@ -140,7 +140,7 @@ class PublicationComponent extends Component
 
         if ($object->type === 'folders') {
             $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
-            $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']]);
+            $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
             $object['children'] = $children;
 
             $this->getController()->set(compact('children'));
