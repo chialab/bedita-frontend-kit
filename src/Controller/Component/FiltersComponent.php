@@ -2,6 +2,7 @@
 namespace Chialab\FrontendKit\Controller\Component;
 
 use Cake\Controller\Component;
+use Cake\Utility\Hash;
 
 /**
  * Filters component.
@@ -30,8 +31,11 @@ class FiltersComponent extends Component
         $request = $this->getController()->getRequest();
 
         $params = $this->getConfig('params');
-        if (isset($params['query']) && !empty($request->getQuery($params['query']))) {
-            $filter['query'] = $request->getQuery($params['query']);
+        foreach ($params as $dest => $source) {
+            $value = $request->getQuery($source);
+            if ($value !== null) {
+                $filter = Hash::insert($filter, $dest, $value);
+            }
         }
 
         return $filter;
