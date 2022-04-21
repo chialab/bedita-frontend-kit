@@ -134,11 +134,9 @@ class PublicationComponent extends Component
      */
     public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
     {
-        $items = $this->loadObjectPath($path)->toList();
-
-        $object = $this->getLeaf($items);
-        $ancestors = $this->getAncestors($items);
-        $parent = $this->getParent($items);
+        $ancestors = $this->loadObjectPath($path)->toList();
+        $object = array_pop($ancestors);
+        $parent = end($ancestors) ?: null;
 
         if ($object->type === 'folders') {
             $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
@@ -174,40 +172,5 @@ class PublicationComponent extends Component
     public function getViablePaths(int $id, ?int $via = null): array
     {
         return $this->loader->getViablePaths($id, $this->getPublication()->id, $via);
-    }
-
-    /**
-     * Extract the leaf object from a list of objects.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $items List of objects.
-     * @return \BEdita\Core\Model\Entity\ObjectEntity|null The leaf object.
-     */
-    public function getLeaf(array $items): ?ObjectEntity
-    {
-        return $items[count($items) - 1] ?? null;
-    }
-
-    /**
-     * Extract a list of ancestors for a list og objects.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $items List of objects.
-     * @return \BEdita\Core\Model\Entity\Folder[] Ancestor objects.
-     */
-    public function getAncestors(array $items): array
-    {
-        return array_slice($items, 0, -1);
-    }
-
-    /**
-     * Extract the parent object from a list of objects.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $items List of objects.
-     * @return \BEdita\Core\Model\Entity\Folder|null The parent object.
-     */
-    public function getParent(array $items): ?Folder
-    {
-        $ancestors = $this->getAncestors($items);
-
-        return $ancestors[count($ancestors) - 1] ?? null;
     }
 }

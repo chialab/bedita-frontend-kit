@@ -104,11 +104,9 @@ trait GenericActionsTrait
     public function fallback(string $path): Response
     {
         try {
-            $items = $this->Publication->loadObjectPath($path)->toList();
-
-            $object = $this->Publication->getLeaf($items);
-            $ancestors = $this->Publication->getAncestors($items);
-            $parent = $this->Publication->getParent($items);
+            $ancestors = $this->Publication->loadObjectPath($path)->toList();
+            $object = array_pop($ancestors);
+            $parent = end($ancestors) ?: null;
 
             if ($object->type === 'folders') {
                 $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $this->Filters->fromQuery());
