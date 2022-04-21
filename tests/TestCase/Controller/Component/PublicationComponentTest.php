@@ -222,13 +222,13 @@ class PublicationComponentTest extends TestCase
     public function testFilteredChildren()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');
-        $children = $this->controller->viewVars['children']->toList();
+        $children = $this->controller->viewVars['children'];
         static::assertSame(2, count($children));
         static::assertSame('Document 1', $children[0]->title);
         static::assertSame('Profile 1', $children[1]->title);
 
         $this->Publication->genericTreeAction('parent-1/child-1', ['query' => 'Document']);
-        $children = $this->controller->viewVars['children']->toList();
+        $children = $this->controller->viewVars['children'];
         static::assertSame(1, count($children));
         static::assertSame('Document 1', $children[0]->title);
     }
@@ -241,7 +241,7 @@ class PublicationComponentTest extends TestCase
     public function testSortedChildren()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');
-        $children = $this->controller->viewVars['children']->toList();
+        $children = $this->controller->viewVars['children'];
         static::assertSame('Document 1', $children[0]->title);
         static::assertSame('Profile 1', $children[1]->title);
 
@@ -250,7 +250,7 @@ class PublicationComponentTest extends TestCase
             'direction' => 'desc',
         ]);
         $this->Publication->genericTreeAction('parent-1/child-1');
-        $children = $this->controller->viewVars['children']->toList();
+        $children = $this->controller->viewVars['children'];
         static::assertSame('Profile 1', $children[0]->title);
         static::assertSame('Document 1', $children[1]->title);
     }
@@ -263,7 +263,7 @@ class PublicationComponentTest extends TestCase
     public function testChildrenParams()
     {
         $this->Publication->genericTreeAction('parent-1/child-1');
-        $children = $this->controller->viewVars['children']->toList();
+        $children = $this->controller->viewVars['children'];
 
         static::assertSame(true, $children[0]->relation['menu']);
         static::assertSame(false, $children[0]->relation['canonical']);
