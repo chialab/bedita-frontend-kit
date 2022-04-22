@@ -156,7 +156,7 @@ class ObjectsLoader
 
         if ($depth === 1 && $hydrate === null && !empty($contain)) {
             $hydrate = array_reduce(
-                array_map(fn (string $assoc) => Inflector::underscore($assoc), $contain),
+                array_map(fn (string $assoc) => Inflector::underscore($assoc), array_keys(Hash::normalize($contain))),
                 fn (array $list, string $relation) => $list + [$relation => 2],
                 $this->autoHydrateAssociations
             );
