@@ -87,7 +87,7 @@ class PublicationComponent extends Component
                 $this->getConfig('publicationLoader.objectTypesConfig', []),
                 $this->getConfig('publicationLoader.autoHydrateAssociations', []),
             );
-            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
+            $publication = $publicationLoader->loadObject($publicationUname, 'folders');
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }

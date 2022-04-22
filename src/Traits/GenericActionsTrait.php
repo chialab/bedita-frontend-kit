@@ -68,8 +68,8 @@ trait GenericActionsTrait
     public function objects(string $id): Response
     {
         try {
-            $object = $this->Objects->loadObject($id);
-            $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+            $object = $this->Objects->loadObject($id, 'objects', [], []);
+            $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
             if ($object->type === 'folders') {
                 $object['children'] = $this->loadFilteredChildren($object->uname);
             }
@@ -90,7 +90,7 @@ trait GenericActionsTrait
     public function object(string $uname): Response
     {
         try {
-            $object = $this->Objects->loadObject($uname);
+            $object = $this->Objects->loadObject($uname, 'objects', [], []);
             $currentRoute = $this->getRequest()->getParam('_matchedRoute');
             foreach (Router::routes() as $route) {
                 if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
@@ -107,7 +107,7 @@ trait GenericActionsTrait
                 return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
             }
 
-            $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+            $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
             if ($object->type === 'folders') {
                 $object['children'] = $this->loadFilteredChildren($object->uname);
             }

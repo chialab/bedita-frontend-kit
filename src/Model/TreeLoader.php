@@ -53,7 +53,7 @@ class TreeLoader
     {
         $parts = array_filter(explode('/', $path));
         $path = implode('/', $parts);
-        $leaf = $this->loader->loadObject(array_pop($parts));
+        $leaf = $this->loader->loadObject(array_pop($parts), 'objects', [], []);
 
         $found = $this->getObjectPaths($leaf->id, $relativeTo)
             ->having(compact('path'), ['path' => 'string'])
@@ -62,7 +62,7 @@ class TreeLoader
         $ids = explode(',', $found['path_ids']);
         array_pop($ids);
 
-        $leaf = $this->loader->loadFullObject((string)$leaf->id, $leaf->type);
+        $leaf = $this->loader->loadObject((string)$leaf->id, $leaf->type, ['include' => '_all']);
 
         if (empty($ids)) {
             return collection([$leaf]);

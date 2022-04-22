@@ -33,13 +33,6 @@ class ObjectsLoader
     use ModelAwareTrait;
 
     /**
-     * List of available relations that are not part of the object schema.
-     *
-     * @var string[]
-     */
-    protected const INCLUDE_ASSOCIATIONS = ['parents'];
-
-    /**
      * Loading configuration on a per-object type basis.
      *
      * @var array[]
@@ -85,30 +78,6 @@ class ObjectsLoader
         $objectType = $this->ObjectTypes->get($type);
 
         return $this->loadSingle($id, $objectType, $options, 1, $hydrate);
-    }
-
-    /**
-     * Fetch an object by its ID or uname and hydrate all its relations.
-     *
-     * @param string|int $id Object ID or uname.
-     * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
-     * @return \BEdita\Core\Model\Entity\ObjectEntity
-     */
-    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
-    {
-        $object = $this->loadObject($id, $type, [], []);
-
-        $objectType = $this->ObjectTypes->get($object->type);
-        $relations = array_merge($objectType->relations, static::INCLUDE_ASSOCIATIONS);
-
-        foreach ($relations as $relation) {
-            $assoc = Inflector::camelize(trim($relation));
-            $object[$relation] = $this->loadRelated($object->id, $objectType, $assoc, [], $options, 2, $hydrate);
-        }
-
-        return $object;
     }
 
     /**
@@ -178,7 +147,20 @@ class ObjectsLoader
 
         $table = $this->getTableLocator()->get($objectType->alias);
         $lang = $this->getLang();
-        $contain = static::prepareContains(Hash::get($options, 'include', ''));
+        $include = Hash::get($options, 'include', '');
+        if ($include === '_all') {
+            $contain = array_map(fn (string $relation) => Inflector::camelize($relation), $objectType->relations);
+        } else {
+            $contain = static::prepareContains($include);
+        }
+
+        if ($depth === 1 && $hydrate === null && !empty($contain)) {
+            $hydrate = array_reduce(
+                array_map(fn (string $assoc) => Inflector::underscore($assoc), $contain),
+                fn (array $list, string $relation) => $list + [$relation => 2],
+                $this->autoHydrateAssociations
+            );
+        }
 
         $action = new GetObjectAction(compact('objectType', 'table'));
         /** @var \BEdita\Core\Model\Entity\ObjectEntity $object */
