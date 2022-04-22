@@ -434,7 +434,7 @@ class ObjectsLoader
         return array_keys(
             array_filter(
                 $hydrateAssociations,
-                function ($maxDepth) use ($depth): bool {
+                function (int $maxDepth) use ($depth): bool {
                     return $maxDepth === -1 || $maxDepth > $depth;
                 }
             )
