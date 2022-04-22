@@ -27,6 +27,11 @@ class PublicationComponent extends Component
     use RenderTrait;
 
     /**
+     * {@inheritDoc}
+     */
+    public $components = ['Chialab/FrontendKit.Objects'];
+
+    /**
      * Default configuration.
      *
      * @var array
@@ -75,13 +80,13 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $publicationLoader = new ObjectsLoader(
-            $this->getConfig('publicationLoader.objectTypesConfig', []),
-            $this->getConfig('publicationLoader.autoHydrateAssociations', [])
-        );
-        $this->loader = new TreeLoader($publicationLoader);
+        $this->loader = new TreeLoader($this->Objects->getLoader());
 
         try {
+            $publicationLoader = new ObjectsLoader(
+                $this->getConfig('publicationLoader.objectTypesConfig', []),
+                $this->getConfig('publicationLoader.autoHydrateAssociations', []),
+            );
             $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
@@ -136,7 +141,7 @@ class PublicationComponent extends Component
         $parent = end($ancestors) ?: null;
 
         if ($object->type === 'folders') {
-            $children = $this->getController()->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
+            $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
             $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
             $object['children'] = $children;
 
