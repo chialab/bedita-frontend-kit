@@ -27,11 +27,6 @@ class PublicationComponent extends Component
     use RenderTrait;
 
     /**
-     * {@inheritDoc}
-     */
-    public $components = ['Chialab/FrontendKit.Objects'];
-
-    /**
      * Default configuration.
      *
      * @var array
@@ -39,7 +34,14 @@ class PublicationComponent extends Component
     protected $_defaultConfig = [
         'menuFolders' => [],
         'publication' => null,
-        'publicationLoader' => null,
+        'publicationLoader' => [
+            'objectTypesConfig' => [
+                'objects' => ['include' => 'poster'],
+            ],
+            'autoHydrateAssociations' => [
+                'children' => 2,
+            ],
+        ],
     ];
 
     /**
@@ -73,13 +75,10 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $publicationLoader = $this->Objects->getLoader();
-        if ($this->getConfig('publicationLoader') !== null) {
-            $publicationLoader = new ObjectsLoader(
-                $this->getConfig('publicationLoader.objectTypesConfig', []),
-                $this->getConfig('publicationLoader.autoHydrateAssociations', [])
-            );
-        }
+        $publicationLoader = new ObjectsLoader(
+            $this->getConfig('publicationLoader.objectTypesConfig', []),
+            $this->getConfig('publicationLoader.autoHydrateAssociations', [])
+        );
         $this->loader = new TreeLoader($publicationLoader);
 
         try {
@@ -137,7 +136,7 @@ class PublicationComponent extends Component
         $parent = end($ancestors) ?: null;
 
         if ($object->type === 'folders') {
-            $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
+            $children = $this->getController()->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
             $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
             $object['children'] = $children;
 

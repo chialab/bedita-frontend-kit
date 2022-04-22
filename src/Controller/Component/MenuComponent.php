@@ -2,7 +2,6 @@
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
-use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Controller\Component;
 use Cake\Datasource\ModelAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
@@ -18,11 +17,6 @@ class MenuComponent extends Component
     use ModelAwareTrait;
 
     /**
-     * {@inheritDoc}
-     */
-    public $components = ['Chialab/FrontendKit.Objects'];
-
-    /**
      * Objects loader instance.
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
@@ -35,7 +29,12 @@ class MenuComponent extends Component
      * @var array
      */
     protected $_defaultConfig = [
-        'menuLoader' => null,
+        'menuLoader' => [
+            'objectTypesConfig' => [],
+            'autoHydrateAssociations' => [
+                'children' => 2,
+            ],
+        ],
     ];
 
     /** {@inheritDoc} */
@@ -45,13 +44,10 @@ class MenuComponent extends Component
 
         $this->loadModel('Trees');
 
-        $menuLoader = $this->Objects->getLoader();
-        if ($this->getConfig('menuLoader') !== null) {
-            $menuLoader = new ObjectsLoader(
-                $this->getConfig('menuLoader.objectTypesConfig', []),
-                $this->getConfig('menuLoader.autoHydrateAssociations', [])
-            );
-        }
+        $menuLoader = new ObjectsLoader(
+            $this->getConfig('menuLoader.objectTypesConfig', []),
+            $this->getConfig('menuLoader.autoHydrateAssociations', [])
+        );
 
         $this->loader = new TreeLoader($menuLoader);
     }
