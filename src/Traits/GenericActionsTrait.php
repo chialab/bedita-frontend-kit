@@ -50,7 +50,7 @@ trait GenericActionsTrait
      * Load folder's children using paginations and query filters.
      *
      * @param int|string $id Folder id to load children.
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
      */
     protected function loadFilteredChildren(string $id): array
     {
