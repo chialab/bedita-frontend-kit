@@ -73,6 +73,7 @@ class PublicationComponentTest extends TestCase
                 'folders' => ['include' => 'children,parents,poster'],
             ],
             'autoHydrateAssociations' => [
+                'has_author' => 2,
                 'author_of' => 2,
                 'poster' => 2,
                 'children' => 3,
