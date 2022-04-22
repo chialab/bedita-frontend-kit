@@ -116,15 +116,16 @@ class ObjectsLoader
      *
      * @param array $filter Filters.
      * @param string $type Object type name.
+     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
 
-        return $this->loadMulti($objectType, $filter, null, 1, $hydrate);
+        return $this->loadMulti($objectType, $filter, $options, 1, $hydrate);
     }
 
     /**
@@ -433,7 +434,7 @@ class ObjectsLoader
         return array_keys(
             array_filter(
                 $hydrateAssociations,
-                function (int $maxDepth) use ($depth): bool {
+                function ($maxDepth) use ($depth): bool {
                     return $maxDepth === -1 || $maxDepth > $depth;
                 }
             )
