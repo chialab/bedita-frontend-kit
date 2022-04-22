@@ -47,6 +47,19 @@ trait GenericActionsTrait
     abstract public function paginate($object = null, array $settings = []);
 
     /**
+     * Load folder's children using paginations and query filters.
+     *
+     * @param int|string $id Folder id to load children.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
+     */
+    protected function loadFilteredChildren(string $id): array
+    {
+        $children = $this->Objects->loadRelatedObjects($id, 'folders', 'children', $this->Filters->fromQuery());
+
+        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
+    }
+
+    /**
      * Generic objects route.
      *
      * @param string $id Object id
@@ -57,6 +70,9 @@ trait GenericActionsTrait
         try {
             $object = $this->Objects->loadObject($id);
             $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+            if ($object->type === 'folders') {
+                $object['children'] = $this->loadFilteredChildren($object->uname);
+            }
             $this->set(compact('object'));
 
             return $this->renderFirstTemplate($object->uname, $object->type, 'objects');
@@ -92,6 +108,10 @@ trait GenericActionsTrait
             }
 
             $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+            if ($object->type === 'folders') {
+                $object['children'] = $this->loadFilteredChildren($object->uname);
+            }
+
             $this->set(compact('object'));
 
             $types = collection($object->object_type->getFullInheritanceChain())
@@ -118,10 +138,7 @@ trait GenericActionsTrait
             $parent = end($ancestors) ?: null;
 
             if ($object->type === 'folders') {
-                $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $this->Filters->fromQuery());
-                $children = $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
-                $object['children'] = $children;
-
+                $children = $object['children'] = $this->loadFilteredChildren($object->uname);
                 $this->set(compact('children'));
             }
 

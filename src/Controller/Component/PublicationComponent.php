@@ -78,8 +78,7 @@ class PublicationComponent extends Component
         if ($this->getConfig('publicationLoader') !== null) {
             $publicationLoader = new ObjectsLoader(
                 $this->getConfig('publicationLoader.objectTypesConfig', []),
-                $this->getConfig('publicationLoader.autoHydrateAssociations', []),
-                $this->getConfig('publicationLoader.extraRelations', [])
+                $this->getConfig('publicationLoader.autoHydrateAssociations', [])
             );
         }
         $this->loader = new TreeLoader($publicationLoader);

@@ -33,6 +33,13 @@ class ObjectsLoader
     use ModelAwareTrait;
 
     /**
+     * List of available relations that are not part of the object schema.
+     *
+     * @var string[]
+     */
+    protected const INCLUDE_ASSOCIATIONS = ['parents'];
+
+    /**
      * Loading configuration on a per-object type basis.
      *
      * @var array[]
@@ -48,24 +55,15 @@ class ObjectsLoader
     protected $autoHydrateAssociations = [];
 
     /**
-     * List of available relations that are not part of the object schema.
-     *
-     * @var string[]
-     */
-    protected $extraRelations = [];
-
-    /**
      * Objects loader constructor.
      *
      * @param array $objectTypesConfig Loading configuration on a per-object type basis.
      * @param array $autoHydrateAssociations Map of associations to be hydrated on each load.
-     * @param array $extraRelations List of available relations that are not part of the object schema.
      */
-    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [], array $extraRelations = [])
+    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
     {
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
-        $this->extraRelations = $extraRelations;
 
         $this->loadModel('BEdita/Core.ObjectTypes');
         $this->loadModel('BEdita/Core.Objects');
@@ -76,8 +74,8 @@ class ObjectsLoader
      *
      * @param string|int $id Object ID or uname.
      * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
     public function loadObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
@@ -94,8 +92,8 @@ class ObjectsLoader
      *
      * @param string|int $id Object ID or uname.
      * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
     public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
@@ -107,17 +105,10 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, $this->extraRelations);
-            if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
-                $relations = array_merge($relations, ['children']);
-            }
+            $relations = array_merge($objectType->relations, static::INCLUDE_ASSOCIATIONS);
             $options['include'] = implode(',', $relations);
         } else {
             $relations = explode(',', $options['include']);
-        }
-
-        if ($hydrate === null) {
-            $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
         }
 
         return $this->loadObject($id, $type, $options, $hydrate);
@@ -128,8 +119,8 @@ class ObjectsLoader
      *
      * @param array $filter Filters.
      * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
     public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
@@ -147,8 +138,8 @@ class ObjectsLoader
      * @param string $type Object type name.
      * @param string $relation The relation name.
      * @param array|null $filter Relation objects filter (e.g. `['query' => 'doc']`).
-     * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
     public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
@@ -178,7 +169,7 @@ class ObjectsLoader
      * @param \BEdita\Core\Model\Entity\ObjectType $objectType Object type.
      * @param array|null $options Options.
      * @param int $depth Depth level.
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
     protected function loadSingle(int $primaryKey, ObjectType $objectType, ?array $options, int $depth = 1, ?array $hydrate = null): ObjectEntity
@@ -206,7 +197,7 @@ class ObjectsLoader
      * @param array $filter Filters.
      * @param array|null $options Options.
      * @param int $depth Depth level.
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
     protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
@@ -248,7 +239,7 @@ class ObjectsLoader
      * @param array|null $filter Filters.
      * @param array|null $options Options.
      * @param int $depth Depth level.
-     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query
      */
     protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
@@ -348,7 +339,7 @@ class ObjectsLoader
      *
      * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects whose related resources must be hydrated.
      * @param int $depth Maximum depth.
-     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
     protected function autoHydrateAssociations(iterable $objects, int $depth, ?array $options = null): CollectionInterface
@@ -433,7 +424,7 @@ class ObjectsLoader
      * Get names of associations for which related objects need to be hydrated.
      *
      * @param int $depth Depth level.
-     * @param array|null $options Override auto-hydrate options (e.g.: `['children' => 2]`).
+     * @param array|null $options Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return string[]
      */
     protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
