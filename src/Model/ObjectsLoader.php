@@ -98,20 +98,17 @@ class ObjectsLoader
      */
     public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
-        $objectType = $this->ObjectTypes->get($type);
+        $object = $this->loadObject($id, $type, [], []);
 
-        if ($options === null) {
-            $options = [];
+        $objectType = $this->ObjectTypes->get($object->type);
+        $relations = array_merge($objectType->relations, static::INCLUDE_ASSOCIATIONS);
+
+        foreach ($relations as $relation) {
+            $assoc = Inflector::camelize(trim($relation));
+            $object[$relation] = $this->loadRelated($object->id, $objectType, $assoc, [], $options, 2, $hydrate);
         }
 
-        if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, static::INCLUDE_ASSOCIATIONS);
-            $options['include'] = implode(',', $relations);
-        } else {
-            $relations = explode(',', $options['include']);
-        }
-
-        return $this->loadObject($id, $type, $options, $hydrate);
+        return $object;
     }
 
     /**
@@ -119,16 +116,15 @@ class ObjectsLoader
      *
      * @param array $filter Filters.
      * @param string $type Object type name.
-     * @param array|null $options Additional options (e.g.: `['include' => 'has_location']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['has_location' => 2]`).
      * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', ?array $hydrate = null): Query
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
 
-        return $this->loadMulti($objectType, $filter, $options, 1, $hydrate);
+        return $this->loadMulti($objectType, $filter, null, 1, $hydrate);
     }
 
     /**
