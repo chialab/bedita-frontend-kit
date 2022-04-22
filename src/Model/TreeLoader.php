@@ -220,9 +220,9 @@ class TreeLoader
                     return $obj;
                 }
 
-                $folder['children'] = $this->loadChildrenRecursively($obj, $depth - 1, $options, $hydrate);
+                $obj['children'] = $this->loadChildrenRecursively($obj, $depth - 1, $options, $hydrate);
 
-                return $folder;
+                return $obj;
             })->toList();
     }
 }
