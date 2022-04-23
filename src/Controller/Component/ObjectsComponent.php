@@ -25,7 +25,6 @@ class ObjectsComponent extends Component
     protected $_defaultConfig = [
         'objectTypesConfig' => [
             'objects' => ['include' => 'poster'],
-            'folders' => ['include' => 'children,poster'],
         ],
         'autoHydrateAssociations' => [
             'children' => 3,
