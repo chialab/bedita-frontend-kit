@@ -196,4 +196,40 @@ class DateRangesHelperTest extends TestCase
             static::assertEquals($end, $actual->end_date);
         }
     }
+
+    /**
+     * Test {@see DateRangesHelper::sortByClosestRange()} method.
+     *
+     * @return void
+     *
+     * @covers ::sortByClosestRange()
+     */
+    public function testSortByClosestRange(): void
+    {
+        $items = array_map(function (array $range) {
+            [$id, $start, $end] = $range;
+
+            return (object)[
+                'id' => $id,
+                'date_ranges' => [
+                    new DateRange([
+                        'start_date' => $start,
+                        'end_date' => $end,
+                    ]),
+                ],
+            ];
+        }, [
+            [1, new FrozenTime('1992-08-01T00:00:00'), new FrozenTime('1992-08-31T23:59:59')],
+            [2, new FrozenTime('2023-09-01T00:00:00'), new FrozenTime('2023-09-30T23:59:59')],
+            [3, new FrozenTime('2001-08-01T00:00:00'), new FrozenTime('2001-08-31T23:59:59')],
+            [4, new FrozenTime('2022-09-01T00:00:00'), new FrozenTime('2022-09-30T23:59:59')],
+        ]);
+
+        $sorted = $this->DateRanges->sortByClosestRange($items);
+
+        $expected = [1, 3, 4, 2];
+        $actual = array_map(fn ($item) => $item->id, $sorted);
+
+        static::assertEquals($expected, $actual);
+    }
 }

@@ -123,4 +123,18 @@ class DateRangesHelper extends Helper
 
         return $sorted->last(); // Get closest event in the past, relative to `$now`.
     }
+
+    /**
+     * Sort a list of objects by their closest date.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to sort.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity[] Sorted objects.
+     */
+    public function sortByClosestRange(iterable $objects): array
+    {
+        $it = collection($objects)->toArray();
+        usort($it, fn ($a, $b): int => $this->getClosestRange($a->date_ranges ?? [])->start_date->getTimestamp() - $this->getClosestRange($b->date_ranges ?? [])->start_date->getTimestamp());
+
+        return $it;
+    }
 }
