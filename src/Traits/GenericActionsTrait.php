@@ -74,7 +74,7 @@ trait GenericActionsTrait
      *
      * @param string $uname Object uname.
      * @param string $type Object type.
-     * @return \Cake\Http\Response|void The resulting response of the events.
+     * @return \Cake\Http\Response|null The resulting response of the events.
      */
     protected function dispatchBeforeLoadEvent(string $uname, string $type): ?Response
     {
@@ -92,6 +92,8 @@ trait GenericActionsTrait
         if ($event->getResult() !== null) {
             return $event->getResult();
         }
+
+        return null;
     }
 
     /**
@@ -100,7 +102,7 @@ trait GenericActionsTrait
      * @param string $uname Object uname.
      * @param string $type Object type.
      * @param array $data Objects data to pass to callback.
-     * @return \Cake\Http\Response|void The resulting response of the events.
+     * @return \Cake\Http\Response|null The resulting response of the events.
      */
     protected function dispatchAfterLoadEvent(string $uname, string $type, array $data): ?Response
     {
@@ -118,6 +120,8 @@ trait GenericActionsTrait
         if ($event->getResult() !== null) {
             return $event->getResult();
         }
+
+        return null;
     }
 
     /**
