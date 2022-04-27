@@ -70,6 +70,57 @@ trait GenericActionsTrait
     }
 
     /**
+     * Dispatch before hook events.
+     *
+     * @param string $uname Object uname.
+     * @param string $type Object type.
+     * @return \Cake\Http\Response|void The resulting response of the events.
+     */
+    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?Response
+    {
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $type), compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+    }
+
+    /**
+     * Dispatch after hook events.
+     *
+     * @param string $uname Object uname.
+     * @param string $type Object type.
+     * @param array $data Objects data to pass to callback.
+     * @return \Cake\Http\Response|void The resulting response of the events.
+     */
+    protected function dispatchAfterLoadEvent(string $uname, string $type, array $data): ?Response
+    {
+        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $type), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent('Controller.afterObjectLoad', $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+    }
+
+    /**
      * Generic objects route.
      *
      * @param string $uname Object id or uname.
@@ -77,40 +128,32 @@ trait GenericActionsTrait
      */
     public function objects(string $uname): Response
     {
-        try {
-            $beforeEvent = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
-            }
+        $object = $this->Objects->loadObject($uname, 'objects', [], []);
 
-            $beforeEvent = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
-            }
-
-            $object = $this->Objects->loadObject($uname, 'objects', [], []);
-            $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
-
-            $afterEvent = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), compact('object'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            $afterEvent = $this->dispatchEvent('Controller.afterObjectLoad', compact('object'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            if ($object->type === 'folders') {
-                $object['children'] = $this->loadFilteredChildren($object->uname);
-            }
-
-            $this->set(compact('object'));
-
-            return $this->renderFirstTemplate($object->uname, $object->type, 'objects');
-        } catch (RecordNotFoundException $e) {
-            throw new NotFoundException(__('Page not found'), null, $e);
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
         }
+
+        $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
+
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders') {
+            $children = $object['children'] = $this->loadFilteredChildren($uname);
+            $this->set('children', $children);
+        }
+
+        $this->set(compact('object'));
+
+        $types = collection($object->object_type->getFullInheritanceChain())
+            ->extract('name')
+            ->toList();
+
+        return $this->renderFirstTemplate(...$types);
     }
 
     /**
@@ -121,60 +164,49 @@ trait GenericActionsTrait
      */
     public function object(string $uname): Response
     {
-        try {
-            $object = $this->Objects->loadObject($uname, 'objects', [], []);
-            $currentRoute = $this->getRequest()->getParam('_matchedRoute');
-            foreach (Router::routes() as $route) {
-                if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
-                    continue;
-                }
+        $object = $this->Objects->loadObject($uname, 'objects', [], []);
 
-                $out = $route->match(['_entity' => $object] + $route->defaults, []);
-                if ($out !== false) {
-                    return $this->redirect($out);
-                }
-            }
-            $paths = $this->Publication->getViablePaths($object->id);
-            if (!empty($paths)) {
-                return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
+        $currentRoute = $this->getRequest()->getParam('_matchedRoute');
+        foreach (Router::routes() as $route) {
+            if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
+                continue;
             }
 
-            $beforeEvent = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
+            $out = $route->match(['_entity' => $object] + $route->defaults, []);
+            if ($out !== false) {
+                return $this->redirect($out);
             }
-
-            $beforeEvent = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
-            }
-
-            $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
-
-            $afterEvent = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), compact('object'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            $afterEvent = $this->dispatchEvent('Controller.afterObjectLoad', compact('object'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            if ($object->type === 'folders') {
-                $object['children'] = $this->loadFilteredChildren($object->uname);
-            }
-
-            $this->set(compact('object'));
-
-            $types = collection($object->object_type->getFullInheritanceChain())
-                ->extract('name')
-                ->toList();
-
-            return $this->renderFirstTemplate(...$types);
-        } catch (RecordNotFoundException $e) {
-            throw new NotFoundException(__('Page not found'), null, $e);
         }
+
+        $paths = $this->Publication->getViablePaths($object->id);
+        if (!empty($paths)) {
+            return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
+        }
+
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
+        }
+
+        $object = $this->Objects->loadObject((string)$object->id, $object->type, ['include' => '_all']);
+
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders') {
+            $children = $object['children'] = $this->loadFilteredChildren($object->uname);
+            $this->set('children', $children);
+        }
+
+        $this->set(compact('object'));
+
+        $types = collection($object->object_type->getFullInheritanceChain())
+            ->extract('name')
+            ->toList();
+
+        return $this->renderFirstTemplate(...$types);
     }
 
     /**
@@ -185,43 +217,30 @@ trait GenericActionsTrait
      */
     public function fallback(string $path): Response
     {
-        try {
-            $paths = array_filter(explode('/', $path));
-            $uname = end($paths);
-            $beforeEvent = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
-            }
+        $paths = array_filter(explode('/', $path));
+        $object = $this->Objects->loadObject(end($paths), 'objects', [], []);
 
-            $beforeEvent = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname'));
-            if ($beforeEvent->getResult() !== null) {
-                return $beforeEvent->getResult();
-            }
-
-            $ancestors = $this->Publication->loadObjectPath($path)->toList();
-            $object = array_pop($ancestors);
-            $parent = end($ancestors) ?: null;
-
-            $afterEvent = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), compact('object', 'parent', 'ancestors'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            $afterEvent = $this->dispatchEvent('Controller.afterObjectLoad', compact('object', 'parent', 'ancestors'));
-            if ($afterEvent->getResult() !== null) {
-                return $afterEvent->getResult();
-            }
-
-            if ($object->type === 'folders') {
-                $children = $object['children'] = $this->loadFilteredChildren($object->uname);
-                $this->set('children', $children);
-            }
-
-            $this->set(compact('object', 'parent', 'ancestors'));
-
-            return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
-        } catch (RecordNotFoundException $e) {
-            throw new NotFoundException(__('Page not found'), null, $e);
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
         }
+
+        $ancestors = $this->Publication->loadObjectPath($path)->toList();
+        $object = array_pop($ancestors);
+        $parent = end($ancestors) ?: null;
+
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object', 'parent', 'ancestors'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders') {
+            $children = $object['children'] = $this->loadFilteredChildren($object->uname);
+            $this->set('children', $children);
+        }
+
+        $this->set(compact('object', 'parent', 'ancestors'));
+
+        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
     }
 }
