@@ -2,6 +2,7 @@
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\DateRange;
+use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\I18n\FrozenTime;
 use Cake\Log\Log;
 use Cake\View\Helper;
@@ -128,11 +129,22 @@ class DateRangesHelper extends Helper
      * Sort a list of objects by their closest date.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to sort.
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[] Sorted objects.
+     * @return \Cake\Collection\Collection Sorted objects.
      */
-    public function sortByClosestRange(iterable $objects): array
+    public function sortByClosestRange(iterable $objects): iterable
     {
         return collection($objects)
-            ->sortBy(fn (ObjectEntity $obj): int => $this->getClosestRange($a->date_ranges ?? [])->start_date->getTimestamp());
+            ->sortBy(function (ObjectEntity $obj): int {
+                if (empty($obj->date_ranges)) {
+                    return -INF;
+                }
+
+                $range = $this->getClosestRange($obj->date_ranges);
+                if ($range === null) {
+                    return -INF;
+                }
+
+                return $range->start_date->getTimestamp();
+            });
     }
 }
