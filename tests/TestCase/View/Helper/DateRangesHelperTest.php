@@ -49,7 +49,7 @@ class DateRangesHelperTest extends TestCase
     }
 
     /** @inheritDoc */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->DateRanges);
         FrozenTime::setTestNow(null);
