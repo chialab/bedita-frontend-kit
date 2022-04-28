@@ -39,7 +39,7 @@ class DateRangesHelperTest extends TestCase
     protected DateRangesHelper $DateRanges;
 
     /** @inheritDoc */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
