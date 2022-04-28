@@ -2,6 +2,7 @@
 namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use BEdita\Core\Model\Entity\DateRange;
+use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\I18n\FrozenTime;
 use Cake\I18n\I18n;
 use Cake\TestSuite\TestCase;
@@ -15,6 +16,21 @@ use Chialab\FrontendKit\View\Helper\DateRangesHelper;
  */
 class DateRangesHelperTest extends TestCase
 {
+    public $fixtures = [
+        'plugin.BEdita/Core.ObjectTypes',
+        'plugin.BEdita/Core.PropertyTypes',
+        'plugin.Chialab/FrontendKit.Properties',
+        'plugin.Chialab/FrontendKit.Relations',
+        'plugin.Chialab/FrontendKit.RelationTypes',
+        'plugin.Chialab/FrontendKit.Objects',
+        'plugin.Chialab/FrontendKit.Users',
+        'plugin.Chialab/FrontendKit.ObjectRelations',
+        'plugin.BEdita/Core.Categories',
+        'plugin.BEdita/Core.ObjectCategories',
+        'plugin.BEdita/Core.Tags',
+        'plugin.BEdita/Core.ObjectTags',
+    ];
+
     /**
      * Test subject
      *
@@ -206,30 +222,31 @@ class DateRangesHelperTest extends TestCase
      */
     public function testSortByClosestRange(): void
     {
-        $items = array_map(function (array $range) {
-            [$id, $start, $end] = $range;
+        $items = array_map(function (array $ranges) {
+            $id = array_shift($ranges);
 
-            return (object)[
+            return new ObjectEntity([
                 'id' => $id,
-                'date_ranges' => [
-                    new DateRange([
-                        'start_date' => $start,
-                        'end_date' => $end,
-                    ]),
-                ],
-            ];
+                'type' => 'events',
+                'date_ranges' => array_map(fn (array $range): DateRange => new DateRange([
+                    'start_date' => $range[0],
+                    'end_date' => $range[1],
+                ]), $ranges),
+            ]);
         }, [
-            [1, new FrozenTime('1992-08-01T00:00:00'), new FrozenTime('1992-08-31T23:59:59')],
-            [2, new FrozenTime('2023-09-01T00:00:00'), new FrozenTime('2023-09-30T23:59:59')],
-            [3, new FrozenTime('2001-08-01T00:00:00'), new FrozenTime('2001-08-31T23:59:59')],
-            [4, new FrozenTime('2022-09-01T00:00:00'), new FrozenTime('2022-09-30T23:59:59')],
+            [1, [new FrozenTime('1992-08-01T00:00:00'), new FrozenTime('1992-08-31T23:59:59')]],
+            [2, [new FrozenTime('2023-09-01T00:00:00'), new FrozenTime('2023-09-30T23:59:59')]],
+            [3],
+            [4, [new FrozenTime('2001-08-01T00:00:00'), new FrozenTime('2001-08-31T23:59:59')]],
+            [5, [new FrozenTime('2022-09-01T00:00:00'), new FrozenTime('2022-09-30T23:59:59')]],
+            [6, [new FrozenTime('1950-09-01T00:00:00'), new FrozenTime('1950-09-30T23:59:59')]],
         ]);
 
-        $sorted = $this->DateRanges->sortByClosestRange($items);
+        $sorted = $this->DateRanges->sortByClosestRange($items)->toList();
 
-        $expected = [1, 3, 4, 2];
+        $expected = [3, 6, 1, 4, 5, 2];
         $actual = array_map(fn ($item) => $item->id, $sorted);
 
-        static::assertEquals($expected, $actual);
+        static::assertSame($expected, $actual);
     }
 }

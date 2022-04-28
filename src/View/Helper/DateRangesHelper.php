@@ -129,22 +129,19 @@ class DateRangesHelper extends Helper
      * Sort a list of objects by their closest date.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to sort.
+     * @param int $dir either SORT_DESC or SORT_ASC.
      * @return \Cake\Collection\Collection Sorted objects.
      */
-    public function sortByClosestRange(iterable $objects): iterable
+    public function sortByClosestRange(iterable $objects, $dir = \SORT_ASC): iterable
     {
         return collection($objects)
-            ->sortBy(function (ObjectEntity $obj): int {
-                if (empty($obj->date_ranges)) {
-                    return -INF;
-                }
-
-                $range = $this->getClosestRange($obj->date_ranges);
+            ->sortBy(function (ObjectEntity $obj): ?int {
+                $range = $this->getClosestRange($obj->date_ranges ?? []);
                 if ($range === null) {
-                    return -INF;
+                    return PHP_INT_MIN;
                 }
 
                 return $range->start_date->getTimestamp();
-            });
+            }, $dir);
     }
 }
