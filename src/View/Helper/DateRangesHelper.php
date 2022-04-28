@@ -132,9 +132,7 @@ class DateRangesHelper extends Helper
      */
     public function sortByClosestRange(iterable $objects): array
     {
-        $it = collection($objects)->toArray();
-        usort($it, fn ($a, $b): int => $this->getClosestRange($a->date_ranges ?? [])->start_date->getTimestamp() - $this->getClosestRange($b->date_ranges ?? [])->start_date->getTimestamp());
-
-        return $it;
+        return collection($objects)
+            ->sortBy(fn (ObjectEntity $obj): int => $this->getClosestRange($a->date_ranges ?? [])->start_date->getTimestamp());
     }
 }
