@@ -117,8 +117,8 @@ class CalendarComponent extends Component
 
         return $this->findInRange($query, $from, $to)
             ->contain(['DateRanges'])
-            ->formatResults(fn (iterable $results): iterable =>
-                collection($results)->unfold(function (ObjectEntity $event) use ($from, $to): \Generator {
+            ->formatResults(function (iterable $results) use ($from, $to): iterable {
+                $grouped = collection($results)->unfold(function (ObjectEntity $event) use ($from, $to): \Generator {
                     foreach ($event->date_ranges as $dr) {
                         $start = new FrozenDate($dr->start_date);
                         $end = new FrozenDate($dr->end_date ?: $dr->start_date);
@@ -136,7 +136,13 @@ class CalendarComponent extends Component
                     }
                 })
                 ->groupBy('day')
-                ->map(fn (array $items): array => array_column($items, 'event')));
+                ->map(fn (array $items): array => array_column($items, 'event'))
+                ->toArray();
+
+                ksort($grouped, SORT_STRING);
+
+                return collection($grouped);
+            });
     }
 
     /**
