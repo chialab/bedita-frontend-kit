@@ -11,6 +11,7 @@ use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
@@ -212,7 +213,17 @@ class ObjectsLoader
                         return;
                     }
 
-                    (new Collection($related))->each($fix);
+                    if ($related instanceof Entity) {
+                        // related entity is not a BEdita object
+                        return;
+                    }
+
+                    (new Collection($related))->each(function (Entity $e) use ($fix) {
+                        // related entity (such as a Translation) may not be an ObjectEntity.
+                        if ($e instanceof ObjectEntity) {
+                            $fix($e);
+                        }
+                    });
                 }
             });
     }
