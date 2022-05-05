@@ -79,9 +79,6 @@ class PublicationComponentTest extends TestCase
         ]);
         $this->Publication = $registry->load('Chialab/FrontendKit.Publication', [
             'publication' => 'root-1',
-            'menuFolders' => [
-                'main' => 'root-1',
-            ],
         ]);
     }
 
@@ -116,22 +113,9 @@ class PublicationComponentTest extends TestCase
      *
      * @covers ::initialize()
      */
-    public function testMenuFolders()
-    {
-        /** @var \BEdita\Core\Model\Entity\Folder[] */
-        $menuFolders = $this->controller->viewVars['menuFolders'];
-        static::assertNotEmpty($menuFolders);
-    }
-
-    /**
-     * Test {@see PublicationComponent::initialize()}.
-     *
-     * @covers ::initialize()
-     */
     public function testTemplateVars()
     {
         static::assertNotNull($this->controller->viewVars['publication']);
-        static::assertNotNull($this->controller->viewVars['menuFolders']);
     }
 
     /**
