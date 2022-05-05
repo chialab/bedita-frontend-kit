@@ -12,7 +12,7 @@ use Throwable;
 
 /**
  * Exception wrapper middleware.
- * 
+ *
  * Catch and rethrow mapped exceptions.
  */
 class ExceptionWrapperMiddleware
