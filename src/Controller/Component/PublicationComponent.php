@@ -39,7 +39,10 @@ class PublicationComponent extends Component
      */
     protected $_defaultConfig = [
         'publication' => null,
-        'publicationLoader' => null,
+        'publicationLoader' => [
+            'objectTypesConfig' => [],
+            'autoHydrateAssociations' => [],
+        ],
     ];
 
     /**
@@ -73,18 +76,13 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $objectLoader = $this->Objects->getLoader();
-        $this->loader = new TreeLoader($objectLoader);
+        $this->loader = new TreeLoader($this->Objects->getLoader());
 
-        if ($this->getConfig('publicationLoader') !== null) {
-            $publicationLoader = new ObjectsLoader(
-                $this->getConfig('publicationLoader.objectTypesConfig', []),
-                $this->getConfig('publicationLoader.autoHydrateAssociations', []),
-                $this->getConfig('publicationLoader.extraRelations', [])
-            );
-        } else {
-            $publicationLoader = $objectLoader;
-        }
+        $publicationLoader = new ObjectsLoader(
+            $this->getConfig('publicationLoader.objectTypesConfig', []),
+            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
+            $this->getConfig('publicationLoader.extraRelations', [])
+        );
 
         try {
             $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
