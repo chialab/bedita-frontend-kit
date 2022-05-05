@@ -38,7 +38,6 @@ class PublicationComponent extends Component
      * @var array
      */
     protected $_defaultConfig = [
-        'menuFolders' => [],
         'publication' => null,
         'publicationLoader' => null,
     ];
@@ -74,15 +73,18 @@ class PublicationComponent extends Component
             throw new InvalidArgumentException('Missing configuration for root folder');
         }
 
-        $publicationLoader = $this->Objects->getLoader();
+        $objectLoader = $this->Objects->getLoader();
+        $this->loader = new TreeLoader($objectLoader);
+
         if ($this->getConfig('publicationLoader') !== null) {
             $publicationLoader = new ObjectsLoader(
                 $this->getConfig('publicationLoader.objectTypesConfig', []),
                 $this->getConfig('publicationLoader.autoHydrateAssociations', []),
                 $this->getConfig('publicationLoader.extraRelations', [])
             );
+        } else {
+            $publicationLoader = $objectLoader;
         }
-        $this->loader = new TreeLoader($publicationLoader);
 
         try {
             $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
@@ -92,17 +94,6 @@ class PublicationComponent extends Component
 
         $this->publication = $publication;
         $this->getController()->set('publication', $this->publication);
-
-        $menuFoldersConfig = $this->getConfig('menuFolders', []);
-        if (empty($menuFoldersConfig)) {
-            return;
-        }
-
-        $menuFolders = $publicationLoader->loadObjects(['uname' => array_values($menuFoldersConfig)], 'folders')
-            ->indexBy(fn (Folder $folder): string => array_search($folder->uname, $menuFoldersConfig))
-            ->toArray();
-
-        $this->getController()->set('menuFolders', $menuFolders);
     }
 
     /**
