@@ -51,6 +51,13 @@ trait AuthTrait
     abstract public function redirect($url, $status = 302);
 
     /**
+     * Return home route, where users will be redirected after logout or when they try to login to a non-staging site.
+     *
+     * @return array|string
+     */
+    abstract protected function getHomeRoute();
+
+    /**
      * @inheritDoc
      *
      * @return \Cake\Http\Response|null
@@ -66,16 +73,6 @@ trait AuthTrait
         $this->Authentication->allowUnauthenticated(['login']);
 
         return null;
-    }
-
-    /**
-     * Return home route, where users will be redirected after logout or when they try to login to a non-staging site.
-     *
-     * @return array|string
-     */
-    protected function getHomeRoute()
-    {
-        return ['_name' => 'pages:home'];
     }
 
     /**
