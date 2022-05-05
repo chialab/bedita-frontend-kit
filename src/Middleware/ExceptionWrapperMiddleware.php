@@ -29,7 +29,7 @@ class ExceptionWrapperMiddleware
      */
     public function __construct()
     {
-        $this->$exceptionMap = [
+        $this->exceptionMap = [
             RecordNotFoundException::class => fn (RecordNotFoundException $e): NotFoundException => new NotFoundException(__('Page not found'), null, $e),
         ];
     }
