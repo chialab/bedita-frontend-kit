@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Model;
 
 use BEdita\Core\Model\Entity\Folder;
+use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
 use Cake\Database\Expression\Comparison;
 use Cake\Database\Expression\FunctionExpression;
@@ -164,5 +165,64 @@ class TreeLoader
             );
 
         return $query->disableHydration();
+    }
+
+    /**
+     * Load menu children.
+     *
+     * @param int|string $id The id or uname of the parent folder.
+     * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
+     * @return \Cake\ORM\Query
+     */
+    public function loadMenuChildren(string $id, ?array $options = null, ?array $hydrate = null): Query
+    {
+        return $this->loader->loadRelatedObjects($id, 'folders', 'children', [], $options, $hydrate)
+            ->where([$this->Trees->aliasField('menu') => true])
+            ->order([$this->Trees->aliasField('tree_left') => 'ASC'], true);
+    }
+
+    /**
+     * Load a menu graph of folders with param `menu = true`.
+     *
+     * @param string $id The id or uname of the parent folder.
+     * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
+     * @param int $depth The depth of the menu for recursive loading.
+     * @return \BEdita\Core\Model\Entity\Folder The root menu folder.
+     */
+    public function loadMenu(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = 3): Folder
+    {
+        $folder = $this->loader->loadObject($id, 'folders', $options, $hydrate);
+        $folder['children'] = $this->loadChildrenRecursively($folder, $depth, $options, $hydrate);
+
+        return $folder;
+    }
+
+    /**
+     * Load menu children of a folder.
+     *
+     * @param \BEdita\Core\Model\Entity\Folder $folder The folder entity.
+     * @param int $depth The depth of the menu for recursive loading.
+     * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
+     * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
+     * @return \BEdita\Core\Model\Entity\ObjectEntity[] A list of children entities.
+     */
+    protected function loadChildrenRecursively(Folder $folder, int $depth, ?array $options = null, ?array $hydrate = null): array
+    {
+        if ($depth === 0) {
+            return null;
+        }
+
+        return collection($this->loadMenuChildren($folder->uname, $options, $hydrate))
+            ->map(function (ObjectEntity $obj) use ($depth, $options, $hydrate) {
+                if ($obj->type !== 'folders') {
+                    return $obj;
+                }
+
+                $obj['children'] = $this->loadChildrenRecursively($obj, $depth - 1, $options, $hydrate);
+
+                return $obj;
+            })->toList();
     }
 }
