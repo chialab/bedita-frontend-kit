@@ -334,6 +334,7 @@ class ObjectsLoader
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
                 if (!$type) {
                     yield from $items;
+
                     return;
                 }
 
