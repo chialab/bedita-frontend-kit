@@ -90,6 +90,8 @@ class ObjectsLoader
      */
     public function loadFullObject(string $id, ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
+        // Normalize ID, get type.
+        $id = $this->Objects->getId($id);
         $type = $this->Objects->get($id)->type;
         $objectType = $this->ObjectTypes->get($type);
 
@@ -107,7 +109,7 @@ class ObjectsLoader
             $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
         }
 
-        return $this->loadObject($id, $type, $options, $hydrate);
+        return $this->loadObject((string)$id, $type, $options, $hydrate);
     }
 
     /**
