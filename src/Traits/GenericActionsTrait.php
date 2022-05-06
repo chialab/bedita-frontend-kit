@@ -45,6 +45,19 @@ trait GenericActionsTrait
     abstract public function paginate($object = null, array $settings = []);
 
     /**
+     * Load folder's children using paginations and query filters.
+     *
+     * @param int|string $id Folder id to load children.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
+     */
+    protected function loadFilteredChildren(string $id): array
+    {
+        $children = $this->Objects->loadRelatedObjects($id, 'folders', 'children', $this->Filters->fromQuery());
+
+        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
+    }
+
+    /**
      * Generic objects route.
      *
      * @param string $id Object id
@@ -52,8 +65,12 @@ trait GenericActionsTrait
      */
     public function objects(string $id): Response
     {
-        $object = $this->Objects->loadObject($id);
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+        $object = $this->Objects->loadFullObject($id);
+        if ($object->type === 'folders') {
+            $children = $this->loadFilteredChildren($object->uname);
+            $object['children'] = $children;
+            $this->set(compact('children'));
+        }
         $this->set(compact('object'));
 
         return $this->renderFirstTemplate($object->uname, $object->type, 'objects');
@@ -67,7 +84,7 @@ trait GenericActionsTrait
      */
     public function object(string $uname): Response
     {
-        $object = $this->Objects->loadObject($uname);
+        $object = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
         foreach (Router::routes() as $route) {
             if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
@@ -84,7 +101,12 @@ trait GenericActionsTrait
             return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
         }
 
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+        $object = $this->Objects->loadFullObject((string)$object->id);
+        if ($object->type === 'folders') {
+            $children = $this->loadFilteredChildren($object->uname);
+            $object['children'] = $children;
+            $this->set(compact('children'));
+        }
         $this->set(compact('object'));
 
         $types = collection($object->object_type->getFullInheritanceChain())
@@ -106,11 +128,10 @@ trait GenericActionsTrait
         $object = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
+        $object = $this->Objects->loadFullObject((string)$object->id);
         if ($object->type === 'folders') {
-            $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $this->Filters->fromQuery());
-            $children = $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
+            $children = $this->loadFilteredChildren($object->uname);
             $object['children'] = $children;
-
             $this->set(compact('children'));
         }
 

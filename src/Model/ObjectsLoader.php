@@ -48,24 +48,15 @@ class ObjectsLoader
     protected $autoHydrateAssociations = [];
 
     /**
-     * List of available relations that are not part of the object schema.
-     *
-     * @var string[]
-     */
-    protected $extraRelations = [];
-
-    /**
      * Objects loader constructor.
      *
      * @param array $objectTypesConfig Loading configuration on a per-object type basis.
      * @param array $autoHydrateAssociations Map of associations to be hydrated on each load.
-     * @param array $extraRelations List of available relations that are not part of the object schema.
      */
-    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [], array $extraRelations = [])
+    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
     {
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
-        $this->extraRelations = $extraRelations;
 
         $this->loadModel('BEdita/Core.ObjectTypes');
         $this->loadModel('BEdita/Core.Objects');
@@ -93,13 +84,13 @@ class ObjectsLoader
      * Fetch an object by its ID or uname and hydrate all its relations.
      *
      * @param string|int $id Object ID or uname.
-     * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
+        $type = $this->Objects->get($id)->type;
         $objectType = $this->ObjectTypes->get($type);
 
         if ($options === null) {
@@ -107,11 +98,7 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, $this->extraRelations);
-            if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
-                $relations = array_merge($relations, ['children']);
-            }
-            $options['include'] = implode(',', $relations);
+            $options['include'] = implode(',', array_merge($objectType->relations), ['parents', 'translations']);
         } else {
             $relations = explode(',', $options['include']);
         }

@@ -80,12 +80,11 @@ class PublicationComponent extends Component
 
         $publicationLoader = new ObjectsLoader(
             $this->getConfig('publicationLoader.objectTypesConfig', []),
-            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
-            $this->getConfig('publicationLoader.extraRelations', [])
+            $this->getConfig('publicationLoader.autoHydrateAssociations', [])
         );
 
         try {
-            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
+            $publication = $publicationLoader->loadFullObject($publicationUname);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
@@ -119,7 +118,7 @@ class PublicationComponent extends Component
      * @param array $childrenFilters Children filters.
      * @return \Cake\Http\Response
      *
-     * @deprecated 1.5.0 Use {@see \Chialab\FrontendKit\Traits\GewnericActionsTrait::fallback()} instead.
+     * @deprecated 1.5.0 Use {@see \Chialab\FrontendKit\Traits\GenericActionsTrait::fallback()} instead.
      */
     public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
     {
@@ -127,6 +126,7 @@ class PublicationComponent extends Component
         $object = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
+        $object = $this->Objects->loadFullObject((string)$object->id);
         if ($object->type === 'folders') {
             $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
             $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
