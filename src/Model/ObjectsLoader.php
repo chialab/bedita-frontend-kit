@@ -7,6 +7,7 @@ use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
 use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use BEdita\Core\Model\Entity\ObjectTag;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
@@ -329,8 +330,13 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (ObjectEntity $object): ObjectEntity => $object, 'type')
+            ->combine('id', fn (Entity $object): Entity => $object, 'type')
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
+                if (!$type) {
+                    yield from $items;
+                    return;
+                }
+
                 $objectType = $this->ObjectTypes->get($type);
                 $filter = [
                     'id' => array_unique((new Collection($items))->extract('id')->toList()),
@@ -338,7 +344,7 @@ class ObjectsLoader
 
                 yield from $this->loadMulti($objectType, $filter, null, $depth);
             })
-            ->sortBy(function (ObjectEntity $object) use ($sortedIds): int {
+            ->sortBy(function (Entity $object) use ($sortedIds): int {
                 return array_search($object->id, $sortedIds);
             }, SORT_ASC)
             ->compile();
@@ -389,7 +395,11 @@ class ObjectsLoader
                     $original = (new Collection($related))->indexBy('id')->toArray();
 
                     $related = $this->toConcreteTypes($related, $depth + 1)
-                        ->each(function (ObjectEntity $rel) use ($original): void {
+                        ->each(function (Entity $rel) use ($original): void {
+                            if (!$rel instanceof ObjectType) {
+                                return;
+                            }
+
                             $orig = Hash::get($original, $rel->id);
                             if ($orig === null || $orig->isEmpty('_joinData')) {
                                 return;
