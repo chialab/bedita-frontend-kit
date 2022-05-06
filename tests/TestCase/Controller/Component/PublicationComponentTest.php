@@ -31,6 +31,7 @@ class PublicationComponentTest extends TestCase
         'plugin.BEdita/Core.ObjectCategories',
         'plugin.BEdita/Core.Tags',
         'plugin.BEdita/Core.ObjectTags',
+        'plugin.BEdita/Core.Translations',
     ];
 
     /**
