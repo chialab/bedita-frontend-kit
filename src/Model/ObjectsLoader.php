@@ -100,7 +100,8 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $options['include'] = implode(',', array_merge($objectType->relations, ['parents', 'translations']));
+            $relations = array_merge($objectType->relations, ['parents', 'translations']);
+            $options['include'] = implode(',', $relations);
         } else {
             $relations = explode(',', $options['include']);
         }
