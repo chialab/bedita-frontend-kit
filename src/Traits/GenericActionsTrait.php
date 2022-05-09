@@ -128,7 +128,6 @@ trait GenericActionsTrait
         $object = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
-        $object = $this->Objects->loadFullObject((string)$object->id);
         if ($object->type === 'folders') {
             $children = $this->loadFilteredChildren($object->uname);
             $object['children'] = $children;

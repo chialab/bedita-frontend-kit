@@ -126,7 +126,6 @@ class PublicationComponent extends Component
         $object = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
-        $object = $this->Objects->loadFullObject((string)$object->id);
         if ($object->type === 'folders') {
             $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
             $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
