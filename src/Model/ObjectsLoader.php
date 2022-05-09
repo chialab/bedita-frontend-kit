@@ -9,6 +9,7 @@ use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectTag;
 use BEdita\Core\Model\Entity\ObjectType;
+use BEdita\Core\Model\Entity\Translation;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
@@ -191,7 +192,9 @@ class ObjectsLoader
         /** @var \BEdita\Core\Model\Entity\ObjectEntity $object */
         $object = $action(compact('primaryKey', 'lang', 'contain'));
 
-        return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)->first();
+        return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)
+            ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object))
+            ->first();
     }
 
     /**
@@ -230,7 +233,8 @@ class ObjectsLoader
                 });
             }
 
-            return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate);
+            return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate)
+                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object));
         });
     }
 
@@ -264,7 +268,7 @@ class ObjectsLoader
                     $related->clean();
                 }
 
-                return $related;
+                return $this->dangerouslyTranslateFields($related);
             }));
     }
 
@@ -355,6 +359,49 @@ class ObjectsLoader
     }
 
     /**
+     * Dangerous processor to set fields to their translated counterparts.
+     *
+     * **WARNING**: do NOT save entities that have been processed by this processor.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Object to process.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity
+     */
+    protected function dangerouslyTranslateFields(ObjectEntity $object): ObjectEntity
+    {
+        $lang = $this->getLang();
+        if ($lang === $object->lang) {
+            return $object;
+        }
+
+        /** @var \BEdita\Core\Model\Entity\Translation|null $requestedTranslation */
+        $requestedTranslation = collection($object->translations ?? [])
+            ->filter(fn (Translation $tr): bool => $tr->lang === $lang)
+            ->first();
+        if ($requestedTranslation === null) {
+            return $object;
+        }
+
+        $object->lang = $requestedTranslation->lang;
+        $object->setDirty('lang', false);
+
+        $originalFields = [];
+        foreach ($requestedTranslation->translated_fields as $field => $value) {
+            if (empty($value)) {
+                continue;
+            }
+
+            $originalFields[$field] = $object->get($field);
+            $object->set($field, $value);
+            $object->setDirty($field, false);
+        }
+
+        $object->set('_originalFields', $originalFields);
+        $object->setDirty('_originalFields', false);
+
+        return $object;
+    }
+
+    /**
      * Automatically hydrate related objects, up to the configured maximum depth.
      *
      * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects whose related resources must be hydrated.
@@ -399,7 +446,7 @@ class ObjectsLoader
                     $original = (new Collection($related))->indexBy('id')->toArray();
 
                     $related = $this->toConcreteTypes($related, $depth + 1)
-                        ->each(function (Entity $rel) use ($original): void {
+                    ->each(function (Entity $rel) use ($original): void {
                             if (!$rel instanceof ObjectType) {
                                 return;
                             }
