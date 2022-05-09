@@ -58,22 +58,118 @@ trait GenericActionsTrait
     }
 
     /**
+     * Dispatch before object load hook events.
+     *
+     * @param string $uname Object uname.
+     * @param string $type Object type.
+     * @return \Cake\Http\Response|null The resulting response of the events.
+     */
+    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?Response
+    {
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $type), compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname', 'type'));
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        return null;
+    }
+
+    /**
+     * Dispatch after object load hook events.
+     *
+     * @param string $uname Object uname.
+     * @param string $type Object type.
+     * @param array $data Objects data to pass to callback.
+     * @return \Cake\Http\Response|null The resulting response of the events.
+     */
+    protected function dispatchAfterLoadEvent(string $uname, string $type, array $data): ?Response
+    {
+        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $type), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent('Controller.afterObjectLoad', $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        return null;
+    }
+
+    /**
+     * Dispatch before object render hook events.
+     *
+     * @param string $uname Object uname.
+     * @param string $type Object type.
+     * @param array $data Objects data to pass to callback.
+     * @return \Cake\Http\Response|null The resulting response of the events.
+     */
+    protected function dispatchBeforeRenderEvent(string $uname, string $type, array $data): ?Response
+    {
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectRender:%s', $uname), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectRender:%s', $type), $data);
+        if ($event->getResult() !== null) {
+            return $event->getResult();
+        }
+
+        return null;
+    }
+
+    /**
      * Generic objects route.
      *
-     * @param string $id Object id
+     * @param string $uname Object id or uname.
      * @return Response
      */
-    public function objects(string $id): Response
+    public function objects(string $uname): Response
     {
-        $object = $this->Objects->loadFullObject($id);
-        if ($object->type === 'folders') {
-            $children = $this->loadFilteredChildren($object->uname);
-            $object['children'] = $children;
-            $this->set(compact('children'));
+        $object = $this->Objects->loadObject($uname, 'objects', [], []);
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
         }
-        $this->set(compact('object'));
 
-        return $this->renderFirstTemplate($object->uname, $object->type, 'objects');
+        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders' && !isset($object['children'])) {
+            $object['children'] = $this->loadFilteredChildren($object->uname);
+        }
+
+        $this->set(compact('object'));
+        if (isset($object['children'])) {
+            $this->set('children', $object['children']);
+        }
+
+        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
     }
 
     /**
@@ -101,19 +197,31 @@ trait GenericActionsTrait
             return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
         }
 
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
+        }
+
         $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
-        if ($object->type === 'folders') {
-            $children = $this->loadFilteredChildren($object->uname);
-            $object['children'] = $children;
-            $this->set(compact('children'));
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders' && !isset($object['children'])) {
+            $object['children'] = $this->loadFilteredChildren($object->uname);
         }
         $this->set(compact('object'));
+        if (isset($object['children'])) {
+            $this->set('children', $object['children']);
+        }
 
-        $types = collection($object->object_type->getFullInheritanceChain())
-            ->extract('name')
-            ->toList();
+        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
 
-        return $this->renderFirstTemplate(...$types);
+        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
     }
 
     /**
@@ -128,13 +236,30 @@ trait GenericActionsTrait
         $object = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
-        if ($object->type === 'folders') {
-            $children = $this->loadFilteredChildren($object->uname);
-            $object['children'] = $children;
-            $this->set(compact('children'));
+        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
+        if ($result !== null) {
+            return $result;
+        }
+
+        $object = $this->loader->loadFullObject((string)$object->id, $object->type);
+        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        if ($object->type === 'folders' && !isset($object['children'])) {
+            $object['children'] = $this->loadFilteredChildren($object->uname);
         }
 
         $this->set(compact('object', 'parent', 'ancestors'));
+        if (isset($object['children'])) {
+            $this->set('children', $object['children']);
+        }
+
+        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        if ($result !== null) {
+            return $result;
+        }
 
         return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
     }
