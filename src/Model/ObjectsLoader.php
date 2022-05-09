@@ -7,7 +7,6 @@ use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
 use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
-use BEdita\Core\Model\Entity\ObjectTag;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Entity\Translation;
 use BEdita\I18n\Core\I18nTrait;
