@@ -17,7 +17,7 @@ use Chialab\FrontendKit\View\Helper\DateRangesHelper;
 class DateRangesHelperTest extends TestCase
 {
     public $fixtures = [
-        'plugin.BEdita/Core.ObjectTypes',
+        'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
         'plugin.Chialab/FrontendKit.Relations',

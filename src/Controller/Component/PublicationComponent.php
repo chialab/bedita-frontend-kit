@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
-use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -80,12 +79,11 @@ class PublicationComponent extends Component
 
         $publicationLoader = new ObjectsLoader(
             $this->getConfig('publicationLoader.objectTypesConfig', []),
-            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
-            $this->getConfig('publicationLoader.extraRelations', [])
+            $this->getConfig('publicationLoader.autoHydrateAssociations', [])
         );
 
         try {
-            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
+            $publication = $publicationLoader->loadFullObject($publicationUname);
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
@@ -119,7 +117,7 @@ class PublicationComponent extends Component
      * @param array $childrenFilters Children filters.
      * @return \Cake\Http\Response
      *
-     * @deprecated 1.5.0 Use {@see \Chialab\FrontendKit\Traits\GewnericActionsTrait::fallback()} instead.
+     * @deprecated 1.5.0 Use {@see \Chialab\FrontendKit\Traits\GenericActionsTrait::fallback()} instead.
      */
     public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
     {

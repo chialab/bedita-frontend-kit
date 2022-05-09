@@ -25,12 +25,10 @@ class ObjectsComponent extends Component
     protected $_defaultConfig = [
         'objectTypesConfig' => [
             'objects' => ['include' => 'poster'],
-            'folders' => ['include' => 'children,poster'],
         ],
         'autoHydrateAssociations' => [
             'children' => 3,
         ],
-        'extraRelations' => ['parents'],
     ];
 
     /**
@@ -49,8 +47,7 @@ class ObjectsComponent extends Component
 
         $this->loader = new ObjectsLoader(
             $this->getConfig('objectTypesConfig', []),
-            $this->getConfig('autoHydrateAssociations', []),
-            $this->getConfig('extraRelations', [])
+            $this->getConfig('autoHydrateAssociations', [])
         );
     }
 
@@ -82,14 +79,13 @@ class ObjectsComponent extends Component
      * Fetch an object by its ID or uname and all its relations.
      *
      * @param string|int $id Object ID or uname.
-     * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
-        return $this->loader->loadFullObject($id, $type, $options, $hydrate);
+        return $this->loader->loadFullObject($id, $options, $hydrate);
     }
 
     /**

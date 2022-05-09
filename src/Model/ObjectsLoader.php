@@ -7,11 +7,13 @@ use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
 use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use BEdita\Core\Model\Entity\ObjectTag;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
@@ -48,24 +50,15 @@ class ObjectsLoader
     protected $autoHydrateAssociations = [];
 
     /**
-     * List of available relations that are not part of the object schema.
-     *
-     * @var string[]
-     */
-    protected $extraRelations = [];
-
-    /**
      * Objects loader constructor.
      *
      * @param array $objectTypesConfig Loading configuration on a per-object type basis.
      * @param array $autoHydrateAssociations Map of associations to be hydrated on each load.
-     * @param array $extraRelations List of available relations that are not part of the object schema.
      */
-    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [], array $extraRelations = [])
+    public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
     {
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
-        $this->extraRelations = $extraRelations;
 
         $this->loadModel('BEdita/Core.ObjectTypes');
         $this->loadModel('BEdita/Core.Objects');
@@ -93,13 +86,15 @@ class ObjectsLoader
      * Fetch an object by its ID or uname and hydrate all its relations.
      *
      * @param string|int $id Object ID or uname.
-     * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
+        // Normalize ID, get type.
+        $id = $this->Objects->getId($id);
+        $type = $this->Objects->get($id)->type;
         $objectType = $this->ObjectTypes->get($type);
 
         if ($options === null) {
@@ -107,10 +102,7 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, $this->extraRelations);
-            if ($type === 'folders' && Hash::get($options, 'children', true) !== false) {
-                $relations = array_merge($relations, ['children']);
-            }
+            $relations = array_merge($objectType->relations, ['parents', 'translations']);
             $options['include'] = implode(',', $relations);
         } else {
             $relations = explode(',', $options['include']);
@@ -120,7 +112,7 @@ class ObjectsLoader
             $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
         }
 
-        return $this->loadObject($id, $type, $options, $hydrate);
+        return $this->loadObject((string)$id, $type, $options, $hydrate);
     }
 
     /**
@@ -310,7 +302,17 @@ class ObjectsLoader
                         return;
                     }
 
-                    (new Collection($related))->each($fix);
+                    if ($related instanceof Entity) {
+                        // related entity is not a BEdita object
+                        return;
+                    }
+
+                    (new Collection($related))->each(function (Entity $e) use ($fix) {
+                        // related entity (such as a Translation) may not be an ObjectEntity.
+                        if ($e instanceof ObjectEntity) {
+                            $fix($e);
+                        }
+                    });
                 }
             });
     }
@@ -328,8 +330,14 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (ObjectEntity $object): ObjectEntity => $object, 'type')
+            ->combine('id', fn (Entity $object): Entity => $object, 'type')
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
+                if (!$type) {
+                    yield from $items;
+
+                    return;
+                }
+
                 $objectType = $this->ObjectTypes->get($type);
                 $filter = [
                     'id' => array_unique((new Collection($items))->extract('id')->toList()),
@@ -337,7 +345,7 @@ class ObjectsLoader
 
                 yield from $this->loadMulti($objectType, $filter, null, $depth);
             })
-            ->sortBy(function (ObjectEntity $object) use ($sortedIds): int {
+            ->sortBy(function (Entity $object) use ($sortedIds): int {
                 return array_search($object->id, $sortedIds);
             }, SORT_ASC)
             ->compile();
@@ -388,7 +396,11 @@ class ObjectsLoader
                     $original = (new Collection($related))->indexBy('id')->toArray();
 
                     $related = $this->toConcreteTypes($related, $depth + 1)
-                        ->each(function (ObjectEntity $rel) use ($original): void {
+                        ->each(function (Entity $rel) use ($original): void {
+                            if (!$rel instanceof ObjectType) {
+                                return;
+                            }
+
                             $orig = Hash::get($original, $rel->id);
                             if ($orig === null || $orig->isEmpty('_joinData')) {
                                 return;
