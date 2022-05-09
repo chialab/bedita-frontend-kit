@@ -447,18 +447,18 @@ class ObjectsLoader
 
                     $related = $this->toConcreteTypes($related, $depth + 1)
                     ->each(function (Entity $rel) use ($original): void {
-                            if (!$rel instanceof ObjectType) {
-                                return;
-                            }
+                        if (!$rel instanceof ObjectType) {
+                            return;
+                        }
 
-                            $orig = Hash::get($original, $rel->id);
-                            if ($orig === null || $orig->isEmpty('_joinData')) {
-                                return;
-                            }
+                        $orig = Hash::get($original, $rel->id);
+                        if ($orig === null || $orig->isEmpty('_joinData')) {
+                            return;
+                        }
 
-                            $rel->set('relation', $orig->get('_joinData'));
-                            $rel->clean();
-                        });
+                        $rel->set('relation', $orig->get('_joinData'));
+                        $rel->clean();
+                    });
                     $object->set($prop, $related);
                 }
 
