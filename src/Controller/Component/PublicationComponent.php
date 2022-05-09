@@ -83,7 +83,7 @@ class PublicationComponent extends Component
         );
 
         try {
-            $publication = $publicationLoader->loadFullObject($publicationUname);
+            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }

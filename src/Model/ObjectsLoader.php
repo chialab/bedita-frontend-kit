@@ -86,15 +86,18 @@ class ObjectsLoader
      * Fetch an object by its ID or uname and hydrate all its relations.
      *
      * @param string|int $id Object ID or uname.
+     * @param string|null $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, ?string $type = null, ?array $options = null, ?array $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
-        $type = $this->Objects->get($id)->type;
+        if ($type === null) {
+            $type = $this->Objects->get($id)->type;
+        }
         $objectType = $this->ObjectTypes->get($type);
 
         if ($options === null) {

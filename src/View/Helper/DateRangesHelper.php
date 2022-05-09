@@ -107,6 +107,7 @@ class DateRangesHelper extends Helper
      * Find closest range in a list of date ranges.
      *
      * @param \BEdita\Core\Model\Entity\DateRange[] $ranges Date ranges.
+     * @param string|null $now Relative to date.
      * @return \BEdita\Core\Model\Entity\DateRange|null
      */
     public function getClosestRange(array $ranges, string $now = null): ?DateRange

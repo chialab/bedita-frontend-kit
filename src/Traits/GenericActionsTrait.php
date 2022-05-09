@@ -101,7 +101,7 @@ trait GenericActionsTrait
             return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
         }
 
-        $object = $this->Objects->loadFullObject((string)$object->id);
+        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
         if ($object->type === 'folders') {
             $children = $this->loadFilteredChildren($object->uname);
             $object['children'] = $children;
