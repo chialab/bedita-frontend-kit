@@ -114,6 +114,7 @@ class DateRangesHelper extends Helper
     {
         $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
         $sorted = collection($ranges)
+            ->filter(fn (DateRange $dr): bool => $dr->start_date !== null)
             ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
             ->filter(fn (DateRange $dr): bool => $dr->start_date->gte($now) || ($dr->end_date !== null && $dr->end_date->gte($now)))
