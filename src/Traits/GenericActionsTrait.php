@@ -241,7 +241,7 @@ trait GenericActionsTrait
             return $result;
         }
 
-        $object = $this->loader->loadFullObject((string)$object->id, $object->type);
+        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
         $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
         if ($result !== null) {
             return $result;
