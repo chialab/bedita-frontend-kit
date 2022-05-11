@@ -206,9 +206,9 @@ class TreeLoader
      * @param int $depth The depth of the menu for recursive loading.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[] A list of children entities.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity[]|null A list of children entities.
      */
-    protected function loadChildrenRecursively(Folder $folder, int $depth, ?array $options = null, ?array $hydrate = null): array
+    protected function loadChildrenRecursively(Folder $folder, int $depth, ?array $options = null, ?array $hydrate = null): ?array
     {
         if ($depth === 0) {
             return null;
