@@ -14,6 +14,7 @@
 namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
+use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
 use WyriHaximus\TwigView\View\TwigView;
@@ -25,7 +26,7 @@ use WyriHaximus\TwigView\View\TwigView;
  *
  * @link https://book.cakephp.org/3/en/views.html#the-app-view
  */
-class AppView extends TwigView
+class AppView extends TwigView implements TemplateExistsInterface
 {
     /**
      * Initialization hook method.
@@ -70,6 +71,18 @@ class AppView extends TwigView
         ]);
         if ($isStaging) {
             $this->loadHelper('Authentication.Identity');
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function templateExists($name = null): bool
+    {
+        try {
+            return is_string($this->_getViewFileName($name));
+        } catch (MissingTemplateException $err) {
+            return false;
         }
     }
 }

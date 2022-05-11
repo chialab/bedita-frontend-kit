@@ -9,10 +9,8 @@ use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
-use Cake\Http\Response;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
-use Chialab\FrontendKit\Traits\RenderTrait;
 use InvalidArgumentException;
 
 /**
@@ -24,7 +22,6 @@ use InvalidArgumentException;
 class PublicationComponent extends Component
 {
     use ModelAwareTrait;
-    use RenderTrait;
 
     /**
      * {@inheritDoc}
@@ -93,14 +90,6 @@ class PublicationComponent extends Component
     }
 
     /**
-     * Render a view using the bound controller.
-     */
-    public function render($view = null, $layout = null)
-    {
-        return $this->getController()->render($view, $layout);
-    }
-
-    /**
      * Getter for publication.
      *
      * @return \BEdita\Core\Model\Entity\Folder
@@ -108,34 +97,6 @@ class PublicationComponent extends Component
     public function getPublication(): Folder
     {
         return $this->publication;
-    }
-
-    /**
-     * Handle specific views/methods according to object tree structure
-     *
-     * @param string $path Full object path, relative to current publication.
-     * @param array $childrenFilters Children filters.
-     * @return \Cake\Http\Response
-     *
-     * @deprecated 1.5.0 Use {@see \Chialab\FrontendKit\Traits\GenericActionsTrait::fallback()} instead.
-     */
-    public function genericTreeAction(string $path = '', array $childrenFilters = []): Response
-    {
-        $ancestors = $this->loadObjectPath($path)->toList();
-        $object = array_pop($ancestors);
-        $parent = end($ancestors) ?: null;
-
-        if ($object->type === 'folders') {
-            $children = $this->Objects->loadRelatedObjects($object->uname, 'folders', 'children', $childrenFilters);
-            $children = $this->getController()->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
-            $object['children'] = $children;
-
-            $this->getController()->set(compact('children'));
-        }
-
-        $this->getController()->set(compact('object', 'parent', 'ancestors'));
-
-        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
     }
 
     /**
