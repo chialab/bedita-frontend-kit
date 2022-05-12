@@ -101,7 +101,7 @@ class RenderTraitTest extends TestCase
         $object = $Object->get($id, ['contain' => 'ObjectTypes']);
         $folders = array_map(fn (int $id) => $Folders->get($id), $parents);
 
-        $result = [...$this->controller->getTemplatesToIterate($object, ...$folders)];
+        $result = [...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders))];
 
         static::assertEquals($expected, $result);
     }
@@ -132,7 +132,7 @@ class RenderTraitTest extends TestCase
         $object = $Object->get($id, ['contain' => 'ObjectTypes']);
         $folders = array_map(fn (int $id) => $Folders->get($id), $parents);
 
-        $response = $this->controller->renderFirstTemplate(...$this->controller->getTemplatesToIterate($object, ...$folders));
+        $response = $this->controller->renderFirstTemplate(...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders)));
 
         static::assertEquals($expected, (string)$response->getBody());
     }

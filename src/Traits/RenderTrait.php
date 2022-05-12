@@ -68,7 +68,6 @@ trait RenderTrait
         yield $object->uname;
 
         $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
-        $ancestors = array_reverse($ancestors);
         foreach ($ancestors as $ancestor) {
             foreach ($chain as $type) {
                 yield sprintf('%s.%s', $ancestor->uname, $type->name);
