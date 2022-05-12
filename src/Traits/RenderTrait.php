@@ -17,7 +17,6 @@ namespace Chialab\FrontendKit\Traits;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
-use Cake\Http\ServerRequest;
 use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\View\TemplateExistsInterface;
 
@@ -31,7 +30,7 @@ trait RenderTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest(): ServerRequest;
+    abstract public function getRequest();
 
     /**
      * Constructs the view class instance based on the current configuration.
@@ -55,7 +54,7 @@ trait RenderTrait
      *
      * @return string
      */
-    abstract protected function _viewPath(): string;
+    abstract protected function _viewPath();
 
     /**
      * Generate a list of templates to try to use for the given object.
@@ -69,6 +68,7 @@ trait RenderTrait
         yield $object->uname;
 
         $chain = iterator_to_array($object->object_type->getFullInheritanceChain());
+        $ancestors = array_reverse($ancestors);
         foreach ($ancestors as $ancestor) {
             foreach ($chain as $type) {
                 yield sprintf('%s.%s', $ancestor->uname, $type->name);
