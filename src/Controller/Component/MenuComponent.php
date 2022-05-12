@@ -67,6 +67,7 @@ class MenuComponent extends Component
         if ($depth === null) {
             $depth = $this->getConfig('depth') ?? 1;
         }
+
         return $this->loader->loadMenu($id, $options, $hydrate, $depth);
     }
 }
