@@ -34,6 +34,14 @@ trait RenderTrait
     abstract public function getRequest(): ServerRequest;
 
     /**
+     * Constructs the view class instance based on the current configuration.
+     *
+     * @param string|null $viewClass Optional namespaced class name of the View class to instantiate.
+     * @return \Cake\View\View
+     */
+    abstract public function createView($viewClass = null);
+
+    /**
      * The render method of the controller.
      *
      * @param string|null $view View to use for rendering
@@ -83,8 +91,15 @@ trait RenderTrait
      */
     public function renderFirstTemplate(string ...$templates): Response
     {
-        /** @var \Cake\View\View $view */
+        /**
+         * Create the view instance.
+         */
         $view = $this->createView();
+
+        /**
+         * Template paths are setted by the controller in the {@see \Cake\Controller\Controller::render()} method.
+         * We are using the same logic here to check the very same template file.
+         */
         if (!$view->getTemplatePath()) {
             $view->setTemplatePath($this->_viewPath());
         }
