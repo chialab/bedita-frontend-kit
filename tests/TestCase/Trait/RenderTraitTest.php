@@ -52,7 +52,7 @@ class RenderTraitTest extends TestCase
 
         $request = new ServerRequest([
             'params' => [
-                'controller' => 'Pages'
+                'controller' => 'Pages',
             ],
         ]);
         $response = new Response();
@@ -80,7 +80,11 @@ class RenderTraitTest extends TestCase
     {
         return [
             'single' => [['profile-1', 'profiles', 'objects'], 12, []],
-            'path' => [['profile-1', 'parent-1.profiles', 'parent-1.objects', 'root-1.profiles', 'root-1.objects', 'profiles', 'objects'], 12, [2, 4]],
+            'path' => [
+                ['profile-1', 'parent-1.profiles', 'parent-1.objects', 'root-1.profiles', 'root-1.objects', 'profiles', 'objects'],
+                12,
+                [2, 4],
+            ],
         ];
     }
 

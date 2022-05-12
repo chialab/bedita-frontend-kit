@@ -114,6 +114,7 @@ trait RenderTrait
                         continue;
                     }
                 }
+
                 return $this->render($template);
             } catch (MissingTemplateException $e) {
                 continue;
