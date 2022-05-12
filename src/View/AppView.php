@@ -77,7 +77,7 @@ class AppView extends TwigView implements TemplateExistsInterface
     /**
      * @inheritDoc
      */
-    public function templateExists($name = null): bool
+    public function templateExists($name): bool
     {
         try {
             return is_string($this->_getViewFileName($name));
