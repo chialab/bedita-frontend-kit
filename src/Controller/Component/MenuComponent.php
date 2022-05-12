@@ -29,6 +29,7 @@ class MenuComponent extends Component
      * @var array
      */
     protected $_defaultConfig = [
+        'depth' => 3,
         'menuLoader' => [
             'objectTypesConfig' => [],
             'autoHydrateAssociations' => [
@@ -61,8 +62,11 @@ class MenuComponent extends Component
      * @param int $depth The depth of the menu for recursive loading.
      * @return \BEdita\Core\Model\Entity\Folder The root menu folder.
      */
-    public function load(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = 3): Folder
+    public function load(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = null): Folder
     {
+        if ($depth === null) {
+            $depth = $this->getConfig('depth') ?? 1;
+        }
         return $this->loader->loadMenu($id, $options, $hydrate, $depth);
     }
 }
