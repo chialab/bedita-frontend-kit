@@ -108,10 +108,8 @@ trait RenderTrait
 
         foreach ($templates as $template) {
             try {
-                if ($view instanceof TemplateExistsInterface) {
-                    if (!$view->templateExists($template)) {
-                        continue;
-                    }
+                if ($view instanceof TemplateExistsInterface && !$view->templateExists($template)) {
+                    continue;
                 }
 
                 return $this->render($template);
