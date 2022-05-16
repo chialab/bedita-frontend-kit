@@ -96,7 +96,7 @@ trait RenderTrait
         $view = $this->createView();
 
         /**
-         * Template paths are setted by the controller in the {@see \Cake\Controller\Controller::render()} method.
+         * Template paths are set by the controller in the {@see \Cake\Controller\Controller::render()} method.
          * We are using the same logic here to check the very same template file.
          */
         if (!$view->getTemplatePath()) {
