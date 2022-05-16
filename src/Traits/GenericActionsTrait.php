@@ -120,7 +120,7 @@ trait GenericActionsTrait
     public function objects(string $uname): Response
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
-        $object = $this->dispatchBeforeLoadEvent($uname, $entity->type);
+        $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
         if ($object === null) {
             $object = $this->Objects->loadFullObject((string)$entity->id, $entity->type);
         }
