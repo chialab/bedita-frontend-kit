@@ -14,9 +14,11 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
 use Cake\Routing\Router;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
+use UnexpectedValueException;
 
 /**
  * Trait with BEdita tree navigation for controllers.
@@ -62,74 +64,48 @@ trait GenericActionsTrait
      *
      * @param string $uname Object uname.
      * @param string $type Object type.
-     * @return \Cake\Http\Response|null The resulting response of the events.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?Response
+    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?ObjectEntity
     {
-        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $uname), compact('uname', 'type'));
-        if ($event->getResult() !== null) {
-            return $event->getResult();
-        }
-
-        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectLoad:%s', $type), compact('uname', 'type'));
-        if ($event->getResult() !== null) {
-            return $event->getResult();
-        }
-
         $event = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname', 'type'));
-        if ($event->getResult() !== null) {
-            return $event->getResult();
+        $result = $event->getResult();
+        if ($result !== null && !$result instanceof ObjectEntity) {
+            throw new UnexpectedValueException('Controller.beforeObjectLoad event must return an ObjectEntity or null');
         }
 
-        return null;
+        return $result;
     }
 
     /**
      * Dispatch after object load hook events.
      *
-     * @param string $uname Object uname.
-     * @param string $type Object type.
-     * @param array $data Objects data to pass to callback.
-     * @return \Cake\Http\Response|null The resulting response of the events.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchAfterLoadEvent(string $uname, string $type, array $data): ?Response
+    protected function dispatchAfterLoadEvent(ObjectEntity $object): ?ObjectEntity
     {
-        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $uname), $data);
-        if ($event->getResult() !== null) {
-            return $event->getResult();
+        $event = $this->dispatchEvent('Controller.afterObjectLoad', compact('object'));
+        $result = $event->getResult();
+        if ($result !== null && !$result instanceof ObjectEntity) {
+            throw new UnexpectedValueException('Controller.afterObjectLoad event must return an ObjectEntity or null');
         }
 
-        $event = $this->dispatchEvent(sprintf('Controller.afterObjectLoad:%s', $type), $data);
-        if ($event->getResult() !== null) {
-            return $event->getResult();
-        }
-
-        $event = $this->dispatchEvent('Controller.afterObjectLoad', $data);
-        if ($event->getResult() !== null) {
-            return $event->getResult();
-        }
-
-        return null;
+        return $result;
     }
 
     /**
      * Dispatch before object render hook events.
      *
-     * @param string $uname Object uname.
-     * @param string $type Object type.
-     * @param array $data Objects data to pass to callback.
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
      * @return \Cake\Http\Response|null The resulting response of the events.
      */
-    protected function dispatchBeforeRenderEvent(string $uname, string $type, array $data): ?Response
+    protected function dispatchBeforeRenderEvent(ObjectEntity $object): ?Response
     {
-        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectRender:%s', $uname), $data);
-        if ($event->getResult() !== null) {
-            return $event->getResult();
-        }
-
-        $event = $this->dispatchEvent(sprintf('Controller.beforeObjectRender:%s', $type), $data);
-        if ($event->getResult() !== null) {
-            return $event->getResult();
+        $event = $this->dispatchEvent('Controller.beforeObjectRender', compact('object'));
+        $result = $event->getResult();
+        if ($result !== null && !$result instanceof Response) {
+            throw new UnexpectedValueException('Controller.beforeObjectRender event must return a valid Response or null');
         }
 
         return null;
@@ -143,18 +119,13 @@ trait GenericActionsTrait
      */
     public function objects(string $uname): Response
     {
-        $object = $this->Objects->loadObject($uname, 'objects', [], []);
-        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
-        if ($result !== null) {
-            return $result;
+        $entity = $this->Objects->loadObject($uname, 'objects', [], []);
+        $object = $this->dispatchBeforeLoadEvent($uname, $entity->type);
+        if ($object === null) {
+            $object = $this->Objects->loadFullObject((string)$entity->id, $entity->type);
         }
 
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
-        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
-        if ($result !== null) {
-            return $result;
-        }
-
+        $object = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
             $object['children'] = $this->loadFilteredChildren($object->uname);
         }
@@ -164,7 +135,7 @@ trait GenericActionsTrait
             $this->set('children', $object['children']);
         }
 
-        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        $result = $this->dispatchBeforeRenderEvent($object);
         if ($result !== null) {
             return $result;
         }
@@ -180,43 +151,40 @@ trait GenericActionsTrait
      */
     public function object(string $uname): Response
     {
-        $object = $this->Objects->loadObject($uname, 'objects', [], []);
+        $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
         foreach (Router::routes() as $route) {
             if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
                 continue;
             }
 
-            $out = $route->match(['_entity' => $object] + $route->defaults, []);
+            $out = $route->match(['_entity' => $entity] + $route->defaults, []);
             if ($out !== false) {
                 return $this->redirect($out);
             }
         }
-        $paths = $this->Publication->getViablePaths($object->id);
+
+        $paths = $this->Publication->getViablePaths($entity->id);
         if (!empty($paths)) {
             return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
         }
 
-        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
-        if ($result !== null) {
-            return $result;
+        $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
+        if ($object === null) {
+            $object = $this->Objects->loadFullObject((string)$entity->id, $entity->type);
         }
 
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
-        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
-        if ($result !== null) {
-            return $result;
-        }
-
+        $object = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
             $object['children'] = $this->loadFilteredChildren($object->uname);
         }
+
         $this->set(compact('object'));
         if (isset($object['children'])) {
             $this->set('children', $object['children']);
         }
 
-        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        $result = $this->dispatchBeforeRenderEvent($object);
         if ($result !== null) {
             return $result;
         }
@@ -233,20 +201,15 @@ trait GenericActionsTrait
     public function fallback(string $path): Response
     {
         $ancestors = $this->Publication->loadObjectPath($path)->toList();
-        $object = array_pop($ancestors);
+        $leaf = array_pop($ancestors);
         $parent = end($ancestors) ?: null;
 
-        $result = $this->dispatchBeforeLoadEvent($object->uname, $object->type);
-        if ($result !== null) {
-            return $result;
+        $object = $this->dispatchBeforeLoadEvent($leaf->uname, $leaf->type);
+        if ($object === null) {
+            $object = $this->Objects->loadFullObject((string)$leaf->id, $leaf->type);
         }
 
-        $object = $this->Objects->loadFullObject((string)$object->id, $object->type);
-        $result = $this->dispatchAfterLoadEvent($object->uname, $object->type, compact('object'));
-        if ($result !== null) {
-            return $result;
-        }
-
+        $objects = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
             $object['children'] = $this->loadFilteredChildren($object->uname);
         }
@@ -256,7 +219,7 @@ trait GenericActionsTrait
             $this->set('children', $object['children']);
         }
 
-        $result = $this->dispatchBeforeRenderEvent($object->uname, $object->type, compact('object'));
+        $result = $this->dispatchBeforeRenderEvent($object);
         if ($result !== null) {
             return $result;
         }
