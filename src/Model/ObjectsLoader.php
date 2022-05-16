@@ -7,7 +7,6 @@ use BEdita\Core\Model\Action\GetObjectAction;
 use BEdita\Core\Model\Action\ListObjectsAction;
 use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
-use BEdita\Core\Model\Entity\ObjectTag;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Entity\Translation;
 use BEdita\I18n\Core\I18nTrait;
@@ -185,7 +184,7 @@ class ObjectsLoader
         }
 
         $table = $this->getTableLocator()->get($objectType->alias);
-        $lang = $this->getLang();
+        $lang = Hash::get($options, 'lang', $this->getLang());
         $contain = static::prepareContains(Hash::get($options, 'include', ''));
 
         $action = new GetObjectAction(compact('objectType', 'table'));
@@ -193,7 +192,7 @@ class ObjectsLoader
         $object = $action(compact('primaryKey', 'lang', 'contain'));
 
         return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)
-            ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object))
+            ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang))
             ->first();
     }
 
@@ -216,7 +215,7 @@ class ObjectsLoader
         $filter += Hash::get($options, 'filter', []);
 
         $table = $this->getTableLocator()->get($objectType->alias);
-        $lang = $this->getLang();
+        $lang = Hash::get($options, 'lang', $this->getLang());
         $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
         $lateContain = static::prepareContains(Hash::get($options, 'include', ''), true);
 
@@ -226,7 +225,7 @@ class ObjectsLoader
         /** @var \Cake\ORM\Table */
         $table = $query->getRepository();
 
-        return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $lateContain, $table): iterable {
+        return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $lateContain, $table, $lang): iterable {
             if (!empty($lateContain)) {
                 $results = collection($results)->each(function (ObjectEntity $object) use ($lateContain, $table): void {
                     $table->loadInto($object, $lateContain);
@@ -234,7 +233,7 @@ class ObjectsLoader
             }
 
             return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate)
-                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object));
+                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang));
         });
     }
 
@@ -252,7 +251,7 @@ class ObjectsLoader
      */
     protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
-        $lang = $this->getLang();
+        $lang = Hash::get($options, 'lang', $this->getLang());
 
         $table = $this->getTableLocator()->get($objectType->alias);
         $association = $table->getAssociation($relation);
@@ -261,14 +260,14 @@ class ObjectsLoader
         $query = $action(compact('primaryKey', 'filter', 'lang'));
 
         return $query->formatResults(fn (iterable $results): iterable => $this->toConcreteTypes($results, $depth + 1)
-            ->map(function (ObjectEntity $related) use ($results): ObjectEntity {
+            ->map(function (ObjectEntity $related) use ($results, $lang): ObjectEntity {
                 $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
                 if (!$original->isEmpty('_joinData')) {
                     $related->set('relation', $original->get('_joinData'));
                     $related->clean();
                 }
 
-                return $this->dangerouslyTranslateFields($related);
+                return $this->dangerouslyTranslateFields($related, $lang);
             }));
     }
 
@@ -364,12 +363,12 @@ class ObjectsLoader
      * **WARNING**: do NOT save entities that have been processed by this processor.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object Object to process.
+     * @param string|null $lang Language code to use.
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function dangerouslyTranslateFields(ObjectEntity $object): ObjectEntity
+    protected function dangerouslyTranslateFields(ObjectEntity $object, ?string $lang): ObjectEntity
     {
-        $lang = $this->getLang();
-        if ($lang === $object->lang) {
+        if ($lang === null || $lang === $object->lang) {
             return $object;
         }
 
