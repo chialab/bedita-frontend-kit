@@ -18,12 +18,28 @@ use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
+use Chialab\FrontendKit\View\TemplateExistsInterface;
 
 /**
  * Render for BEdita frontends.
  */
 trait RenderTrait
 {
+    /**
+     * Gets the request instance.
+     *
+     * @return \Cake\Http\ServerRequest
+     */
+    abstract public function getRequest();
+
+    /**
+     * Constructs the view class instance based on the current configuration.
+     *
+     * @param string|null $viewClass Optional namespaced class name of the View class to instantiate.
+     * @return \Cake\View\View
+     */
+    abstract public function createView($viewClass = null);
+
     /**
      * The render method of the controller.
      *
@@ -32,6 +48,13 @@ trait RenderTrait
      * @return \Cake\Http\Response A response object containing the rendered view.
      */
     abstract public function render($view = null, $layout = null);
+
+    /**
+     * Get the viewPath based on controller name and request prefix.
+     *
+     * @return string
+     */
+    abstract protected function _viewPath();
 
     /**
      * Generate a list of templates to try to use for the given object.
@@ -62,13 +85,33 @@ trait RenderTrait
     /**
      * Render first found template.
      *
-     * @param string ...$templates Templates to search.
+     * @param string[] $templates Templates to search.
      * @return \Cake\Http\Response
      */
     public function renderFirstTemplate(string ...$templates): Response
     {
+        /**
+         * Create the view instance.
+         */
+        $view = $this->createView();
+
+        /**
+         * Template paths are set by the controller in the {@see \Cake\Controller\Controller::render()} method.
+         * We are using the same logic here to check the very same template file.
+         */
+        if (!$view->getTemplatePath()) {
+            $view->setTemplatePath($this->_viewPath());
+        }
+        if (!$view->getTemplate()) {
+            $view->setTemplate($this->getRequest()->getParam('action'));
+        }
+
         foreach ($templates as $template) {
             try {
+                if ($view instanceof TemplateExistsInterface && !$view->templateExists($template)) {
+                    continue;
+                }
+
                 return $this->render($template);
             } catch (MissingTemplateException $e) {
                 continue;

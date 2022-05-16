@@ -20,3 +20,6 @@ indent_size = 2
 [Vagrantfile]
 indent_style = space
 indent_size = 2
+
+[*.ctp]
+insert_final_newline = false
