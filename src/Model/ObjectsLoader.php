@@ -251,7 +251,7 @@ class ObjectsLoader
      */
     protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
-        $lang = Hash::get($options, 'lang', $this->getLang());
+        $lang = Hash::get($options ?? [], 'lang', $this->getLang());
 
         $table = $this->getTableLocator()->get($objectType->alias);
         $association = $table->getAssociation($relation);
