@@ -115,9 +115,9 @@ trait GenericActionsTrait
      * Generic objects route.
      *
      * @param string $uname Object id or uname.
-     * @return Response
+     * @return \Cake\Http\Response|null
      */
-    public function objects(string $uname): Response
+    public function objects(string $uname): ?Response
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
@@ -140,16 +140,20 @@ trait GenericActionsTrait
             return $result;
         }
 
-        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
+        if (!$this->viewBuilder()->getTemplate()) {
+            return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
+        }
+
+        return null;
     }
 
     /**
      * Generic object route.
      *
      * @param string $uname Object `id` or `uname`.
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function object(string $uname): Response
+    public function object(string $uname): ?Response
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
@@ -189,16 +193,20 @@ trait GenericActionsTrait
             return $result;
         }
 
-        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
+        if (!$this->viewBuilder()->getTemplate()) {
+            return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object));
+        }
+
+        return null;
     }
 
     /**
      * Generic object view.
      *
      * @param string $path Object path.
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function fallback(string $path): Response
+    public function fallback(string $path): ?Response
     {
         $ancestors = $this->Publication->loadObjectPath($path)->toList();
         $leaf = array_pop($ancestors);
@@ -224,6 +232,10 @@ trait GenericActionsTrait
             return $result;
         }
 
-        return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
+        if (!$this->viewBuilder()->getTemplate()) {
+            return $this->renderFirstTemplate(...$this->getTemplatesToIterate($object, ...array_reverse($ancestors)));
+        }
+
+        return null;
     }
 }
