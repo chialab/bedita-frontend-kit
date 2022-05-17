@@ -105,7 +105,12 @@ class ObjectsLoader
         }
 
         if (!isset($options['include'])) {
-            $relations = array_merge($objectType->relations, ['parents', 'translations']);
+            $defaultOptions = $this->getDefaultOptions($objectType);
+            $alwaysInclude = explode(',', Hash::get($defaultOptions, 'include', ''));
+            $alwaysExclude = explode(',', Hash::get($defaultOptions, 'exclude', ''));
+
+            $relations = array_merge($alwaysInclude, $objectType->relations, ['parents', 'translations']);
+            $relations = array_diff($relations, $alwaysExclude);
             $options['include'] = implode(',', $relations);
         } else {
             $relations = explode(',', $options['include']);
