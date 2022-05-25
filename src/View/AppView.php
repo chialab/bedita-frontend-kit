@@ -15,6 +15,7 @@ namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
 use Cake\View\Exception\MissingTemplateException;
+use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
 use WyriHaximus\TwigView\View\TwigView;
@@ -41,8 +42,9 @@ class AppView extends TwigView implements TemplateExistsInterface
     {
         parent::initialize();
 
-        $this->getTwig()->addExtension(new SortByExtension());
+        $this->getTwig()->addExtension(new FileExtension());
         $this->getTwig()->addExtension(new I18nExtension());
+        $this->getTwig()->addExtension(new SortByExtension());
 
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
