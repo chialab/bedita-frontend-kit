@@ -383,10 +383,12 @@ class ObjectsLoader
             return $object;
         }
 
+        $originalFields = [
+            'lang' => $object->lang,
+        ];
         $object->lang = $requestedTranslation->lang;
         $object->setDirty('lang', false);
 
-        $originalFields = [];
         foreach ($requestedTranslation->translated_fields as $field => $value) {
             if (empty($value)) {
                 continue;
