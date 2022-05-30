@@ -45,9 +45,15 @@ class LocaleUrlFilter
      */
     public function __invoke(array $params, ServerRequest $request): array
     {
-        if ($request->getParam($this->param) && !isset($params[$this->param])) {
+        if (isset($params[$this->param])) {
+            if ($params[$this->param] === false) {
+                $params[$this->param] = null;
+            }
+        } elseif ($request->getParam($this->param)) {
             $params[$this->param] = $request->getParam($this->param);
-        } elseif (isset($params[$this->param]) && !empty($params['_name']) && substr($params['_name'], 0, strlen($this->namePrefix)) !== $this->namePrefix) {
+        }
+
+        if (isset($params[$this->param]) && !empty($params['_name']) && substr($params['_name'], 0, strlen($this->namePrefix)) !== $this->namePrefix) {
             $params['_name'] = $this->namePrefix . $params['_name'];
         }
 
