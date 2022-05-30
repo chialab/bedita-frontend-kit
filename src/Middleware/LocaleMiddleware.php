@@ -28,7 +28,7 @@ class LocaleMiddleware
             return $next($request, $response);
         }
 
-        $locale = $request->getParam('_locale');
+        $locale = $request->getParam('locale');
         if (!empty($locale)) {
             I18n::setLocale($locale);
             Configure::write('I18n.lang', $locale);

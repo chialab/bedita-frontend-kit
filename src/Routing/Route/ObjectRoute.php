@@ -19,12 +19,23 @@ use RuntimeException;
 class ObjectRoute extends DashedRoute
 {
     /**
+     * Route filters.
+     *
+     * @var array
+     */
+    protected array $filters = [];
+
+    /**
      * @inheritdoc
      */
     public function compile(): ?string
     {
         $compiled = parent::compile();
-        unset($this->defaults['_filters']);
+
+        if (isset($this->defaults['_filters'])) {
+            $this->filters = $this->defaults['_filters'];
+            unset($this->defaults['_filters']);
+        }
 
         return $compiled;
     }
@@ -49,14 +60,13 @@ class ObjectRoute extends DashedRoute
         }
 
         $entity = Hash::get($url, '_entity');
-        $filters = Hash::get($url, '_filters');
         unset($url['_entity'], $url['_filters']);
 
         if (!isset($entity)) {
             return parent::match($url, $context);
         }
         $this->checkEntity($entity);
-        if (!empty($filters) && $this->checkFilters($entity, $filters) === false) {
+        if ($this->checkFilters($entity) === false) {
             return false;
         }
 
@@ -91,12 +101,15 @@ class ObjectRoute extends DashedRoute
      * Check if Object matches route filters.
      *
      * @param \ArrayAccess|array $entity Entity value from the URL options.
-     * @param array $filters Filters from the URL options.
      * @return bool
      */
-    protected function checkFilters($entity, $filters = []): bool
+    protected function checkFilters($entity): bool
     {
-        foreach ($filters as $filter => $values) {
+        if (empty($this->filters)) {
+            return true;
+        }
+
+        foreach ($this->filters as $filter => $values) {
             switch ($filter) {
                 case 'type':
                     if ($values !== '*' && (empty($entity['type']) || !in_array($entity['type'], (array)$values))) {
