@@ -162,7 +162,10 @@ trait GenericActionsTrait
                 continue;
             }
 
-            $out = $route->match(['_entity' => $entity] + $route->defaults, []);
+            $params = [
+                'locale' => $this->getRequest()->getParam('locale', null),
+            ];
+            $out = $route->match(['_entity' => $entity] + $route->defaults + array_filter($params), []);
             if ($out !== false) {
                 return $this->redirect($out);
             }
