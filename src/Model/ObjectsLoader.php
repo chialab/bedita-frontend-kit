@@ -192,7 +192,7 @@ class ObjectsLoader
 
         $action = new GetObjectAction(compact('objectType', 'table'));
         /** @var \BEdita\Core\Model\Entity\ObjectEntity $object */
-        $object = $action(compact('primaryKey', 'lang', 'contain'));
+        $object = $action(static::includeTranslations($contain) ? compact('primaryKey', 'contain') : compact('primaryKey', 'lang', 'contain'));
 
         return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)
             ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang))
@@ -224,7 +224,7 @@ class ObjectsLoader
 
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
-        $query = $action(compact('filter', 'lang', 'contain'));
+        $query = $action(static::includeTranslations($contain) ? compact('filter', 'contain') : compact('filter', 'lang', 'contain'));
         /** @var \Cake\ORM\Table */
         $table = $query->getRepository();
 
@@ -553,5 +553,16 @@ class ObjectsLoader
 
             return $contains;
         }, []);
+    }
+
+    /**
+     * Check if translations association is in the contain list.
+     *
+     * @param array $contains Contain list.
+     * @return bool
+     */
+    protected static function includeTranslations(array $contain): bool
+    {
+        return in_array('Translations', $contain);
     }
 }
