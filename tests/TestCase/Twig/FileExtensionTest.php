@@ -56,4 +56,32 @@ class FileExtensionTest extends TestCase
     {
         static::assertSame($expected, $this->extension->readableSize($size));
     }
+
+    /**
+     * Data provider for {@see FileExtensionTest::testMimeType()} test case.
+     *
+     * @return array[]
+     */
+    public function mimeTypeProvider(): array
+    {
+        return [
+            'word' => ['word', 'application/msword'],
+            'archive' => ['archive', 'application/zip'],
+            'image' => ['image', 'image/png'],
+            'audio' => ['audio', 'audio/wav'],
+        ];
+    }
+
+    /**
+     * Test {@see FileExtension::mimeType()}.
+     *
+     * @return void
+     *
+     * @dataProvider mimeTypeProvider()
+     * @covers ::mimeType()
+     */
+    public function testMimeType(string $expected, string $mime)
+    {
+        static::assertSame($expected, $this->extension->mimeType($mime));
+    }
 }
