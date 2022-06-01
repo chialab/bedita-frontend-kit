@@ -17,7 +17,7 @@ class FileExtension extends AbstractExtension
      *
      * @var array
      */
-    protected static $MEDIA_TYPE_CATEGORIES = [
+    protected const MEDIA_TYPE_CATEGORIES = [
         'application/x-abiword' => 'word',
         'application/msword' => 'word',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'word',
@@ -87,6 +87,6 @@ class FileExtension extends AbstractExtension
     {
         $mediaType = strtolower($mediaType);
 
-        return static::$MEDIA_TYPE_CATEGORIES[$mediaType] ?? explode('/', $mediaType, 2)[0];
+        return static::MEDIA_TYPE_CATEGORIES[$mediaType] ?? explode('/', $mediaType, 2)[0];
     }
 }
