@@ -31,11 +31,11 @@ class FileExtensionTest extends TestCase
     }
 
     /**
-     * Data provider for {@see FileExtensionTest::testReadableSize()} test case.
+     * Data provider for {@see FileExtensionTest::testFormatFileSize()} test case.
      *
      * @return array[]
      */
-    public function readableSizeProvider(): array
+    public function formatFileSizeProvider(): array
     {
         return [
             'bytes' => ['100 Bytes', 100],
@@ -45,24 +45,24 @@ class FileExtensionTest extends TestCase
     }
 
     /**
-     * Test {@see FileExtension::readableSize()}.
+     * Test {@see FileExtension::formatFileSize()}.
      *
      * @return void
      *
-     * @dataProvider readableSizeProvider()
-     * @covers ::readableSize()
+     * @dataProvider formatFileSizeProvider()
+     * @covers ::formatFileSize()
      */
-    public function testReadableSize(string $expected, int $size)
+    public function testFormatFileSize(string $expected, int $size)
     {
-        static::assertSame($expected, $this->extension->readableSize($size));
+        static::assertSame($expected, $this->extension->formatFileSize($size));
     }
 
     /**
-     * Data provider for {@see FileExtensionTest::testMimeType()} test case.
+     * Data provider for {@see FileExtensionTest::testMediaTypeCategory()} test case.
      *
      * @return array[]
      */
-    public function mimeTypeProvider(): array
+    public function mediaTypeCateoryProvider(): array
     {
         return [
             'word' => ['word', 'application/msword'],
@@ -73,15 +73,15 @@ class FileExtensionTest extends TestCase
     }
 
     /**
-     * Test {@see FileExtension::mimeType()}.
+     * Test {@see FileExtension::mediaTypeCategory()}.
      *
      * @return void
      *
-     * @dataProvider mimeTypeProvider()
-     * @covers ::mimeType()
+     * @dataProvider mediaTypeCateoryProvider()
+     * @covers ::mediaTypeCategory()
      */
-    public function testMimeType(string $expected, string $mime)
+    public function testMediaTypeCategory(string $expected, string $mediaType)
     {
-        static::assertSame($expected, $this->extension->mimeType($mime));
+        static::assertSame($expected, $this->extension->mediaTypeCategory($mediaType));
     }
 }

@@ -13,13 +13,56 @@ use Twig\TwigFilter;
 class FileExtension extends AbstractExtension
 {
     /**
+     * Media type category map.
+     *
+     * @var array
+     */
+    protected static $MEDIA_TYPE_CATEGORIES = [
+        'application/x-abiword' => 'word',
+        'application/msword' => 'word',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'word',
+        'application/vnd.oasis.opendocument.text' => 'word',
+        'application/vnd.oasis.opendocument.presentation' => 'presentation',
+        'application/vnd.ms-powerpoint' => 'presentation',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'presentation',
+        'application/vnd.oasis.opendocument.spreadsheet' => 'spreadsheet',
+        'application/vnd.ms-excel' => 'spreadsheet',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'spreadsheet',
+        'application/x-freearc' => 'archive',
+        'application/x-bzip' => 'archive',
+        'application/x-bzip2' => 'archive',
+        'application/gzip' => 'archive',
+        'application/vnd.rar' => 'archive',
+        'application/x-tar' => 'archive',
+        'application/zip' => 'archive',
+        'application/x-7z-compressed' => 'archive',
+        'application/vnd.amazon.ebook' => 'ebook',
+        'application/epub+zip' => 'ebook',
+        'application/vnd.ms-fontobject' => 'font',
+        'text/css' => 'css',
+        'text/html' => 'html',
+        'application/xhtml+xml' => 'xml',
+        'application/xml' => 'xml',
+        'text/xml' => 'xml',
+        'application/vnd.mozilla.xul+xml' => 'xml',
+        'text/javascript' => 'javascript',
+        'application/javascript' => 'javascript',
+        'text/json' => 'json',
+        'application/json' => 'json',
+        'application/ld+json' => 'json',
+        'text/calendar' => 'calendar',
+        'application/pdf' => 'pdf',
+        'application/rtf' => 'text',
+    ];
+
+    /**
      * @inheritDoc
      */
     public function getFilters()
     {
         return [
-            new TwigFilter('readable_size', [$this, 'readableSize']),
-            new TwigFilter('mime_type', [$this, 'mimeType']),
+            new TwigFilter('format_file_size', [$this, 'formatFileSize']),
+            new TwigFilter('media_type_category', [$this, 'mediaTypeCategory']),
         ];
     }
 
@@ -29,73 +72,21 @@ class FileExtension extends AbstractExtension
      * @param int|string $size Byte size.
      * @return string
      */
-    public function readableSize($size): string
+    public function formatFileSize($size): string
     {
         return Number::toReadableSize($size);
     }
 
     /**
-     * Get the generic type of the mime.
+     * Get the category type of the media.
      *
-     * @param string $mime The mime type string.
+     * @param string $mediaType The media type string.
      * @return string
      */
-    public function mimeType(string $mime): string
+    public function mediaTypeCategory(string $mediaType): string
     {
-        $mime = strtolower($mime);
+        $mediaType = strtolower($mediaType);
 
-        switch ($mime) {
-            case 'application/x-abiword':
-            case 'application/msword':
-            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            case 'application/vnd.oasis.opendocument.text':
-                return 'word';
-            case 'application/vnd.oasis.opendocument.presentation':
-            case 'application/vnd.ms-powerpoint':
-            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-                return 'presentation';
-            case 'application/vnd.oasis.opendocument.spreadsheet':
-            case 'application/vnd.ms-excel':
-            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                return 'spreadsheet';
-            case 'application/x-freearc':
-            case 'application/x-bzip':
-            case 'application/x-bzip2':
-            case 'application/gzip':
-            case 'application/vnd.rar':
-            case 'application/x-tar':
-            case 'application/zip':
-            case 'application/x-7z-compressed':
-                return 'archive';
-            case 'application/vnd.amazon.ebook':
-            case 'application/epub+zip':
-                return 'ebook';
-            case 'application/vnd.ms-fontobject':
-                return 'font';
-            case 'text/css':
-                return 'css';
-            case 'text/html':
-                return 'html';
-            case 'application/xhtml+xml':
-            case 'application/xml':
-            case 'text/xml':
-            case 'application/vnd.mozilla.xul+xml':
-                return 'xml';
-            case 'text/javascript':
-            case 'application/javascript':
-                return 'javascript';
-            case 'text/json':
-            case 'application/json':
-            case 'application/ld+json':
-                return 'json';
-            case 'text/calendar':
-                return 'calendar';
-            case 'application/pdf':
-                return 'pdf';
-            case 'application/rtf':
-                return 'text';
-            default:
-                return explode('/', $mime)[0];
-        }
+        return static::$MEDIA_TYPE_CATEGORIES[$mediaType] ?? explode('/', $mediaType, 2)[0];
     }
 }
