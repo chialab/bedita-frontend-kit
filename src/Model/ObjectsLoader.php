@@ -451,7 +451,7 @@ class ObjectsLoader
 
                     $related = $this->toConcreteTypes($related, $depth + 1)
                         ->each(function (Entity $rel) use ($original): void {
-                            if (!$rel instanceof ObjectType) {
+                            if (!$rel instanceof ObjectEntity) {
                                 return;
                             }
 
