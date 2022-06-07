@@ -40,16 +40,16 @@ class LocaleUrlFilter
      * Exec url filter.
      *
      * @param array $params Request params.
-     * @param \Cake\Http\ServerRequest $request The request.
+     * @param \Cake\Http\ServerRequest|null $request The request.
      * @return array Updated params.
      */
-    public function __invoke(array $params, ServerRequest $request): array
+    public function __invoke(array $params, ?ServerRequest $request = null): array
     {
         if (isset($params[$this->param])) {
             if ($params[$this->param] === false) {
                 $params[$this->param] = null;
             }
-        } elseif ($request->getParam($this->param)) {
+        } elseif ($request !== null && $request->getParam($this->param)) {
             $params[$this->param] = $request->getParam($this->param);
         }
 
