@@ -65,6 +65,9 @@ class ObjectRoute extends DashedRoute
         if (!isset($entity)) {
             return parent::match($url, $context);
         }
+        if (empty($url['locale']) === in_array('locale', $this->keys)) {
+            return false;
+        }
         $this->checkEntity($entity);
         if ($this->checkFilters($entity) === false) {
             return false;

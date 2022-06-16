@@ -165,10 +165,6 @@ trait GenericActionsTrait
                 continue;
             }
 
-            if (empty($locale) === in_array('locale', $route->keys)) {
-                continue;
-            }
-
             $out = $route->match(['_entity' => $entity] + $route->defaults + $params, []);
             if ($out !== false) {
                 return $this->redirect($out);
