@@ -157,15 +157,19 @@ trait GenericActionsTrait
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
+        $locale = $this->getRequest()->getParam('locale', null);
+        $params = array_filter(compact('locale'));
+
         foreach (Router::routes() as $route) {
             if (!$route instanceof ObjectRoute || $currentRoute === $route->template) {
                 continue;
             }
 
-            $params = [
-                'locale' => $this->getRequest()->getParam('locale', null),
-            ];
-            $out = $route->match(['_entity' => $entity] + $route->defaults + array_filter($params), []);
+            if (empty($locale) === in_array('locale', $route->keys)) {
+                continue;
+            }
+
+            $out = $route->match(['_entity' => $entity] + $route->defaults + $params, []);
             if ($out !== false) {
                 return $this->redirect($out);
             }
@@ -173,7 +177,7 @@ trait GenericActionsTrait
 
         $paths = $this->Publication->getViablePaths($entity->id);
         if (!empty($paths)) {
-            return $this->redirect(['action' => 'fallback', $paths[0]['path']]);
+            return $this->redirect(['action' => 'fallback', $paths[0]['path']] + $params);
         }
 
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
