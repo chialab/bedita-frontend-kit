@@ -59,6 +59,7 @@ class AppView extends TwigView implements TemplateExistsInterface
 
         $fallbackImage = Configure::read('FallbackImage');
         $fallback = $fallbackImage ? $this->Url->image($fallbackImage) : null;
+        $this->loadHelper('Chialab/FrontendKit.Media');
         $this->loadHelper('Chialab/FrontendKit.Thumb', [
             'fallbackImage' => $fallback,
         ]);
