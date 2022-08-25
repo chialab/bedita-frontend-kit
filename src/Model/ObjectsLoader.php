@@ -259,19 +259,22 @@ class ObjectsLoader
         $table = $this->getTableLocator()->get($objectType->alias);
         $association = $table->getAssociation($relation);
         $action = new ListRelatedObjectsAction(compact('association'));
+        $contain = $options ? static::prepareContains(Hash::get($options, 'include', ''), true) : [];
+
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('primaryKey', 'filter', 'lang'));
 
-        return $query->formatResults(fn (iterable $results): iterable => $this->toConcreteTypes($results, $depth + 1)
-            ->map(function (ObjectEntity $related) use ($results, $lang): ObjectEntity {
-                $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $related->id)->first();
-                if (!$original->isEmpty('_joinData')) {
-                    $related->set('relation', $original->get('_joinData'));
-                    $related->clean();
-                }
+        return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $table, $lang): iterable {
+            $results = $this->toConcreteTypes($results, $depth + 1);
+            if (!empty($contain)) {
+                $results = collection($results)->each(function (ObjectEntity $object) use ($contain, $table): void {
+                    $table->loadInto($object, $contain);
+                });
+            }
 
-                return $this->dangerouslyTranslateFields($related, $lang);
-            }));
+            return $this->autoHydrateAssociations($this->setJoinData($results, $contain), $depth, $hydrate)
+                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang));
+        });
     }
 
     /**
