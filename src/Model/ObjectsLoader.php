@@ -215,12 +215,12 @@ class ObjectsLoader
         if ($options === null) {
             $options = $this->getDefaultOptions($objectType);
         }
-        $filter += Hash::get($options, 'filter', []);
 
-        $table = $this->getTableLocator()->get($objectType->alias);
         $lang = Hash::get($options, 'lang', $this->getLang());
+        $filter += Hash::get($options, 'filter', []);
         $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
         $lateContain = static::prepareContains(Hash::get($options, 'include', ''), true);
+        $table = $this->getTableLocator()->get($objectType->alias);
 
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
@@ -254,26 +254,38 @@ class ObjectsLoader
      */
     protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
-        $lang = Hash::get($options ?? [], 'lang', $this->getLang());
+        // Fetch default options.
+        if ($options === null) {
+            $options = $this->getDefaultOptions($objectType);
+        }
 
+        $lang = Hash::get($options, 'lang', $this->getLang());
+        $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
         $table = $this->getTableLocator()->get($objectType->alias);
         $association = $table->getAssociation($relation);
         $action = new ListRelatedObjectsAction(compact('association'));
-        $contain = $options ? static::prepareContains(Hash::get($options, 'include', ''), true) : [];
 
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('primaryKey', 'filter', 'lang'));
 
         return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $table, $lang): iterable {
-            $results = $this->toConcreteTypes($results, $depth + 1);
+            $objects = $this->toConcreteTypes($results, $depth + 1);
             if (!empty($contain)) {
-                $results = collection($results)->each(function (ObjectEntity $object) use ($contain, $table): void {
+                $objects = collection($objects)->each(function (ObjectEntity $object) use ($contain, $table): void {
                     $table->loadInto($object, $contain);
                 });
             }
 
-            return $this->autoHydrateAssociations($this->setJoinData($results, $contain), $depth, $hydrate)
-                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang));
+            return $this->autoHydrateAssociations($this->setJoinData($objects, $contain), $depth, $hydrate)
+                ->map(function (ObjectEntity $object) use ($results, $lang): ObjectEntity {
+                    $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $object->id)->first();
+                    if (!$original->isEmpty('_joinData')) {
+                        $object->set('relation', $original->get('_joinData'));
+                        $object->clean();
+                    }
+
+                    return $this->dangerouslyTranslateFields($object, $lang);
+                });
         });
     }
 
