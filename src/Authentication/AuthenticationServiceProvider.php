@@ -39,6 +39,10 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
                 'username' => 'username',
                 'password' => 'password_hash',
             ],
+            'resolver' => [
+                'className' => 'Authentication.Orm',
+                'finder' => 'login',
+            ],
         ]);
 
         // Load the authenticators, you want session first
