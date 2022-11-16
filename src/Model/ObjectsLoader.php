@@ -278,7 +278,7 @@ class ObjectsLoader
 
             return $this->autoHydrateAssociations($this->setJoinData($objects, $contain), $depth, $hydrate)
                 ->map(function (ObjectEntity $object) use ($results, $lang): ObjectEntity {
-                    $original = collection($results)->filter(fn (ObjectEntity $object): bool => $object->id === $object->id)->first();
+                    $original = collection($results)->filter(fn (ObjectEntity $orig): bool => $orig->id === $object->id)->first();
                     if (!$original->isEmpty('_joinData')) {
                         $object->set('relation', $original->get('_joinData'));
                         $object->clean();
