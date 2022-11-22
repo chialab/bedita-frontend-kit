@@ -107,12 +107,17 @@ class TrustedProxiesMiddleware
 
         while (true) {
             $remoteAddress = $request->clientIp();
-            if (!$this->isTrusted($remoteAddress)) {
+            $trustedProxies = $request->getTrustedProxies();
+            if (!$this->isTrusted($remoteAddress) || in_array($remoteAddress, $trustedProxies)) {
+                // Remote address does not belong to any trusted proxies,
+                // or there are no more addresses in the `X-Forwarded-For` stack.
                 break;
             }
 
+            // The remote address belongs to a trusted proxy subnet.
+            // Add it to the trusted proxies addresses and repeat.
             $request->trustProxy = true;
-            $request->setTrustedProxies(array_merge($request->getTrustedProxies(), [$remoteAddress]));
+            $request->setTrustedProxies(array_merge($trustedProxies, [$remoteAddress]));
         }
 
         return $next($request, $response);

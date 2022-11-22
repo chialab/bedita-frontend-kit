@@ -38,6 +38,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
             'trusted proxies' => ['192.168.1.1', ['127.0.0.1'], new TrustedProxiesMiddleware('127.0.0.1'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1')],
             'multiple trusted proxies' => ['10.0.1.1', ['127.0.0.1', '192.168.1.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1')],
             'invalid address' => ['not-an-ip-address', ['127.0.0.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1, not-an-ip-address')],
+            'all trusted' => ['192.168.1.1', ['127.0.0.1', '192.168.1.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '192.168.1.1')],
         ];
     }
 
