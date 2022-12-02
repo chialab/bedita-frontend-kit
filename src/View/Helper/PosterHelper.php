@@ -136,7 +136,7 @@ class PosterHelper extends Helper
      */
     public function exists(?ObjectEntity $object, array $options = []): bool
     {
-        if ($object->has('provider_thumbnail')) {
+        if ($object !== null && $object->has('provider_thumbnail')) {
             return true;
         }
 
@@ -203,7 +203,7 @@ class PosterHelper extends Helper
      */
     public function url(?ObjectEntity $object, $thumbOptions = 'default', array $posterOptions = []): ?string
     {
-        if ($object->has('provider_thumbnail')) {
+        if ($object !== null && $object->has('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
         }
 
