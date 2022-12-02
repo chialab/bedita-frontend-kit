@@ -136,6 +136,10 @@ class PosterHelper extends Helper
      */
     public function exists(?ObjectEntity $object, array $options = []): bool
     {
+        if ($object->has('provider_thumbnail')) {
+            return true;
+        }
+
         foreach ($this->candidates($object, $options) as $media) {
             if ($media->has('media_url')) {
                 return true;
@@ -199,6 +203,10 @@ class PosterHelper extends Helper
      */
     public function url(?ObjectEntity $object, $thumbOptions = 'default', array $posterOptions = []): ?string
     {
+        if ($object->has('provider_thumbnail')) {
+            return $object->get('provider_thumbnail');
+        }
+
         $fallbackStatic = filter_var(Hash::get($posterOptions, 'fallbackStatic', true), FILTER_VALIDATE_BOOL);
         $thumbFallbackOptions = $posterOptions;
         $thumbFallbackOptions['fallbackStatic'] = false;
