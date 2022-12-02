@@ -62,6 +62,13 @@ class PosterHelperTest extends TestCase
         ]);
     }
 
+    protected function createVideo(): Media
+    {
+        return new Media([
+            'type' => 'videos',
+        ]);
+    }
+
     protected function createStream(int $width, int $height): Stream
     {
         return new Stream([
@@ -119,5 +126,35 @@ class PosterHelperTest extends TestCase
 
         $orientation = $this->Poster->orientation($object);
         $this->assertSame('landscape', $orientation);
+    }
+
+    /**
+     * Test {@see PosterHelper::exists()}.
+     *
+     * @return void
+     *
+     * @covers ::exists()
+     */
+    public function testExistsWithProviderThumbnail()
+    {
+        $object = $this->createVideo();
+        $object->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
+
+        $this->assertTrue($this->Poster->exists($object));
+    }
+
+    /**
+     * Test {@see PosterHelper::url()}.
+     *
+     * @return void
+     *
+     * @covers ::url()
+     */
+    public function testUrlWithProviderThumbnail()
+    {
+        $object = $this->createVideo();
+        $object->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
+
+        $this->assertSame('https://www.bedita.com/favicon.png', $this->Poster->url($object));
     }
 }
