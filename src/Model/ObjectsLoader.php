@@ -184,6 +184,8 @@ class ObjectsLoader
                 return $table->getAssociation($key);
             }
         }
+
+        return null;
     }
 
     /**
