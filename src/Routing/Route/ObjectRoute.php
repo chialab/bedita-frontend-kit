@@ -89,7 +89,7 @@ class ObjectRoute extends DashedRoute
      * @return void
      * @throws \RuntimeException
      */
-    protected function checkEntity(ArrayAccess|array $entity): void
+    protected function checkEntity($entity): void
     {
         if (!$entity instanceof ArrayAccess && !is_array($entity)) {
             throw new RuntimeException(sprintf(
@@ -106,7 +106,7 @@ class ObjectRoute extends DashedRoute
      * @param \ArrayAccess|array $entity Entity value from the URL options.
      * @return bool
      */
-    protected function checkFilters(ArrayAccess|array $entity): bool
+    protected function checkFilters($entity): bool
     {
         if (empty($this->filters)) {
             return true;

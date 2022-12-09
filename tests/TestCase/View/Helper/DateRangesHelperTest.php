@@ -56,7 +56,7 @@ class DateRangesHelperTest extends TestCase
     {
         unset($this->DateRanges);
         FrozenTime::setTestNow(null);
-        I18n::setLocale(null);
+        I18n::setLocale('en');
 
         parent::tearDown();
     }

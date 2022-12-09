@@ -15,12 +15,8 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Traits;
 
 use BEdita\Core\Model\Entity\ObjectEntity;
-use Cake\Datasource\ResultSetInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
-use Cake\ORM\Query;
-use Cake\ORM\ResultSet;
-use Cake\ORM\Table;
 use Cake\Routing\Router;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use UnexpectedValueException;
@@ -49,7 +45,7 @@ trait GenericActionsTrait
      * @param array $settings The settings/configuration used for pagination.
      * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
      */
-    abstract public function paginate(Table|string|Query|null $object = null, array $settings = []): ResultSet|ResultSetInterface;
+    abstract public function paginate($object = null, array $settings = []);
 
     /**
      * Load folder's children using paginations and query filters.

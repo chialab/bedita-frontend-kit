@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
+use Cake\Controller\Controller;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\I18n\FrozenTime;
@@ -68,11 +69,7 @@ class CalendarComponentTest extends TestCase
 
         $request = new ServerRequest();
         $response = new Response();
-        /** @var \Cake\Controller\Controller $controller */
-        $controller = $this->getMockBuilder('Cake\Controller\Controller')
-            ->setConstructorArgs([$request, $response])
-            ->setMethods(null)
-            ->getMock();
+        $controller = new Controller($request, $response);
 
             $controller->viewBuilder()->setTemplatePath('Pages');
         $this->controller = $controller;

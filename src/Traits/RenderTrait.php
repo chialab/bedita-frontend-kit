@@ -53,11 +53,11 @@ trait RenderTrait
     abstract public function render(?string $view = null, ?string $layout = null): Response;
 
     /**
-     * Get the viewPath based on controller name and request prefix.
+     * Get the templatePath based on controller name and request prefix.
      *
      * @return string
      */
-    abstract protected function _viewPath(): string;
+    abstract protected function _templatePath(): string;
 
     /**
      * Generate a list of templates to try to use for the given object.
@@ -88,7 +88,7 @@ trait RenderTrait
     /**
      * Render first found template.
      *
-     * @param array<string> $templates Templates to search.
+     * @param string $templates Templates to search.
      * @return \Cake\Http\Response
      */
     public function renderFirstTemplate(string ...$templates): Response
@@ -103,10 +103,13 @@ trait RenderTrait
          * We are using the same logic here to check the very same template file.
          */
         if (!$view->getTemplatePath()) {
-            $view->setTemplatePath($this->_viewPath());
+            $view->setTemplatePath($this->_templatePath());
         }
         if (!$view->getTemplate()) {
-            $view->setTemplate($this->getRequest()->getParam('action'));
+            $action = $this->getRequest()->getParam('action');
+            if ($action !== null) {
+                $view->setTemplate($this->getRequest()->getParam('action'));
+            }
         }
 
         foreach ($templates as $template) {

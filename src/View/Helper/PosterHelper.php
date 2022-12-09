@@ -157,7 +157,7 @@ class PosterHelper extends Helper
      * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
-    protected function getMediaUrl(Media $media, mixed $thumbOptions, array $fallbackOptions): ?string
+    protected function getMediaUrl(Media $media, $thumbOptions, array $fallbackOptions): ?string
     {
         if ($thumbOptions !== false) {
             return $this->Thumb->url($media, $thumbOptions, $fallbackOptions);
@@ -201,7 +201,7 @@ class PosterHelper extends Helper
      * @param array $posterOptions Poster options.
      * @return string|null
      */
-    public function url(?ObjectEntity $object, string|array|false $thumbOptions = 'default', array $posterOptions = []): ?string
+    public function url(?ObjectEntity $object, $thumbOptions = 'default', array $posterOptions = []): ?string
     {
         if ($object !== null && $object->has('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
@@ -233,7 +233,7 @@ class PosterHelper extends Helper
      * @param array $posterOptions Poster options. {@see \Chialab\FrontendKit\View\Helper\PosterHelper::url()}
      * @return string
      */
-    public function image(?ObjectEntity $object, string|array|false $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
+    public function image(?ObjectEntity $object, $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
     {
         $url = $this->url($object, $thumbOptions, $posterOptions);
         if (!$url) {

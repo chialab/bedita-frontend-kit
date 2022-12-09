@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
 use Cake\Controller\ComponentRegistry;
+use Cake\Controller\Controller;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
@@ -61,13 +62,9 @@ class PublicationComponentTest extends TestCase
 
         $request = new ServerRequest();
         $response = new Response();
-        /** @var \Cake\Controller\Controller $controller */
-        $controller = $this->getMockBuilder('Cake\Controller\Controller')
-            ->setConstructorArgs([$request, $response])
-            ->setMethods(null)
-            ->getMock();
+        $controller = new Controller($request, $response);
 
-            $controller->viewBuilder()->setTemplatePath('Pages');
+        $controller->viewBuilder()->setTemplatePath('Pages');
         $this->controller = $controller;
 
         $registry = new ComponentRegistry($this->controller);
@@ -119,6 +116,6 @@ class PublicationComponentTest extends TestCase
      */
     public function testTemplateVars()
     {
-        static::assertNotNull($this->controller->viewVars['publication']);
+        static::assertNotNull($this->controller->viewBuilder()->getVar('publication'));
     }
 }

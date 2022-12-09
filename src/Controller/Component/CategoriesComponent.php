@@ -124,7 +124,7 @@ class CategoriesComponent extends Component
     {
         return $table->find()
             ->where(fn (QueryExpression $exp): QueryExpression => $exp
-                ->or_(function (QueryExpression $exp) use ($categories, $table): QueryExpression {
+                ->or(function (QueryExpression $exp) use ($categories, $table): QueryExpression {
                     $ids = array_filter($categories, 'is_numeric');
                     if (!empty($ids)) {
                         $exp = $exp->in($table->aliasField('id'), $ids);
