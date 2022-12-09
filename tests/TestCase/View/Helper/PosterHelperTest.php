@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use BEdita\Core\Model\Entity\Media;

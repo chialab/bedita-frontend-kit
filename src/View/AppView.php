@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -18,14 +20,14 @@ use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
-use WyriHaximus\TwigView\View\TwigView;
+use Cake\TwigView\View\TwigView;
 
 /**
  * Application View
  *
  * Your application's default view class
  *
- * @link https://book.cakephp.org/3/en/views.html#the-app-view
+ * @link https://book.cakephp.org/4/en/views.html#the-app-view
  */
 class AppView extends TwigView implements TemplateExistsInterface
 {
@@ -38,7 +40,7 @@ class AppView extends TwigView implements TemplateExistsInterface
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Chialab\FrontendKit;
 
@@ -13,7 +14,7 @@ class Plugin extends BasePlugin
     /**
      * {@inheritDoc}
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 

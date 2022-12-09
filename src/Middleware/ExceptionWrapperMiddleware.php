@@ -5,7 +5,6 @@ namespace Chialab\FrontendKit\Middleware;
 
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\NotFoundException;
-use Migrations\Migrations;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;

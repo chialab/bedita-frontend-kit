@@ -8,7 +8,6 @@ use Chialab\Ip\Address;
 use Chialab\Ip\Subnet;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Traversable;
 
 /**
  * Middleware to set trusted proxies on the incoming request, thus reliably reading actual client IP.

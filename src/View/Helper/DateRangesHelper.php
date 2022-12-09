@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\DateRange;
@@ -117,7 +119,7 @@ class DateRangesHelper extends Helper
             ->filter(fn (DateRange $dr): bool => $dr->start_date !== null)
             ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
-            ->filter(fn (DateRange $dr): bool => $dr->start_date->gte($now) || ($dr->end_date !== null && $dr->end_date->gte($now)))
+            ->filter(fn (DateRange $dr): bool => (new FrozenTime($dr->start_date))->gte($now) || ($dr->end_date !== null && (new FrozenTime($dr->end_date))->gte($now)))
             ->first();
         if ($currentOrFuture !== null) {
             // Found an event overlapping `$now` point in time, or the closest one in the future.
