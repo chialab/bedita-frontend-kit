@@ -29,11 +29,9 @@ class PublicationComponent extends Component
     public $components = ['Chialab/FrontendKit.Objects'];
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'publication' => null,
         'publicationLoader' => [
             'objectTypesConfig' => [],
