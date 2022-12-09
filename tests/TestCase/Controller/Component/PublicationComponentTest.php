@@ -61,13 +61,14 @@ class PublicationComponentTest extends TestCase
 
         $request = new ServerRequest();
         $response = new Response();
-        /** @var \Cake\Controller\Controller */
-        $this->controller = $this->getMockBuilder('Cake\Controller\Controller')
+        /** @var \Cake\Controller\Controller $controller */
+        $controller = $this->getMockBuilder('Cake\Controller\Controller')
             ->setConstructorArgs([$request, $response])
             ->setMethods(null)
             ->getMock();
 
-        $this->controller->viewBuilder()->setTemplatePath('Pages');
+            $controller->viewBuilder()->setTemplatePath('Pages');
+        $this->controller = $controller;
 
         $registry = new ComponentRegistry($this->controller);
         $registry->load('Chialab/FrontendKit.Objects', [

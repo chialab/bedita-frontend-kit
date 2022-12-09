@@ -40,7 +40,9 @@ class MenuComponent extends Component
         ],
     ];
 
-    /** {@inheritDoc} */
+    /**
+     * @inheritDoc
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);

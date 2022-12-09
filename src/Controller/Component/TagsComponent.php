@@ -29,7 +29,9 @@ class TagsComponent extends Component
      */
     protected array $_defaultConfig = [];
 
-    /** {@inheritDoc} */
+    /**
+     * @inheritDoc
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);
@@ -94,7 +96,7 @@ class TagsComponent extends Component
     public function filterByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
 
@@ -128,7 +130,7 @@ class TagsComponent extends Component
     public function filterExcludeByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
 

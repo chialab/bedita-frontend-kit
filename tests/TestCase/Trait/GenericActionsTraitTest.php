@@ -145,11 +145,11 @@ class GenericActionsTraitTest extends TestCase
 
         $response = $this->controller->fallback($path);
 
-        /** @var \BEdita\Core\Model\Entity\Folder */
+        /** @var \BEdita\Core\Model\Entity\Folder $object */
         $object = $this->controller->viewVars['object'];
-        /** @var \BEdita\Core\Model\Entity\Folder */
+        /** @var \BEdita\Core\Model\Entity\Folder $parent */
         $parent = $this->controller->viewVars['parent'];
-        /** @var \BEdita\Core\Model\Entity\Folder[] */
+        /** @var \BEdita\Core\Model\Entity\Folder[] $ancestors */
         $ancestors = $this->controller->viewVars['ancestors'];
 
         // assert the object has been correctly load

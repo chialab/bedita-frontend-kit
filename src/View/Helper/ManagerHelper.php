@@ -11,7 +11,7 @@ use Cake\View\Helper;
  */
 class ManagerHelper extends Helper
 {
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'enabled' => true,
         'managerUrl' => null,
     ];

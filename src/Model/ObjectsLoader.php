@@ -224,7 +224,7 @@ class ObjectsLoader
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
         $query = $action(static::includeTranslations($contain) ? compact('filter', 'contain') : compact('filter', 'lang', 'contain'));
-        /** @var \Cake\ORM\Table */
+        /** @var \Cake\ORM\Table $table */
         $table = $query->getRepository();
 
         return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $lateContain, $table, $lang): iterable {
@@ -563,7 +563,7 @@ class ObjectsLoader
                 return $contains;
             }
 
-            $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
+            $contains[$assoc] = fn (Query $query): Query => $query->limit($limit);
 
             return $contains;
         }, []);

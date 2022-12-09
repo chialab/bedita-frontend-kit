@@ -81,7 +81,7 @@ class CalendarComponent extends Component
      */
     public function findInRange(Query $query, FrozenTime $from, FrozenTime $to): Query
     {
-        /** @var \Cake\ORM\Table */
+        /** @var \Cake\ORM\Table $table */
         $table = $query->getRepository();
         if (!$table->hasAssociation('DateRanges')) {
             throw new InvalidArgumentException('Table must be associated with DateRanges');

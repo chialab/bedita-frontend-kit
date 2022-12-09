@@ -29,7 +29,9 @@ class CategoriesComponent extends Component
      */
     protected array $_defaultConfig = [];
 
-    /** {@inheritDoc} */
+    /**
+     * @inheritDoc
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);
@@ -150,7 +152,7 @@ class CategoriesComponent extends Component
     public function filterByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
 
@@ -184,7 +186,7 @@ class CategoriesComponent extends Component
     public function filterExcludeByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
 

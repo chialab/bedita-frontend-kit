@@ -61,7 +61,8 @@ trait AuthTrait
     abstract protected function getHomeRoute(): array|string;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @return \Cake\Http\Response|null
      */
     public function beforeFilter(Event $event): ?Response
