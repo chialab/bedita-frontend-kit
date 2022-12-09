@@ -18,11 +18,9 @@ use const SORT_ASC;
 class DateRangesHelper extends Helper
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'single' => '{0,date,long}, {0,time,short}',
         'wholeDay' => '{0,date,long}',
         'sameDay' => '{0,date,long}, dalle {0,time,short} alle {1,time,short}',

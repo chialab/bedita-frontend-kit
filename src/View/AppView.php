@@ -85,7 +85,7 @@ class AppView extends TwigView implements TemplateExistsInterface
     public function templateExists($name): bool
     {
         try {
-            return is_string($this->_getViewFileName($name));
+            return is_string($this->_getTemplateFileName($name));
         } catch (MissingTemplateException $err) {
             return false;
         }

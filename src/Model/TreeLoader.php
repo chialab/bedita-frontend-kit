@@ -6,7 +6,7 @@ namespace Chialab\FrontendKit\Model;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
-use Cake\Database\Expression\Comparison;
+use Cake\Database\Expression\ComparisonExpression;
 use Cake\Database\Expression\FunctionExpression;
 use Cake\Database\Expression\IdentifierExpression;
 use Cake\Datasource\ModelAwareTrait;
@@ -85,7 +85,7 @@ class TreeLoader
         $query = $this->getObjectPaths($id, $relativeTo);
         if ($via !== null) {
             $query = $query->having(new FunctionExpression('BIT_OR', [
-                new Comparison($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '='),
+                new ComparisonExpression($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '='),
             ]));
         }
 

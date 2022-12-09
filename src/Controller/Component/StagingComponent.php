@@ -32,7 +32,7 @@ class StagingComponent extends Component
     /**
      * @inheritDoc
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         if ($this->isAuthRequired()) {
             $this->getController()->loadComponent('Authentication.Authentication', $this->getConfig('authConfig'));

@@ -23,16 +23,14 @@ class CategoriesComponent extends Component
     use ModelAwareTrait;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [];
+    protected $_defaultConfig = [];
 
     /**
      * @inheritDoc
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 

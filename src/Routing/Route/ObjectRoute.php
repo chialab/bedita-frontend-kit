@@ -28,7 +28,7 @@ class ObjectRoute extends DashedRoute
     /**
      * @inheritDoc
      */
-    public function compile(): ?string
+    public function compile(): string
     {
         $compiled = parent::compile();
 
@@ -51,9 +51,9 @@ class ObjectRoute extends DashedRoute
      * @param array $context An array of the current request context.
      *   Contains information such as the current host, scheme, port, and base
      *   directory.
-     * @return string|bool Either false or a string URL.
+     * @return string|null Either false or a string URL.
      */
-    public function match(array $url, array $context = []): bool|string
+    public function match(array $url, array $context = []): ?string
     {
         if (empty($this->_compiledRoute)) {
             $this->compile();

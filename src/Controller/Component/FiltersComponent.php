@@ -12,11 +12,9 @@ use Cake\Utility\Hash;
 class FiltersComponent extends Component
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'params' => [
             'query' => 'q',
         ],

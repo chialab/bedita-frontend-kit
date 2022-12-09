@@ -20,11 +20,9 @@ class PlaceholdersHelper extends Helper
     use ModelAwareTrait;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'relation' => 'placeholder',
         'extract' => null,
         'template' => null,

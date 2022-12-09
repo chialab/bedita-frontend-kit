@@ -18,11 +18,9 @@ use Chialab\FrontendKit\Model\ObjectsLoader;
 class ObjectsComponent extends Component
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'objectTypesConfig' => [
             'objects' => ['include' => 'poster'],
         ],
@@ -41,7 +39,7 @@ class ObjectsComponent extends Component
     /**
      * @inheritDoc
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 

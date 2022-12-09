@@ -26,11 +26,9 @@ class MenuComponent extends Component
     protected TreeLoader $loader;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'depth' => 3,
         'menuLoader' => [
             'objectTypesConfig' => [],
@@ -43,7 +41,7 @@ class MenuComponent extends Component
     /**
      * @inheritDoc
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
