@@ -57,7 +57,7 @@ trait GenericActionsTrait
     {
         $children = $this->Objects->loadRelatedObjects($id, 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
+        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left' => 'ASC']])->toList();
     }
 
     /**

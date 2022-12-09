@@ -169,7 +169,7 @@ class GenericActionsTraitTest extends TestCase
             }
         } else {
             // children variable should not be set if not a folder
-            static::assertNotNull($this->controller->viewBuilder()->getVar('children'));
+            static::assertNull($this->controller->viewBuilder()->getVar('children'));
         }
 
         // assert main object relations are loaded

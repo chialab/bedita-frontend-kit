@@ -16,7 +16,7 @@
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^5.0",
         "cakephp/plugin-installer": "^1.0",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "~8.5.0 || ^9.3"
     },
     "autoload": {
         "psr-4": {

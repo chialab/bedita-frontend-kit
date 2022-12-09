@@ -13,9 +13,11 @@ use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
+use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use Iterator;
@@ -169,6 +171,22 @@ class ObjectsLoader
     }
 
     /**
+     * Get assocation by relation name.
+     * @param \Cake\ORM\Table The table.
+     * @param string $name The relation name.
+     * @return \Cake\ORM\Association|null The association object, if found.
+     */
+    protected function getAssociation(Table $table, string $name): ?Association
+    {
+        $associations = $table->associations()->keys();
+        foreach ($associations as $key) {
+            if (strtolower($key) === strtolower($name)) {
+                return $table->getAssociation($key);
+            }
+        }
+    }
+
+    /**
      * Load a single object knowing its ID and object type.
      *
      * @param int $primaryKey Object ID.
@@ -261,7 +279,7 @@ class ObjectsLoader
         $lang = Hash::get($options, 'lang', $this->getLang());
         $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
         $table = $this->getTableLocator()->get($objectType->alias);
-        $association = $table->getAssociation($relation);
+        $association = $this->getAssociation($table, $relation);
         $action = new ListRelatedObjectsAction(compact('association'));
 
         /** @var \Cake\ORM\Query $query */
@@ -313,7 +331,7 @@ class ObjectsLoader
                     if (!$table->associations()->has($name)) {
                         continue;
                     }
-                    $prop = $table->getAssociation($name)->getProperty();
+                    $prop = $this->getAssociation($table, $name)->getProperty();
 
                     if (!$object->has($prop) || $object->isEmpty($prop)) {
                         continue;

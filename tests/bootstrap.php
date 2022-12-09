@@ -88,7 +88,7 @@ ConnectionManager::setConfig('test', [
 ConnectionManager::alias('test', 'default');
 
 Router::reload();
-Security::setSalt('BEDITA');
+Security::setSalt('BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA');
 
 FilesystemRegistry::setConfig([
     'default' => ['className' => NullAdapter::class],

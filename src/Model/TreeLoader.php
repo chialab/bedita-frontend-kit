@@ -66,6 +66,7 @@ class TreeLoader
         }
 
         return $this->loader->loadObjects(['id' => $ids], 'folders')
+            ->all()
             ->sortBy(function (Folder $folder) use ($ids): int {
                 return array_search($folder->id, $ids);
             }, SORT_ASC)
