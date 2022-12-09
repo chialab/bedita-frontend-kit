@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
@@ -21,14 +23,14 @@ class MenuComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
-    protected $loader;
+    protected TreeLoader $loader;
 
     /**
      * Default configuration.
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'depth' => 3,
         'menuLoader' => [
             'objectTypesConfig' => [],

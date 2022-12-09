@@ -17,7 +17,7 @@ use Cake\View\Helper;
 class MediaHelper extends Helper
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'fallbackImage' => null,

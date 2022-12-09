@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use Cake\Controller\Component;
@@ -14,7 +16,7 @@ class FiltersComponent extends Component
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'params' => [
             'query' => 'q',
         ],

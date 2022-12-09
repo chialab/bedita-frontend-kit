@@ -174,8 +174,8 @@ class ObjectsFixture extends BEObjectsFixture
         [
             'uname' => 'document-1',
             'title' => 'Document 1',
-            'description' => "<p>Hello there</p>",
-            'body' => "<p>Hello world</p>",
+            'description' => '<p>Hello there</p>',
+            'body' => '<p>Hello world</p>',
             'extra' => null,
             'lang' => 'en',
             'status' => 'on',
@@ -192,8 +192,8 @@ class ObjectsFixture extends BEObjectsFixture
         [
             'uname' => 'image-1',
             'title' => 'Image 1',
-            'description' => "",
-            'body' => "",
+            'description' => '',
+            'body' => '',
             'extra' => null,
             'lang' => 'en',
             'status' => 'on',
@@ -210,8 +210,8 @@ class ObjectsFixture extends BEObjectsFixture
         [
             'uname' => 'profile-1',
             'title' => 'Profile 1',
-            'description' => "",
-            'body' => "",
+            'description' => '',
+            'body' => '',
             'extra' => null,
             'lang' => 'en',
             'status' => 'on',

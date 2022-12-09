@@ -16,11 +16,11 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
+use Cake\TwigView\View\TwigView;
 use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
-use Cake\TwigView\View\TwigView;
 
 /**
  * Application View

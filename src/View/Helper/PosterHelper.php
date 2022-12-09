@@ -21,7 +21,7 @@ class PosterHelper extends Helper
     protected const OBJECT_TYPE = 'images';
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $helpers = [
         'Html',
@@ -30,7 +30,7 @@ class PosterHelper extends Helper
     ];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'fallbackImage' => null,
@@ -78,7 +78,7 @@ class PosterHelper extends Helper
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object The object.
      * @param array $options Poster options.
-     * @return \Iterator|\BEdita\Core\Model\Entity\Media[]
+     * @return \Iterator|array<\BEdita\Core\Model\Entity\Media>
      */
     protected function candidates(?ObjectEntity $object, array $options): Iterator
     {
@@ -157,7 +157,7 @@ class PosterHelper extends Helper
      * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
-    protected function getMediaUrl(Media $media, $thumbOptions, array $fallbackOptions): ?string
+    protected function getMediaUrl(Media $media, mixed $thumbOptions, array $fallbackOptions): ?string
     {
         if ($thumbOptions !== false) {
             return $this->Thumb->url($media, $thumbOptions, $fallbackOptions);
@@ -197,11 +197,11 @@ class PosterHelper extends Helper
      * - additional values are passed to {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()} (unless `$thumbOptions === false`)
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to get thumb for.
-     * @param string|array|false $thumbOptions Thumbnail preset name or options, or `false` for no thumbnail. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
+     * @param array|string|false $thumbOptions Thumbnail preset name or options, or `false` for no thumbnail. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
      * @param array $posterOptions Poster options.
      * @return string|null
      */
-    public function url(?ObjectEntity $object, $thumbOptions = 'default', array $posterOptions = []): ?string
+    public function url(?ObjectEntity $object, string|array|false $thumbOptions = 'default', array $posterOptions = []): ?string
     {
         if ($object !== null && $object->has('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
@@ -228,12 +228,12 @@ class PosterHelper extends Helper
      * Create `<img>` HTML tag for poster.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
-     * @param string|array|false $thumbOptions Thumbnail preset name or options, or `false` for no thumbnail. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
+     * @param array|string|false $thumbOptions Thumbnail preset name or options, or `false` for no thumbnail. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
      * @param array $attributes HTML attributes for `<img>` tag.
      * @param array $posterOptions Poster options. {@see \Chialab\FrontendKit\View\Helper\PosterHelper::url()}
      * @return string
      */
-    public function image(?ObjectEntity $object, $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
+    public function image(?ObjectEntity $object, string|array|false $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
     {
         $url = $this->url($object, $thumbOptions, $posterOptions);
         if (!$url) {
@@ -357,10 +357,10 @@ class PosterHelper extends Helper
         $aspectlabel = '';
 
         switch (true) {
-            case ($aspect > 1):
+            case $aspect > 1:
                 $aspectlabel = 'landscape';
                 break;
-            case ($aspect < 1):
+            case $aspect < 1:
                 $aspectlabel = 'portrait';
                 break;
             default:

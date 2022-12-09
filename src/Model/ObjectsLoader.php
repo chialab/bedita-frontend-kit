@@ -24,7 +24,6 @@ use Iterator;
  * Objects loader.
  *
  * @package Chialab\FrontendKit\Model
- *
  * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
  * @property \BEdita\Core\Model\Table\ObjectsTable $Objects
  */
@@ -37,17 +36,17 @@ class ObjectsLoader
     /**
      * Loading configuration on a per-object type basis.
      *
-     * @var array[]
+     * @var array<array>
      */
-    protected $objectTypesConfig = [];
+    protected array $objectTypesConfig = [];
 
     /**
      * Map of associations that need to be hydrated to the actual object types
      * every time they are fetched, to the maximum depth for this auto-hydration.
      *
-     * @var int[]
+     * @var array<int>
      */
-    protected $autoHydrateAssociations = [];
+    protected array $autoHydrateAssociations = [];
 
     /**
      * Objects loader constructor.
@@ -128,7 +127,7 @@ class ObjectsLoader
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
     {
@@ -147,7 +146,7 @@ class ObjectsLoader
      * @param array|null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
     {
@@ -161,8 +160,8 @@ class ObjectsLoader
     /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function hydrateObjects(array $objects): CollectionInterface
     {
@@ -207,7 +206,7 @@ class ObjectsLoader
      * @param array|null $options Options.
      * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
     {
@@ -292,9 +291,9 @@ class ObjectsLoader
     /**
      * Set `relation` property for contained entities, using what is stored in `_joinData`, if present.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
      * @param array $containedAssociations List of contained associations.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function setJoinData(iterable $objects, array $containedAssociations): CollectionInterface
     {
@@ -331,7 +330,7 @@ class ObjectsLoader
                         return;
                     }
 
-                    (new Collection($related))->each(function (Entity $e) use ($fix) {
+                    (new Collection($related))->each(function (Entity $e) use ($fix): void {
                         // related entity (such as a Translation) may not be an ObjectEntity.
                         if ($e instanceof ObjectEntity) {
                             $fix($e);
@@ -344,9 +343,9 @@ class ObjectsLoader
     /**
      * Given a set of objects, re-map them to their concrete type implementation.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to re-map to their concrete types.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects to re-map to their concrete types.
      * @param int $depth Depth level.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function toConcreteTypes(iterable $objects, int $depth): CollectionInterface
     {
@@ -423,10 +422,10 @@ class ObjectsLoader
     /**
      * Automatically hydrate related objects, up to the configured maximum depth.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects whose related resources must be hydrated.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects whose related resources must be hydrated.
      * @param int $depth Maximum depth.
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function autoHydrateAssociations(iterable $objects, int $depth, ?array $options = null): CollectionInterface
     {
@@ -515,7 +514,7 @@ class ObjectsLoader
      *
      * @param int $depth Depth level.
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return string[]
+     * @return array<string>
      */
     protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
     {

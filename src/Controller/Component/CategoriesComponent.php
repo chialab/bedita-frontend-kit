@@ -27,7 +27,7 @@ class CategoriesComponent extends Component
      *
      * @var array
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /** {@inheritDoc} */
     public function initialize(array $config)
@@ -106,7 +106,6 @@ class CategoriesComponent extends Component
      * @param \Cake\ORM\Query $query The current query.
      * @param int $id ID of the category.
      * @return \Cake\ORM\Query
-     *
      * @deprecated Use {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent::filterByCategories()} instead.
      */
     public function filterById(Query $query, int $id): Query
@@ -118,7 +117,7 @@ class CategoriesComponent extends Component
      * Build categories subquery for filtering.
      *
      * @param \Cake\ORM\Table $table Categories table instance.
-     * @param (string|int)[] $categories Categories ids or names.
+     * @param array<string|int> $categories Categories ids or names.
      * @return \Cake\ORM\Query
      */
     protected function buildCategoriesSubquery(Table $table, array $categories): Query
@@ -144,7 +143,7 @@ class CategoriesComponent extends Component
      * Filter contents that are in one or more of the given categories.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $categories Array of category ids or names.
+     * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
@@ -178,7 +177,7 @@ class CategoriesComponent extends Component
      * Filter contents that are not in any of the given categories.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $categories Array of category ids or names.
+     * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */

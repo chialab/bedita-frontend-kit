@@ -14,9 +14,12 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Auth trait for BEdita frontends.
@@ -30,7 +33,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest();
+    abstract public function getRequest(): ServerRequest;
 
     /**
      * Add a component to the controller's registry.
@@ -39,27 +42,26 @@ trait AuthTrait
      * @param array $config The config for the component.
      * @return \Cake\Controller\Component
      */
-    abstract public function loadComponent($name, array $config = []);
+    abstract public function loadComponent(string $name, array $config = []): Component;
 
     /**
      * Redirects to given $url, after turning off $this->autoRender.
      *
-     * @param string|array|\Psr\Http\Message\UriInterface $url A string, array-based URL or UriInterface instance.
+     * @param \Psr\Http\Message\UriInterface|array|string $url A string, array-based URL or UriInterface instance.
      * @param int $status HTTP status code. Defaults to `302`.
      * @return \Cake\Http\Response|null
      */
-    abstract public function redirect($url, $status = 302);
+    abstract public function redirect(string|array|UriInterface $url, int $status = 302): ?Response;
 
     /**
      * Return home route, where users will be redirected after logout or when they try to login to a non-staging site.
      *
      * @return array|string
      */
-    abstract protected function getHomeRoute();
+    abstract protected function getHomeRoute(): array|string;
 
     /**
      * @inheritDoc
-     *
      * @return \Cake\Http\Response|null
      */
     public function beforeFilter(Event $event): ?Response

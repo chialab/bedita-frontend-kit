@@ -27,7 +27,7 @@ class TagsComponent extends Component
      *
      * @var array
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /** {@inheritDoc} */
     public function initialize(array $config)
@@ -61,7 +61,7 @@ class TagsComponent extends Component
      * Build tags subquery for filtering.
      *
      * @param \Cake\ORM\Table $table Tags table instance.
-     * @param (string|int)[] $tags Tags ids or names.
+     * @param array<string|int> $tags Tags ids or names.
      * @return \Cake\ORM\Query
      */
     protected function buildTagsSubquery(Table $table, array $tags): Query
@@ -87,7 +87,7 @@ class TagsComponent extends Component
      * Filter contents that has at least one of the given tags.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $tags Array of tag ids or names.
+     * @param array<string|int> $tags Array of tag ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
@@ -121,7 +121,7 @@ class TagsComponent extends Component
      * Filter contents that does not have any of the given tags
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $tags Array of tags ids or names.
+     * @param array<string|int> $tags Array of tags ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */

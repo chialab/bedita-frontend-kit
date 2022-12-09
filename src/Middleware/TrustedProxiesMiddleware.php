@@ -6,6 +6,7 @@ namespace Chialab\FrontendKit\Middleware;
 use Cake\Http\ServerRequest;
 use Chialab\Ip\Address;
 use Chialab\Ip\Subnet;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -17,14 +18,14 @@ class TrustedProxiesMiddleware
     /**
      * List of trusted proxies.
      *
-     * @var string[]
+     * @var array<string>
      */
     protected array $trustedProxies = [];
 
     /**
      * Compiled list of subnets.
      *
-     * @var \Chialab\Ip\Subnet[]|null
+     * @var array<\Chialab\Ip\Subnet>|null
      */
     protected ?array $subnets;
 
@@ -42,7 +43,7 @@ class TrustedProxiesMiddleware
     /**
      * Iterate through trusted proxies, compiled as {@see \Chialab\Ip\Subnet} objects.
      *
-     * @return \Chialab\Ip\Subnet[]
+     * @return array<\Chialab\Ip\Subnet>
      */
     protected function compile(): array
     {
@@ -77,7 +78,7 @@ class TrustedProxiesMiddleware
     {
         try {
             $address = Address::parse($remoteAddress);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return false;
         }
 

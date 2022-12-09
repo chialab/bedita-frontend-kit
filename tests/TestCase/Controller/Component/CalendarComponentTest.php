@@ -136,7 +136,6 @@ class CalendarComponentTest extends TestCase
      * @param array $expected Expected objects.
      * @param string $start Start date.
      * @return void
-     *
      * @covers ::findGroupedByDay()
      * @dataProvider findGroupByDayWithStartProvider()
      */
@@ -186,7 +185,6 @@ class CalendarComponentTest extends TestCase
      * @param string $start Start date.
      * @param string $end End date.
      * @return void
-     *
      * @covers ::findGroupedByDay()
      * @dataProvider findGroupedByDayWithRangeProvider()
      */

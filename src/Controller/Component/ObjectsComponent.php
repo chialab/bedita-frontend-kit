@@ -22,7 +22,7 @@ class ObjectsComponent extends Component
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'objectTypesConfig' => [
             'objects' => ['include' => 'poster'],
         ],
@@ -36,10 +36,10 @@ class ObjectsComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\ObjectsLoader
      */
-    protected $loader;
+    protected ObjectsLoader $loader;
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function initialize(array $config)
     {
@@ -96,7 +96,7 @@ class ObjectsComponent extends Component
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
     {
@@ -106,8 +106,8 @@ class ObjectsComponent extends Component
     /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function hydrateObjects(array $objects): CollectionInterface
     {
@@ -123,7 +123,7 @@ class ObjectsComponent extends Component
      * @param null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
     {

@@ -69,10 +69,10 @@ class FileExtension extends AbstractExtension
     /**
      * Format bytes size.
      *
-     * @param int|string $size Byte size.
+     * @param string|int $size Byte size.
      * @return string
      */
-    public function formatFileSize($size): string
+    public function formatFileSize(int|string $size): string
     {
         return Number::toReadableSize($size);
     }

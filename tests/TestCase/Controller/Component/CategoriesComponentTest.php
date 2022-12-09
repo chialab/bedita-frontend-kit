@@ -91,7 +91,6 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     *
      * @covers ::filterByCategories()
      * @dataProvider filterByCategoriesProvider()
      */
@@ -129,7 +128,6 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     *
      * @covers ::filterExcludeByCategories()
      * @dataProvider filterExcludeByCategoriesProvider()
      */

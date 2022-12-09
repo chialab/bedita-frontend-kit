@@ -26,5 +26,5 @@ interface TemplateExistsInterface
      * @param string $name Name of the view to check.
      * @return bool Template exists.
      */
-    public function templateExists($name): bool;
+    public function templateExists(string $name): bool;
 }

@@ -15,7 +15,12 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Traits;
 
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Datasource\ResultSetInterface;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
+use Cake\ORM\Query;
+use Cake\ORM\ResultSet;
+use Cake\ORM\Table;
 use Cake\Routing\Router;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use UnexpectedValueException;
@@ -35,22 +40,22 @@ trait GenericActionsTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest();
+    abstract public function getRequest(): ServerRequest;
 
     /**
      * Handles pagination of records in Table objects.
      *
-     * @param \Cake\ORM\Table|string|\Cake\ORM\Query|null $object Table to paginate
+     * @param \Cake\ORM\Table|\Cake\ORM\Query|string|null $object Table to paginate
      * @param array $settings The settings/configuration used for pagination.
      * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
      */
-    abstract public function paginate($object = null, array $settings = []);
+    abstract public function paginate(Table|string|Query|null $object = null, array $settings = []): ResultSet|ResultSetInterface;
 
     /**
      * Load folder's children using paginations and query filters.
      *
-     * @param int|string $id Folder id to load children.
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
+     * @param string|int $id Folder id to load children.
+     * @return array<\BEdita\Core\Model\Entity\ObjectEntity> An array of children.
      */
     protected function loadFilteredChildren(string $id): array
     {

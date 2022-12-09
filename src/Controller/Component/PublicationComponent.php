@@ -24,7 +24,7 @@ class PublicationComponent extends Component
     use ModelAwareTrait;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public $components = ['Chialab/FrontendKit.Objects'];
 
@@ -33,7 +33,7 @@ class PublicationComponent extends Component
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'publication' => null,
         'publicationLoader' => [
             'objectTypesConfig' => [],
@@ -46,14 +46,14 @@ class PublicationComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
-    protected $loader;
+    protected TreeLoader $loader;
 
     /**
      * Current publication
      *
      * @var \BEdita\Core\Model\Entity\Folder
      */
-    protected $publication;
+    protected Folder $publication;
 
     /**
      * Initialization hook method.
@@ -103,7 +103,7 @@ class PublicationComponent extends Component
      * Load all objects in a path.
      *
      * @param string $path Path.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[] List of objects, the root element in the path being the first in the list, the leaf being the latter.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity> List of objects, the root element in the path being the first in the list, the leaf being the latter.
      */
     public function loadObjectPath(string $path): CollectionInterface
     {

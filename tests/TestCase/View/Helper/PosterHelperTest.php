@@ -100,7 +100,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     *
      * @covers ::orientation()
      */
     public function testOrientationWithPosterArray()
@@ -117,7 +116,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     *
      * @covers ::orientation()
      */
     public function testOrientationWithPosterCollection()
@@ -134,7 +132,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::exists()}.
      *
      * @return void
-     *
      * @covers ::exists()
      */
     public function testExistsWithProviderThumbnail()
@@ -149,7 +146,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::url()}.
      *
      * @return void
-     *
      * @covers ::url()
      */
     public function testUrlWithProviderThumbnail()

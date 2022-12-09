@@ -11,6 +11,7 @@ use Cake\I18n\FrozenDate;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
+use Generator;
 use InvalidArgumentException;
 
 /**
@@ -19,7 +20,7 @@ use InvalidArgumentException;
 class CalendarComponent extends Component
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public $components = ['Chialab/FrontendKit.Objects'];
 
@@ -118,7 +119,7 @@ class CalendarComponent extends Component
         return $this->findInRange($query, $from, $to)
             ->contain(['DateRanges'])
             ->formatResults(function (iterable $results) use ($from, $to): iterable {
-                $grouped = collection($results)->unfold(function (ObjectEntity $event) use ($from, $to): \Generator {
+                $grouped = collection($results)->unfold(function (ObjectEntity $event) use ($from, $to): Generator {
                     foreach ($event->date_ranges as $dr) {
                         $start = new FrozenDate($dr->start_date);
                         $end = new FrozenDate($dr->end_date ?: $dr->start_date);
@@ -166,7 +167,7 @@ class CalendarComponent extends Component
      * Create `from` and `to` values for "today".
      *
      * @param bool $fullDay Return the full day or just the remaining time.
-     * @return \Cake\I18n\FrozenTime[]
+     * @return array<\Cake\I18n\FrozenTime>
      */
     public function today(bool $fullDay = true): array
     {
@@ -178,7 +179,7 @@ class CalendarComponent extends Component
     /**
      * Create `from` and `to` values for "tomorrow".
      *
-     * @return \Cake\I18n\FrozenTime[]
+     * @return array<\Cake\I18n\FrozenTime>
      */
     public function tomorrow(): array
     {
@@ -191,7 +192,7 @@ class CalendarComponent extends Component
      * Create `from` and `to` values for the current week.
      *
      * @param bool $fullWeek Return the full week range or just the remaining time.
-     * @return \Cake\I18n\FrozenTime[]
+     * @return array<\Cake\I18n\FrozenTime>
      */
     public function thisWeek(bool $fullWeek = true): array
     {
@@ -204,7 +205,7 @@ class CalendarComponent extends Component
      * Create `from` and `to` values for the current weekend.
      *
      * @param bool $fullWeekend Return the full weekend range or just the remaining time.
-     * @return \Cake\I18n\FrozenTime[]
+     * @return array<\Cake\I18n\FrozenTime>
      */
     public function thisWeekend(bool $fullWeekend = true): array
     {
@@ -223,7 +224,7 @@ class CalendarComponent extends Component
      * Create `from` and `to` values for the current month.
      *
      * @param bool $fullMonth Return the full month range or just the remaining time.
-     * @return \Cake\I18n\FrozenTime[]
+     * @return array<\Cake\I18n\FrozenTime>
      */
     public function thisMonth(bool $fullMonth = true): array
     {

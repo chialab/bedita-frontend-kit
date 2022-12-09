@@ -10,6 +10,7 @@ use Cake\Log\Log;
 use Cake\View\Helper;
 use DateTimeInterface;
 use Generator;
+use const SORT_ASC;
 
 /**
  * Date helper
@@ -21,7 +22,7 @@ class DateRangesHelper extends Helper
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'single' => '{0,date,long}, {0,time,short}',
         'wholeDay' => '{0,date,long}',
         'sameDay' => '{0,date,long}, dalle {0,time,short} alle {1,time,short}',
@@ -81,7 +82,7 @@ class DateRangesHelper extends Helper
      *
      * @param \Cake\I18n\FrozenTime $start Beginning of range.
      * @param \Cake\I18n\FrozenTime $end End of range.
-     * @return \Generator|string[]
+     * @return \Generator|array<string>
      */
     protected function getFormats(FrozenTime $start, FrozenTime $end): Generator
     {
@@ -108,11 +109,11 @@ class DateRangesHelper extends Helper
     /**
      * Find closest range in a list of date ranges.
      *
-     * @param \BEdita\Core\Model\Entity\DateRange[] $ranges Date ranges.
+     * @param array<\BEdita\Core\Model\Entity\DateRange> $ranges Date ranges.
      * @param string|null $now Relative to date.
      * @return \BEdita\Core\Model\Entity\DateRange|null
      */
-    public function getClosestRange(array $ranges, string $now = null): ?DateRange
+    public function getClosestRange(array $ranges, ?string $now = null): ?DateRange
     {
         $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
         $sorted = collection($ranges)
@@ -132,11 +133,11 @@ class DateRangesHelper extends Helper
     /**
      * Sort a list of objects by their closest date.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to sort.
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects to sort.
      * @param int $dir either SORT_DESC or SORT_ASC.
      * @return \Cake\Collection\Collection Sorted objects.
      */
-    public function sortByClosestRange(iterable $objects, $dir = \SORT_ASC): iterable
+    public function sortByClosestRange(iterable $objects, int $dir = SORT_ASC): iterable
     {
         return collection($objects)
             ->sortBy(function (ObjectEntity $obj): ?int {

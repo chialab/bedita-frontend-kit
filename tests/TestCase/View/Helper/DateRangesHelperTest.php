@@ -10,6 +10,7 @@ use Cake\I18n\I18n;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\DateRangesHelper;
+use DateTimeInterface;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\DateRangesHelper} Test Case
@@ -109,11 +110,10 @@ class DateRangesHelperTest extends TestCase
      * @param \DateTimeInterface $start Start of range.
      * @param \DateTimeInterface|null $end End of range.
      * @return void
-     *
      * @dataProvider formatRangeProvider()
      * @covers ::formatRange()
      */
-    public function testFormatRange(string $expected, \DateTimeInterface $start, ?\DateTimeInterface $end): void
+    public function testFormatRange(string $expected, DateTimeInterface $start, ?DateTimeInterface $end): void
     {
         $range = new DateRange([
             'start_date' => $start,
@@ -128,7 +128,6 @@ class DateRangesHelperTest extends TestCase
      * Test {@see DateRangesHelper::formatRange()} method when arguments are swapped.
      *
      * @return void
-     *
      * @covers ::formatRange()
      */
     public function testFormatRangeSwapped(): void
@@ -188,7 +187,6 @@ class DateRangesHelperTest extends TestCase
      * @param \DateTimeInterface[]|null $expected Expected result.
      * @param \DateTimeInterface[][] $ranges Ranges.
      * @return void
-     *
      * @dataProvider getClosestRangeProvider()
      * @covers ::getClosestRange()
      */
@@ -219,7 +217,6 @@ class DateRangesHelperTest extends TestCase
      * Test {@see DateRangesHelper::sortByClosestRange()} method.
      *
      * @return void
-     *
      * @covers ::sortByClosestRange()
      */
     public function testSortByClosestRange(): void

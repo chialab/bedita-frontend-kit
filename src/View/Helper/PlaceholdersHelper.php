@@ -7,6 +7,7 @@ use Cake\Datasource\EntityInterface;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
+use InvalidArgumentException;
 use Iterator;
 
 /**
@@ -23,7 +24,7 @@ class PlaceholdersHelper extends Helper
      *
      * @var array
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'relation' => 'placeholder',
         'extract' => null,
         'template' => null,
@@ -46,9 +47,9 @@ class PlaceholdersHelper extends Helper
      * @param string $field Field.
      * @param \Cake\Datasource\EntityInterface $placeholder Entity referenced in the placeholder.
      * @param mixed $params Placeholder custom params.
-     * @return string[]
+     * @return array<string>
      */
-    public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): array
+    public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): array
     {
         $type = $placeholder->get('type') ?: 'objects';
         $objectType = $this->ObjectTypes->get($type);
@@ -70,7 +71,7 @@ class PlaceholdersHelper extends Helper
      * @param mixed $params Placeholder custom params.
      * @return string|null
      */
-    public function getTemplate(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): ?string
+    public function getTemplate(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): ?string
     {
         foreach ($this->getTemplatePaths($entity, $field, $placeholder, $params) as $element) {
             if ($this->getView()->elementExists($element)) {
@@ -86,11 +87,11 @@ class PlaceholdersHelper extends Helper
      *
      * @param \Cake\Datasource\EntityInterface $entity Parent entity.
      * @param string $field String name.
-     * @param \Cake\Datasource\EntityInterface[] $placeholders Entities referenced as placeholders.
+     * @param array<\Cake\Datasource\EntityInterface> $placeholders Entities referenced as placeholders.
      * @param callable $callback Callback to be invoked for each instance of placeholder. This is supposed to return the templated placeholder.
      * @return mixed Templated field contents.
      */
-    public static function defaultTemplater(EntityInterface $entity, string $field, array $placeholders, callable $callback)
+    public static function defaultTemplater(EntityInterface $entity, string $field, array $placeholders, callable $callback): mixed
     {
         $contents = $entity->get($field);
         if (!is_string($contents) || empty($contents) || empty($placeholders)) {
@@ -130,14 +131,14 @@ class PlaceholdersHelper extends Helper
      * @param string $field Field to be templated.
      * @return mixed
      */
-    public function template(EntityInterface $entity, string $field)
+    public function template(EntityInterface $entity, string $field): mixed
     {
         $relation = $this->getConfigOrFail('relation');
         $placeholder = $entity->get($relation);
         if ($placeholder instanceof Iterator) {
             $placeholder = iterator_to_array($placeholder);
         } elseif (!is_array($placeholder) && $placeholder !== null) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('Expected property "%s" to be an iterable, got "%s"', $relation, is_object($placeholder) ? get_class($placeholder) : gettype($placeholder))
             );
         }

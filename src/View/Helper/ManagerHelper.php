@@ -8,7 +8,6 @@ use Cake\View\Helper;
 
 /**
  * Helper to set BEdita Manager refs
- *
  */
 class ManagerHelper extends Helper
 {
@@ -20,9 +19,9 @@ class ManagerHelper extends Helper
     /**
      * Return current object var from view vars
      *
-     * @return array|\ArrayAccess
+     * @return \ArrayAccess|array
      */
-    protected function getObject()
+    protected function getObject(): array|ArrayAccess
     {
         $candidates = array_filter([
             $this->getView()->get('_main'),
@@ -31,7 +30,7 @@ class ManagerHelper extends Helper
         ]);
         foreach ($candidates as $varName) {
             $var = $this->getView()->get($varName);
-            if (!empty($var) && (is_array($var) || $var instanceof \ArrayAccess)) {
+            if (!empty($var) && (is_array($var) || $var instanceof ArrayAccess)) {
                 return $var;
             }
         }
@@ -61,7 +60,7 @@ class ManagerHelper extends Helper
             return null;
         }
 
-        $managerEditUrl = $managerUrl . "/view/" . $object['id'];
+        $managerEditUrl = $managerUrl . '/view/' . $object['id'];
 
         return $managerEditUrl;
     }

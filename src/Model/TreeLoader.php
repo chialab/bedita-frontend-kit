@@ -16,7 +16,6 @@ use Cake\ORM\Query;
  * Class TreeLoader
  *
  * @package Chialab\FrontendKit\Model
- *
  * @property \BEdita\Core\Model\Table\TreesTable $Trees
  */
 class TreeLoader
@@ -28,7 +27,7 @@ class TreeLoader
      *
      * @var \Chialab\FrontendKit\Model\ObjectsLoader
      */
-    protected $loader;
+    protected ObjectsLoader $loader;
 
     /**
      * Tree loader constructor.
@@ -47,7 +46,7 @@ class TreeLoader
      *
      * @param string $path Path.
      * @param int|null $relativeTo ID of parent relative to which compute paths.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[] List of objects, the root element in the path being the first in the list, the leaf being the latter.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity> List of objects, the root element in the path being the first in the list, the leaf being the latter.
      */
     public function loadObjectPath(string $path, ?int $relativeTo = null): CollectionInterface
     {
@@ -79,7 +78,7 @@ class TreeLoader
      * @param int $id Object ID.
      * @param int|null $relativeTo ID of parent relative to which compute paths.
      * @param int|null $via ID of requested parent.
-     * @return array[]
+     * @return array<array>
      */
     public function getViablePaths(int $id, ?int $relativeTo, ?int $via = null): array
     {
@@ -168,7 +167,7 @@ class TreeLoader
     /**
      * Load menu children.
      *
-     * @param int|string $id The id or uname of the parent folder.
+     * @param string|int $id The id or uname of the parent folder.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query
@@ -204,7 +203,7 @@ class TreeLoader
      * @param int $depth The depth of the menu for recursive loading.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[]|null A list of children entities.
+     * @return array<\BEdita\Core\Model\Entity\ObjectEntity>|null A list of children entities.
      */
     protected function loadChildrenRecursively(Folder $folder, int $depth, ?array $options = null, ?array $hydrate = null): ?array
     {

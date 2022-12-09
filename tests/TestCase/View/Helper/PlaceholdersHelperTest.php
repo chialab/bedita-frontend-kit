@@ -122,7 +122,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::getTemplatePaths()}.
      *
      * @return void
-     *
      * @covers ::getTemplatePaths()
      */
     public function testGetTemplatePaths()
@@ -138,7 +137,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::getTemplate()}.
      *
      * @return void
-     *
      * @covers ::getTemplate()
      */
     public function testGetTemplate()
@@ -150,7 +148,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::defaultTemplater()}.
      *
      * @return void
-     *
      * @covers ::defaultTemplater()
      */
     public function testDefaultTemplater()
@@ -163,7 +160,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::template()}.
      *
      * @return void
-     *
      * @covers ::template()
      */
     public function testTemplate()
