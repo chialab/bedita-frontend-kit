@@ -1,1 +1,1 @@
-<?php echo $object->title; ?>
+<?= $object->title; ?>

@@ -41,7 +41,7 @@ trait RenderTrait
      * @param string|null $viewClass Optional namespaced class name of the View class to instantiate.
      * @return \Cake\View\View
      */
-    abstract public function createView(?string $viewClass = null): View;
+    abstract public function createView(string|null $viewClass = null): View;
 
     /**
      * The render method of the controller.
@@ -50,7 +50,7 @@ trait RenderTrait
      * @param string|null $layout Layout to use
      * @return \Cake\Http\Response A response object containing the rendered view.
      */
-    abstract public function render(?string $view = null, ?string $layout = null): Response;
+    abstract public function render(string|null $view = null, string|null $layout = null): Response;
 
     /**
      * Get the templatePath based on controller name and request prefix.

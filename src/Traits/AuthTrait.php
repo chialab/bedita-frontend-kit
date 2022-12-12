@@ -51,7 +51,7 @@ trait AuthTrait
      * @param int $status HTTP status code. Defaults to `302`.
      * @return \Cake\Http\Response|null
      */
-    abstract public function redirect(string|array|UriInterface $url, int $status = 302): ?Response;
+    abstract public function redirect(string|array|UriInterface $url, int $status = 302): Response|null;
 
     /**
      * Return home route, where users will be redirected after logout or when they try to login to a non-staging site.
@@ -65,7 +65,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\Response|null
      */
-    public function beforeFilter(Event $event): ?Response
+    public function beforeFilter(Event $event): Response|null
     {
         parent::beforeFilter($event);
 
@@ -83,7 +83,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\Response|null
      */
-    public function login(): ?Response
+    public function login(): Response|null
     {
         $result = $this->Authentication->getResult();
         if ($result->isValid()) {
@@ -104,7 +104,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\Response|null
      */
-    public function logout(): ?Response
+    public function logout(): Response|null
     {
         $this->Authentication->logout();
 

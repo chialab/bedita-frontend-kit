@@ -53,7 +53,7 @@ class ObjectRoute extends DashedRoute
      *   directory.
      * @return string|null Either false or a string URL.
      */
-    public function match(array $url, array $context = []): ?string
+    public function match(array $url, array $context = []): string|null
     {
         if (empty($this->_compiledRoute)) {
             $this->compile();
@@ -89,7 +89,7 @@ class ObjectRoute extends DashedRoute
      * @return void
      * @throws \RuntimeException
      */
-    protected function checkEntity($entity): void
+    protected function checkEntity(ArrayAccess|array $entity): void
     {
         if (!$entity instanceof ArrayAccess && !is_array($entity)) {
             throw new RuntimeException(sprintf(
@@ -106,7 +106,7 @@ class ObjectRoute extends DashedRoute
      * @param \ArrayAccess|array $entity Entity value from the URL options.
      * @return bool
      */
-    protected function checkFilters($entity): bool
+    protected function checkFilters(ArrayAccess|array $entity): bool
     {
         if (empty($this->filters)) {
             return true;

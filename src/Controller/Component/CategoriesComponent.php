@@ -44,7 +44,7 @@ class CategoriesComponent extends Component
      * @param int|null $parentId ID of parent category.
      * @return \Cake\ORM\Query
      */
-    public function load(?string $type = null, ?int $parentId = null): Query
+    public function load(string|null $type = null, int|null $parentId = null): Query
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true]);

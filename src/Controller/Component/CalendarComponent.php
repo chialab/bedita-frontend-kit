@@ -112,7 +112,7 @@ class CalendarComponent extends Component
      * @param \Cake\I18n\FrozenTime|null $to Range end.
      * @return \Cake\ORM\Query
      */
-    public function findGroupedByDay(Query $query, FrozenTime $from, ?FrozenTime $to = null): Query
+    public function findGroupedByDay(Query $query, FrozenTime $from, FrozenTime|null $to = null): Query
     {
         $to = $to ?? $from->addWeek();
 
@@ -154,7 +154,7 @@ class CalendarComponent extends Component
      * @param \Cake\I18n\FrozenTime|null $to Range end.
      * @return \Cake\ORM\Query
      */
-    public function calendarFolder(string $parent, FrozenTime $from, ?FrozenTime $to): Query
+    public function calendarFolder(string $parent, FrozenTime $from, FrozenTime|null $to): Query
     {
         return $this->findGroupedByDay(
             $this->Objects->loadObjects(['parent' => $parent], 'objects'),

@@ -74,7 +74,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadObject(string $id, string $type = 'objects', array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -92,7 +92,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, ?string $type = null, ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -131,7 +131,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): Query
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
@@ -150,7 +150,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): Query
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -172,11 +172,12 @@ class ObjectsLoader
 
     /**
      * Get assocation by relation name.
+     *
      * @param \Cake\ORM\Table The table.
      * @param string $name The relation name.
      * @return \Cake\ORM\Association|null The association object, if found.
      */
-    protected function getAssociation(Table $table, string $name): ?Association
+    protected function getAssociation(Table $table, string $name): Association|null
     {
         $associations = $table->associations()->keys();
         foreach ($associations as $key) {
@@ -198,7 +199,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function loadSingle(int $primaryKey, ObjectType $objectType, ?array $options, int $depth = 1, ?array $hydrate = null): ObjectEntity
+    protected function loadSingle(int $primaryKey, ObjectType $objectType, array|null $options, int $depth = 1, array|null $hydrate = null): ObjectEntity
     {
         // Fetch default options.
         if ($options === null) {
@@ -228,7 +229,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
+    protected function loadMulti(ObjectType $objectType, array $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -271,7 +272,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query
      */
-    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
+    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, array|null $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -403,7 +404,7 @@ class ObjectsLoader
      * @param string|null $lang Language code to use.
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function dangerouslyTranslateFields(ObjectEntity $object, ?string $lang): ObjectEntity
+    protected function dangerouslyTranslateFields(ObjectEntity $object, string|null $lang): ObjectEntity
     {
         if ($lang === null || $lang === $object->lang) {
             return $object;
@@ -447,7 +448,7 @@ class ObjectsLoader
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    protected function autoHydrateAssociations(iterable $objects, int $depth, ?array $options = null): CollectionInterface
+    protected function autoHydrateAssociations(iterable $objects, int $depth, array|null $options = null): CollectionInterface
     {
         if (!($objects instanceof CollectionInterface)) {
             $objects = new Collection($objects);
@@ -536,7 +537,7 @@ class ObjectsLoader
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return array<string>
      */
-    protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
+    protected function getAssociationsToHydrate(int $depth, array|null $options = null): array
     {
         $hydrateAssociations = $this->autoHydrateAssociations;
         if ($options !== null) {
@@ -560,7 +561,7 @@ class ObjectsLoader
      * @param bool|null $limited Include only associations with or without a limit.
      * @return array
      */
-    protected static function prepareContains(string $include, ?bool $limited = null): array
+    protected static function prepareContains(string $include, bool|null $limited = null): array
     {
         $contains = explode(',', $include);
 

@@ -24,7 +24,7 @@ class ManagerHelper extends Helper
      *
      * @return \ArrayAccess|array
      */
-    protected function getObject()
+    protected function getObject(): ArrayAccess|array
     {
         $candidates = array_filter([
             $this->getView()->get('_main'),
@@ -46,7 +46,7 @@ class ManagerHelper extends Helper
      *
      * @return string|null
      */
-    public function getViewUrl(): ?string
+    public function getViewUrl(): string|null
     {
         if (!$this->isEnabled()) {
             return null;

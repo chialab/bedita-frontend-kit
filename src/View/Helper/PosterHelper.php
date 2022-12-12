@@ -41,7 +41,7 @@ class PosterHelper extends Helper
      *
      * @return string|null
      */
-    public function getFallbackImage(): ?string
+    public function getFallbackImage(): string|null
     {
         return $this->getConfig('fallbackImage', $this->Media->getFallbackImage());
     }
@@ -53,7 +53,7 @@ class PosterHelper extends Helper
      * @param int $pos Position.
      * @return \BEdita\Core\Model\Entity\Media|null
      */
-    protected function getPosterAt(ObjectEntity $object, int $pos = 0): ?Media
+    protected function getPosterAt(ObjectEntity $object, int $pos = 0): Media|null
     {
         $posters = $object->get('poster');
         if (empty($posters) || !is_iterable($posters)) {
@@ -80,7 +80,7 @@ class PosterHelper extends Helper
      * @param array $options Poster options.
      * @return \Iterator|array<\BEdita\Core\Model\Entity\Media>
      */
-    protected function candidates(?ObjectEntity $object, array $options): Iterator
+    protected function candidates(ObjectEntity|null $object, array $options): Iterator
     {
         $forceSelf = filter_var(Hash::get($options, 'forceSelf', false), FILTER_VALIDATE_BOOL);
         $variant = Hash::get($options, 'variant', 0);
@@ -114,7 +114,7 @@ class PosterHelper extends Helper
      * @return bool
      * @deprecated Use {@see \Chialab\FrontendKit\View\Helper\PosterHelper::exists()} instead.
      */
-    public function check(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): bool
+    public function check(ObjectEntity|null $object, bool $forceSelf = false, int $variant = 0): bool
     {
         deprecationWarning('PosterHelper::check() is deprecated, use PosterHelper::exists() instead.', 2);
 
@@ -134,7 +134,7 @@ class PosterHelper extends Helper
      * @param array $options Poster options.
      * @return bool
      */
-    public function exists(?ObjectEntity $object, array $options = []): bool
+    public function exists(ObjectEntity|null $object, array $options = []): bool
     {
         if ($object !== null && $object->has('provider_thumbnail')) {
             return true;
@@ -153,11 +153,11 @@ class PosterHelper extends Helper
      * Get media URL, optionally generating a thumbnail.
      *
      * @param \BEdita\Core\Model\Entity\Media $media Media entity.
-     * @param mixed $thumbOptions Thumb options.
+     * @param array|string|false $thumbOptions Thumb options.
      * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
-    protected function getMediaUrl(Media $media, $thumbOptions, array $fallbackOptions): ?string
+    protected function getMediaUrl(Media $media, array|string|false $thumbOptions, array $fallbackOptions): string|null
     {
         if ($thumbOptions !== false) {
             return $this->Thumb->url($media, $thumbOptions, $fallbackOptions);
@@ -178,11 +178,11 @@ class PosterHelper extends Helper
      * @return string|null
      * @deprecated Use {@see \Chialab\FrontendKit\View\Helper\PosterHelper::url()} instead.
      */
-    public function getUrl(?ObjectEntity $object, bool $forceSelf = false, int $variant = 0): ?string
+    public function getUrl(ObjectEntity|null $object, bool $forceSelf = false, int $variant = 0): string|null
     {
         deprecationWarning('PosterHelper::getUrl() is deprecated, use PosterHelper::url() instead.', 2);
 
-        return $this->url($object, false, compact('forceSelf', 'variant'));
+        return $this->url($object, posterOptions: compact('forceSelf', 'variant'));
     }
 
     /**
@@ -201,7 +201,7 @@ class PosterHelper extends Helper
      * @param array $posterOptions Poster options.
      * @return string|null
      */
-    public function url(?ObjectEntity $object, $thumbOptions = 'default', array $posterOptions = []): ?string
+    public function url(ObjectEntity|null $object, array|string|false $thumbOptions = 'default', array $posterOptions = []): string|null
     {
         if ($object !== null && $object->has('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
@@ -233,7 +233,7 @@ class PosterHelper extends Helper
      * @param array $posterOptions Poster options. {@see \Chialab\FrontendKit\View\Helper\PosterHelper::url()}
      * @return string
      */
-    public function image(?ObjectEntity $object, $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
+    public function image(ObjectEntity|null $object, array|string|false $thumbOptions = 'default', array $attributes = [], array $posterOptions = []): string
     {
         $url = $this->url($object, $thumbOptions, $posterOptions);
         if (!$url) {
@@ -249,7 +249,7 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom crop the poster image.
      * @return string position string in the following format: '<x-string> <y-string>'
      */
-    public function position(?ObjectEntity $object): string
+    public function position(ObjectEntity|null $object): string
     {
         $props = [];
 
@@ -312,7 +312,7 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster ratio .
      * @return float aspect value
      */
-    public function aspect(?ObjectEntity $object): float
+    public function aspect(ObjectEntity|null $object): float
     {
         $streams = [];
 
@@ -346,7 +346,7 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom get poster orientation.
      * @return string aspect string in the following format: 'portrait | landscape | square'
      */
-    public function orientation(?ObjectEntity $object): string
+    public function orientation(ObjectEntity|null $object): string
     {
         $aspect = $this->aspect($object);
 

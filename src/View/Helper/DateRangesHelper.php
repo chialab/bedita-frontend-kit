@@ -111,7 +111,7 @@ class DateRangesHelper extends Helper
      * @param string|null $now Relative to date.
      * @return \BEdita\Core\Model\Entity\DateRange|null
      */
-    public function getClosestRange(array $ranges, ?string $now = null): ?DateRange
+    public function getClosestRange(array $ranges, string|null $now = null): DateRange|null
     {
         $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
         $sorted = collection($ranges)
@@ -138,7 +138,7 @@ class DateRangesHelper extends Helper
     public function sortByClosestRange(iterable $objects, int $dir = SORT_ASC): iterable
     {
         return collection($objects)
-            ->sortBy(function (ObjectEntity $obj): ?int {
+            ->sortBy(function (ObjectEntity $obj): int|null {
                 $range = $this->getClosestRange($obj->date_ranges ?? []);
                 if ($range === null) {
                     return PHP_INT_MIN;

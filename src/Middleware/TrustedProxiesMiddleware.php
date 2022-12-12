@@ -27,7 +27,7 @@ class TrustedProxiesMiddleware
      *
      * @var array<\Chialab\Ip\Subnet>|null
      */
-    protected ?array $subnets;
+    protected array|null $subnets;
 
     /**
      * Middleware constructor.

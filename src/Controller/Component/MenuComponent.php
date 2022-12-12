@@ -64,7 +64,7 @@ class MenuComponent extends Component
      * @param int $depth The depth of the menu for recursive loading.
      * @return \BEdita\Core\Model\Entity\Folder The root menu folder.
      */
-    public function load(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = null): Folder
+    public function load(string $id, array|null $options = null, array|null $hydrate = null, int|null $depth = null): Folder
     {
         if ($depth === null) {
             $depth = $this->getConfig('depth') ?? 1;

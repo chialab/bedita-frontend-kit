@@ -26,7 +26,7 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
      * @param string|null $loginUrl The url of the login page.
      * @return void
      */
-    public function __construct(?string $loginUrl = '/login')
+    public function __construct(string|null $loginUrl = '/login')
     {
         $this->authService = new AuthenticationService();
         $this->authService->setConfig([

@@ -44,6 +44,8 @@ trait GenericActionsTrait
      * @param \Cake\ORM\Table|\Cake\ORM\Query|string|null $object Table to paginate
      * @param array $settings The settings/configuration used for pagination.
      * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     abstract public function paginate($object = null, array $settings = []);
 
@@ -67,7 +69,7 @@ trait GenericActionsTrait
      * @param string $type Object type.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?ObjectEntity
+    protected function dispatchBeforeLoadEvent(string $uname, string $type): ObjectEntity|null
     {
         $event = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname', 'type'));
         $result = $event->getResult();
@@ -84,7 +86,7 @@ trait GenericActionsTrait
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchAfterLoadEvent(ObjectEntity $object): ?ObjectEntity
+    protected function dispatchAfterLoadEvent(ObjectEntity $object): ObjectEntity|null
     {
         $event = $this->dispatchEvent('Controller.afterObjectLoad', compact('object'));
         $result = $event->getResult();
@@ -101,7 +103,7 @@ trait GenericActionsTrait
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
      * @return \Cake\Http\Response|null The resulting response of the events.
      */
-    protected function dispatchBeforeRenderEvent(ObjectEntity $object): ?Response
+    protected function dispatchBeforeRenderEvent(ObjectEntity $object): Response|null
     {
         $event = $this->dispatchEvent('Controller.beforeObjectRender', compact('object'));
         $result = $event->getResult();
@@ -118,7 +120,7 @@ trait GenericActionsTrait
      * @param string $uname Object id or uname.
      * @return \Cake\Http\Response|null
      */
-    public function objects(string $uname): ?Response
+    public function objects(string $uname): Response|null
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
@@ -154,7 +156,7 @@ trait GenericActionsTrait
      * @param string $uname Object `id` or `uname`.
      * @return \Cake\Http\Response|null
      */
-    public function object(string $uname): ?Response
+    public function object(string $uname): Response|null
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
@@ -210,7 +212,7 @@ trait GenericActionsTrait
      * @param string $path Object path.
      * @return \Cake\Http\Response|null
      */
-    public function fallback(string $path): ?Response
+    public function fallback(string $path): Response|null
     {
         $ancestors = $this->Publication->loadObjectPath($path)->toList();
         $leaf = array_pop($ancestors);

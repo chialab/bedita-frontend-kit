@@ -36,7 +36,7 @@ class ThumbHelper extends Helper
      *
      * @return string|null
      */
-    public function getFallbackImage(): ?string
+    public function getFallbackImage(): string|null
     {
         return $this->getConfig('fallbackImage', $this->Media->getFallbackImage());
     }
@@ -55,7 +55,7 @@ class ThumbHelper extends Helper
      * @param array $fallbackOptions Fallback options.
      * @return string|null
      */
-    public function url(?ObjectEntity $object, array|string $thumbOptions = 'default', array $fallbackOptions = []): ?string
+    public function url(ObjectEntity|null $object, array|string $thumbOptions = 'default', array $fallbackOptions = []): string|null
     {
         $allowPending = filter_var(Hash::get($fallbackOptions, 'allowPending', false), FILTER_VALIDATE_BOOL);
         $fallbackOriginal = filter_var(Hash::get($fallbackOptions, 'fallbackOriginal', true), FILTER_VALIDATE_BOOL);
@@ -93,7 +93,7 @@ class ThumbHelper extends Helper
      * @param array $fallbackOptions Fallback options. {@see \Chialab\FrontendKit\View\Helper\ThumbHelper::url()}
      * @return string
      */
-    public function image(?ObjectEntity $object, array|string $thumbOptions = 'default', array $attributes = [], array $fallbackOptions = []): string
+    public function image(ObjectEntity|null $object, array|string $thumbOptions = 'default', array $attributes = [], array $fallbackOptions = []): string
     {
         $url = $this->url($object, $thumbOptions, $fallbackOptions);
         if (empty($url)) {

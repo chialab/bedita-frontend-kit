@@ -47,7 +47,7 @@ class PlaceholdersHelper extends Helper
      * @param mixed $params Placeholder custom params.
      * @return array<string>
      */
-    public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): array
+    public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): array
     {
         $type = $placeholder->get('type') ?: 'objects';
         $objectType = $this->ObjectTypes->get($type);
@@ -69,7 +69,7 @@ class PlaceholdersHelper extends Helper
      * @param mixed $params Placeholder custom params.
      * @return string|null
      */
-    public function getTemplate(EntityInterface $entity, string $field, EntityInterface $placeholder, $params = null): ?string
+    public function getTemplate(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): string|null
     {
         foreach ($this->getTemplatePaths($entity, $field, $placeholder, $params) as $element) {
             if ($this->getView()->elementExists($element)) {
@@ -89,7 +89,7 @@ class PlaceholdersHelper extends Helper
      * @param callable $callback Callback to be invoked for each instance of placeholder. This is supposed to return the templated placeholder.
      * @return mixed Templated field contents.
      */
-    public static function defaultTemplater(EntityInterface $entity, string $field, array $placeholders, callable $callback)
+    public static function defaultTemplater(EntityInterface $entity, string $field, array $placeholders, callable $callback): mixed
     {
         $contents = $entity->get($field);
         if (!is_string($contents) || empty($contents) || empty($placeholders)) {
@@ -129,7 +129,7 @@ class PlaceholdersHelper extends Helper
      * @param string $field Field to be templated.
      * @return mixed
      */
-    public function template(EntityInterface $entity, string $field)
+    public function template(EntityInterface $entity, string $field): mixed
     {
         $relation = $this->getConfigOrFail('relation');
         $placeholder = $entity->get($relation);

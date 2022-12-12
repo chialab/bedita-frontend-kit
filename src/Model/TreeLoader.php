@@ -48,7 +48,7 @@ class TreeLoader
      * @param int|null $relativeTo ID of parent relative to which compute paths.
      * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity> List of objects, the root element in the path being the first in the list, the leaf being the latter.
      */
-    public function loadObjectPath(string $path, ?int $relativeTo = null): CollectionInterface
+    public function loadObjectPath(string $path, int|null $relativeTo = null): CollectionInterface
     {
         $parts = array_filter(explode('/', $path));
         $path = implode('/', $parts);
@@ -81,7 +81,7 @@ class TreeLoader
      * @param int|null $via ID of requested parent.
      * @return array<array>
      */
-    public function getViablePaths(int $id, ?int $relativeTo, ?int $via = null): array
+    public function getViablePaths(int $id, int|null $relativeTo, int|null $via = null): array
     {
         $query = $this->getObjectPaths($id, $relativeTo);
         if ($via !== null) {
@@ -100,7 +100,7 @@ class TreeLoader
      * @param int|null $relativeTo Object ID relative to which paths should be computed.
      * @return \Cake\ORM\Query
      */
-    protected function getObjectPaths(int $id, ?int $relativeTo = null): Query
+    protected function getObjectPaths(int $id, int|null $relativeTo = null): Query
     {
         $query = $this->Trees->find()
             ->select([$this->Trees->aliasField('canonical')])
@@ -173,7 +173,7 @@ class TreeLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query
      */
-    public function loadMenuChildren(string $id, ?array $options = null, ?array $hydrate = null): Query
+    public function loadMenuChildren(string $id, array|null $options = null, array|null $hydrate = null): Query
     {
         return $this->loader->loadRelatedObjects($id, 'folders', 'children', [], $options, $hydrate)
             ->where([$this->Trees->aliasField('menu') => true])
@@ -189,7 +189,7 @@ class TreeLoader
      * @param int $depth The depth of the menu for recursive loading.
      * @return \BEdita\Core\Model\Entity\Folder The root menu folder.
      */
-    public function loadMenu(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = 3): Folder
+    public function loadMenu(string $id, array|null $options = null, array|null $hydrate = null, int|null $depth = 3): Folder
     {
         $folder = $this->loader->loadObject($id, 'folders', $options, $hydrate);
         $folder['children'] = $this->loadChildrenRecursively($folder, $depth, $options, $hydrate);
@@ -206,7 +206,7 @@ class TreeLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return array<\BEdita\Core\Model\Entity\ObjectEntity>|null A list of children entities.
      */
-    protected function loadChildrenRecursively(Folder $folder, int $depth, ?array $options = null, ?array $hydrate = null): ?array
+    protected function loadChildrenRecursively(Folder $folder, int $depth, array|null $options = null, array|null $hydrate = null): array|null
     {
         if ($depth === 0) {
             return null;
