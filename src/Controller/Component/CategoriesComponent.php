@@ -101,19 +101,6 @@ class CategoriesComponent extends Component
     }
 
     /**
-     * Add a filter by category id.
-     *
-     * @param \Cake\ORM\Query $query The current query.
-     * @param int $id ID of the category.
-     * @return \Cake\ORM\Query
-     * @deprecated Use {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent::filterByCategories()} instead.
-     */
-    public function filterById(Query $query, int $id): Query
-    {
-        return $this->filterByCategories($query, [$id]);
-    }
-
-    /**
      * Build categories subquery for filtering.
      *
      * @param \Cake\ORM\Table $table Categories table instance.

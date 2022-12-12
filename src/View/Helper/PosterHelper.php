@@ -108,22 +108,6 @@ class PosterHelper extends Helper
     /**
      * Check if object has a valid poster, or is an Image itself, and the referenced file does actually exist.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
-     * @param bool $forceSelf Restrict checks to the object itself, rather than evaluating its `poster` related objects.
-     * @param int $variant Poster variant, i.e. priority of the desired poster related object.
-     * @return bool
-     * @deprecated Use {@see \Chialab\FrontendKit\View\Helper\PosterHelper::exists()} instead.
-     */
-    public function check(ObjectEntity|null $object, bool $forceSelf = false, int $variant = 0): bool
-    {
-        deprecationWarning('PosterHelper::check() is deprecated, use PosterHelper::exists() instead.', 2);
-
-        return $this->exists($object, compact('forceSelf', 'variant'));
-    }
-
-    /**
-     * Check if object has a valid poster, or is an Image itself, and the referenced file does actually exist.
-     *
      * ### Poster options:
      *
      * - `forceSelf`: restrict checks to the object itself, rather than evaluating its `poster` related objects. Default: `false`
@@ -167,22 +151,6 @@ class PosterHelper extends Helper
         }
 
         return null;
-    }
-
-    /**
-     * Get URL for poster image.
-     *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
-     * @param bool $forceSelf Restrict checks to the object itself, rather than evaluating its `poster` related objects.
-     * @param int $variant Poster variant, i.e. priority of the desired poster related object.
-     * @return string|null
-     * @deprecated Use {@see \Chialab\FrontendKit\View\Helper\PosterHelper::url()} instead.
-     */
-    public function getUrl(ObjectEntity|null $object, bool $forceSelf = false, int $variant = 0): string|null
-    {
-        deprecationWarning('PosterHelper::getUrl() is deprecated, use PosterHelper::url() instead.', 2);
-
-        return $this->url($object, posterOptions: compact('forceSelf', 'variant'));
     }
 
     /**
