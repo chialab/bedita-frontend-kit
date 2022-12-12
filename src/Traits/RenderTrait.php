@@ -119,11 +119,11 @@ trait RenderTrait
                 }
 
                 return $this->render($template);
-            } catch (MissingTemplateException $e) {
+            } catch (MissingTemplateException) {
                 continue;
             }
         }
 
-        throw new MissingTemplateException(__('None of the searched templates was found'));
+        throw new MissingTemplateException(array_pop($template));
     }
 }

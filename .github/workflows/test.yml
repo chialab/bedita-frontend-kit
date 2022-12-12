@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
@@ -32,7 +32,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v2'
+        uses: 'actions/cache@v3'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
@@ -44,10 +44,7 @@ jobs:
         run: 'composer install --prefer-dist --no-interaction'
 
       - name: 'Run PHP CodeSniffer'
-        run: |
-          vendor/bin/phpcs -n -p --extensions=php \
-            --standard=vendor/cakephp/cakephp-codesniffer/CakePHP --ignore=/Migrations/,/Seeds/ \
-            ./src ./tests
+        run: 'composer run-script cs-check -- -n'
 
   stan:
     name: 'Static code analyzer'
@@ -56,7 +53,7 @@ jobs:
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
@@ -71,7 +68,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v2'
+        uses: 'actions/cache@v3'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
@@ -125,7 +122,7 @@ jobs:
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
@@ -141,7 +138,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v2'
+        uses: 'actions/cache@v3'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}"
@@ -156,13 +153,13 @@ jobs:
         run: 'vendor/bin/phpunit --coverage-clover=clover.xml'
 
       - name: 'Export coverage results'
-        uses: 'codecov/codecov-action@v1'
+        uses: 'codecov/codecov-action@v3'
         with:
           file: './clover.xml'
           env_vars: PHP_VERSION,DB_VENDOR
 
       - name: 'Archive code coverage results'
-        uses: 'actions/upload-artifact@v2'
+        uses: 'actions/upload-artifact@v3'
         with:
           name: 'PHP ${{ matrix.php }} with ${{ fromJson(matrix.db).vendor }}'
           path: 'clover.xml'
