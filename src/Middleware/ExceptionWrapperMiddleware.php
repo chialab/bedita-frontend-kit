@@ -7,6 +7,8 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
 /**
@@ -14,7 +16,7 @@ use Throwable;
  *
  * Catch and rethrow mapped exceptions.
  */
-class ExceptionWrapperMiddleware
+class ExceptionWrapperMiddleware implements MiddlewareInterface
 {
     /**
      * Exceptions map.
@@ -34,17 +36,12 @@ class ExceptionWrapperMiddleware
     }
 
     /**
-     * Invoke method.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Message\ResponseInterface $response The response.
-     * @param callable $next Callback to invoke the next middleware.
-     * @return \Psr\Http\Message\ResponseInterface A response
+     * @inheritDoc
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            return $next($request, $response);
+            return $handler($request);
         } catch (Throwable $e) {
             $ctr = get_class($e);
             if (!isset($this->exceptionMap[$ctr])) {

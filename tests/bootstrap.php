@@ -48,6 +48,7 @@ define('CONFIG', ROOT . DS . 'config' . DS);
 define('CACHE', TMP . 'cache' . DS);
 define('CORE_PATH', $root . DS . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 
+Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 Configure::write('debug', true);
 Configure::write('App', [
     'namespace' => 'Chialab\FrontendKit\Test\TestApp',
