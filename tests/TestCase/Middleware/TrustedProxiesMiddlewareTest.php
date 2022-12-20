@@ -7,9 +7,12 @@ use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware;
+use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\ServerRequest as DiactorosServerRequest;
+use Laminas\HttpHandlerRunner\RequestHandlerRunner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Test {@see \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware}.
@@ -54,11 +57,10 @@ class TrustedProxiesMiddlewareTest extends TestCase
      */
     public function testInvoke(?string $expectedClientIp, ?array $expectedTrustedProxies, TrustedProxiesMiddleware $middleware, ServerRequestInterface $request): void
     {
-        $response = new Response();
+        $response = new EmptyResponse();
         $invoked = 0;
-        $next = function (ServerRequestInterface $req, ResponseInterface $res) use ($response, $expectedClientIp, $expectedTrustedProxies, &$invoked): ResponseInterface {
+        $next = function (ServerRequestInterface $req) use ($response, $expectedClientIp, $expectedTrustedProxies, &$invoked): ResponseInterface {
             $invoked++;
-            static::assertSame($response, $res, 'It should not manipulate response object');
             if ($expectedClientIp !== null) {
                 static::assertInstanceOf(ServerRequest::class, $req);
             }
@@ -67,11 +69,23 @@ class TrustedProxiesMiddlewareTest extends TestCase
                 static::assertEquals($expectedTrustedProxies, $req->getTrustedProxies());
             }
 
-            return $res;
+            return $response;
+        };
+        $handler = new class($next) implements RequestHandlerInterface {
+            private $next;
+
+            public function __construct(callable $next) {
+                $this->next = $next;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return ($this->next)($request);
+            }
         };
 
-        $res = $middleware($request, $response, $next);
-        static::assertSame($response, $res);
+        $res = $middleware->process($request, $handler);
+        static::assertSame($response, $res, 'It should not manipulate response');
         static::assertSame(1, $invoked);
     }
 }

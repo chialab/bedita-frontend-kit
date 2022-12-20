@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Middleware;
 
+use Laminas\Diactoros\Response\EmptyResponse;
 use Migrations\Migrations;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -47,11 +48,11 @@ class StatusMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = $handler($request);
         if ($request->getUri()->getPath() !== $this->path) {
-            return $handler($request);
+            return $handler->handle($request);
         }
 
+        $response = new EmptyResponse();
         $migrations = new Migrations();
         if (!$this->checkMigrated($migrations->status())) {
             return $response->withStatus(500);

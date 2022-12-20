@@ -9,11 +9,13 @@ use Chialab\Ip\Subnet;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Middleware to set trusted proxies on the incoming request, thus reliably reading actual client IP.
  */
-class TrustedProxiesMiddleware
+class TrustedProxiesMiddleware implements MiddlewareInterface
 {
     /**
      * List of trusted proxies.
@@ -92,17 +94,12 @@ class TrustedProxiesMiddleware
     }
 
     /**
-     * Invoke method.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Message\ResponseInterface $response The response.
-     * @param callable $next Callback to invoke the next middleware.
-     * @return \Psr\Http\Message\ResponseInterface A response
+     * @inheritDoc
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (!$request instanceof ServerRequest || empty($this->trustedProxies)) {
-            return $next($request, $response);
+            return $handler->handle($request);
         }
 
         while (true) {
@@ -120,6 +117,6 @@ class TrustedProxiesMiddleware
             $request->setTrustedProxies(array_merge($trustedProxies, [$remoteAddress]));
         }
 
-        return $next($request, $response);
+        return $handler->handle($request);
     }
 }
