@@ -41,9 +41,9 @@ class ExceptionWrapperMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            return $handler($request);
+            return $handler->handle($request);
         } catch (Throwable $e) {
-            $ctr = get_class($e);
+            $ctr = $e::class;
             if (!isset($this->exceptionMap[$ctr])) {
                 throw $e;
             }
