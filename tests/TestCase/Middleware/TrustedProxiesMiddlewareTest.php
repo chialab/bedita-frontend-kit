@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Test\TestCase\Middleware;
 
-use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\ServerRequest as DiactorosServerRequest;
-use Laminas\HttpHandlerRunner\RequestHandlerRunner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -71,10 +69,11 @@ class TrustedProxiesMiddlewareTest extends TestCase
 
             return $response;
         };
-        $handler = new class($next) implements RequestHandlerInterface {
+        $handler = new class ($next) implements RequestHandlerInterface {
             private $next;
 
-            public function __construct(callable $next) {
+            public function __construct(callable $next)
+            {
                 $this->next = $next;
             }
 
