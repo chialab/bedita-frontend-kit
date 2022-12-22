@@ -54,9 +54,16 @@ trait GenericActionsTrait
      */
     protected function loadFilteredChildren(string $id): array
     {
+        $folder = $this->Objects->loadObject($id, 'folders');
+        $order = $folder['custom_props'] && $folder['custom_props']['children_order'] ?? $folder['custom_props']['children_order'];
+        if ($order) {
+            $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
+        } else {
+            $order = ['Trees.tree_left'];
+        }
         $children = $this->Objects->loadRelatedObjects($id, 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left']])->toList();
+        return $this->paginate($children->order([], true), ['order' => $order])->toList();
     }
 
     /**
