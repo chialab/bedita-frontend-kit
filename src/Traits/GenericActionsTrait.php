@@ -63,6 +63,7 @@ trait GenericActionsTrait
         }
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
+        
         return $this->paginate($children->order([], true), ['order' => $order])->toList();
     }
 
