@@ -18,6 +18,7 @@ use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
 use Cake\Routing\Router;
+use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use UnexpectedValueException;
 
