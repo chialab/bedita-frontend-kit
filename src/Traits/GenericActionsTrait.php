@@ -51,7 +51,7 @@ trait GenericActionsTrait
     /**
      * Load folder's children using paginations and query filters.
      *
-     * @param \BEdita\Core\Model\Entity\Folder $Folder to load children.
+     * @param \BEdita\Core\Model\Entity\Folder $folder to load children.
      * @return \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
      */
     protected function loadFilteredChildren(Folder $folder): array
