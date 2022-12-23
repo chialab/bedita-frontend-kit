@@ -55,7 +55,7 @@ trait GenericActionsTrait
      */
     protected function loadFilteredChildren(Folder $folder): array
     {
-        $order = $folder['custom_props'] && $folder['custom_props']['children_order'] ? $folder['custom_props']['children_order'] : null;
+        $order = Hash::get($folder, 'custom_props.children_order', null);
         if ($order) {
             $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
         } else {
