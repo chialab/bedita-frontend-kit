@@ -63,7 +63,7 @@ trait GenericActionsTrait
         if ($order) {
             $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
         } else {
-            $order = ['Trees.tree_left'];
+            $order = ['Trees.tree_left' => 'ASC'];
         }
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
