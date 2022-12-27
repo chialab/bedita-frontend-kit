@@ -14,10 +14,12 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
+use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use UnexpectedValueException;
 
@@ -55,11 +57,18 @@ trait GenericActionsTrait
      * @param string|int $id Folder id to load children.
      * @return array<\BEdita\Core\Model\Entity\ObjectEntity> An array of children.
      */
-    protected function loadFilteredChildren(string $id): array
+    protected function loadFilteredChildren(Folder $folder): array
     {
-        $children = $this->Objects->loadRelatedObjects($id, 'folders', 'children', $this->Filters->fromQuery());
+        $order = Hash::get($folder, 'custom_props.children_order', null);
+        if ($order) {
+            $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
+        } else {
+            $order = ['Trees.tree_left'];
+        }
 
-        return $this->paginate($children->order([], true), ['order' => ['Trees.tree_left' => 'ASC']])->toList();
+        $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
+
+        return $this->paginate($children->order([], true), ['order' => $order])->toList();
     }
 
     /**
@@ -130,7 +139,7 @@ trait GenericActionsTrait
 
         $object = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
-            $object['children'] = $this->loadFilteredChildren($object->uname);
+            $object['children'] = $this->loadFilteredChildren($object);
         }
 
         $this->set(compact('object'));
@@ -186,7 +195,7 @@ trait GenericActionsTrait
 
         $object = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
-            $object['children'] = $this->loadFilteredChildren($object->uname);
+            $object['children'] = $this->loadFilteredChildren($object);
         }
 
         $this->set(compact('object'));
@@ -225,7 +234,7 @@ trait GenericActionsTrait
 
         $objects = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
-            $object['children'] = $this->loadFilteredChildren($object->uname);
+            $object['children'] = $this->loadFilteredChildren($object);
         }
 
         $this->set(compact('object', 'parent', 'ancestors'));
