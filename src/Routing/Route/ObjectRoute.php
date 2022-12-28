@@ -66,11 +66,11 @@ class ObjectRoute extends DashedRoute
             return parent::match($url, $context);
         }
         if (isset($url['locale']) && !in_array('locale', $this->keys)) {
-            return false;
+            return null;
         }
         $this->checkEntity($entity);
         if ($this->checkFilters($entity) === false) {
-            return false;
+            return null;
         }
 
         foreach ($this->keys as $field) {
