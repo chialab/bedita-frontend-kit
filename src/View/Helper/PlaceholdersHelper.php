@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
+use BEdita\Core\Model\Table\ObjectTypesTable;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
@@ -22,7 +23,7 @@ class PlaceholdersHelper extends Helper
      *
      * @var \BEdita\Core\Model\Table\ObjectTypesTable
      */
-    public $ObjectTypes;
+    public ObjectTypesTable $ObjectTypes;
 
     /**
      * @inheritDoc

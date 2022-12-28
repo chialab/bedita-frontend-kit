@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Model;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use BEdita\Core\Model\Table\TreesTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Database\Expression\ComparisonExpression;
 use Cake\Database\Expression\FunctionExpression;
@@ -31,7 +32,7 @@ class TreeLoader
      *
      * @var \BEdita\Core\Model\Table\TreesTable
      */
-    public $Trees;
+    public TreesTable $Trees;
 
     /**
      * Tree loader constructor.

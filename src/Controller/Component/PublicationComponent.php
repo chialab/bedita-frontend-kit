@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
+use BEdita\Core\Model\Table\TreesTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -57,7 +58,7 @@ class PublicationComponent extends Component
      *
      * @var \BEdita\Core\Model\Table\TreesTable
      */
-    public $Trees;
+    public TreesTable $Trees;
 
     /**
      * Initialization hook method.

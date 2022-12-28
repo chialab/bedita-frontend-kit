@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
+use BEdita\Core\Model\Table\TreesTable;
 use Cake\Controller\Component;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
@@ -28,7 +29,7 @@ class MenuComponent extends Component
      *
      * @var \BEdita\Core\Model\Table\TreesTable
      */
-    public $Trees;
+    public TreesTable $Trees;
 
     /**
      * @inheritDoc

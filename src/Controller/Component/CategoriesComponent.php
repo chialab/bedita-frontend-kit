@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Category;
+use BEdita\Core\Model\Table\CategoriesTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
@@ -30,7 +31,7 @@ class CategoriesComponent extends Component
      *
      * @var \BEdita\Core\Model\Table\CategoriesTable
      */
-    public $Categories;
+    public CategoriesTable $Categories;
 
     /**
      * @inheritDoc

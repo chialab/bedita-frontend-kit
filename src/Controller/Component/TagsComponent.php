@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Tag;
+use BEdita\Core\Model\Table\TagsTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
@@ -30,7 +31,7 @@ class TagsComponent extends Component
      *
      * @var \BEdita\Core\Model\Table\TagsTable
      */
-    public $Tags;
+    public TagsTable $Tags;
 
     /**
      * @inheritDoc
