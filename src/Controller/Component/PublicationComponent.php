@@ -7,8 +7,8 @@ use BEdita\Core\Model\Entity\Folder;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 use InvalidArgumentException;
@@ -17,11 +17,10 @@ use InvalidArgumentException;
  * Publication component
  *
  * @property-read \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
- * @property-read \BEdita\Core\Model\Table\TreesTable $Trees
  */
 class PublicationComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @inheritDoc
@@ -54,6 +53,13 @@ class PublicationComponent extends Component
     protected Folder $publication;
 
     /**
+     * Trees table.
+     *
+     * @var \BEdita\Core\Model\Table\TreesTable
+     */
+    public $Trees;
+
+    /**
      * Initialization hook method.
      *
      * @param array $config Configuration.
@@ -63,7 +69,7 @@ class PublicationComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loadModel('BEdita/Core.Trees');
+        $this->Trees = $this->fetchTable('BEdita/Core.Trees');
 
         $publicationUname = $this->getConfig('publication');
         if (empty($publicationUname)) {

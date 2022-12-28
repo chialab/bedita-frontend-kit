@@ -7,25 +7,30 @@ use BEdita\Core\Model\Entity\Category;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
 use InvalidArgumentException;
 
 /**
- * Categories component
- *
- * @property-read \BEdita\Core\Model\Table\CategoriesTable $Categories
+ * Categories component.
  */
 class CategoriesComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @inheritDoc
      */
     protected $_defaultConfig = [];
+
+    /**
+     * Categories table.
+     *
+     * @var \BEdita\Core\Model\Table\CategoriesTable
+     */
+    public $Categories;
 
     /**
      * @inheritDoc
@@ -34,7 +39,7 @@ class CategoriesComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loadModel('Categories');
+        $this->Categories = $this->fetchTable('Categories');
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\View\Helper;
 
 use Cake\Datasource\EntityInterface;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
 use InvalidArgumentException;
@@ -12,12 +12,17 @@ use Iterator;
 
 /**
  * Placeholders helper.
- *
- * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
  */
 class PlaceholdersHelper extends Helper
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
+
+    /**
+     * ObjectTypes table.
+     *
+     * @var \BEdita\Core\Model\Table\ObjectTypesTable
+     */
+    public $ObjectTypes;
 
     /**
      * @inheritDoc
@@ -35,7 +40,7 @@ class PlaceholdersHelper extends Helper
     {
         parent::initialize($config);
 
-        $this->loadModel('ObjectTypes');
+        $this->ObjectTypes = $this->fetchTable('ObjectTypes');
     }
 
     /**

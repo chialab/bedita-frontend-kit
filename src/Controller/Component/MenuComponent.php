@@ -5,18 +5,16 @@ namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
 use Cake\Controller\Component;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 
 /**
- * Menu component
- *
- * @property-read \BEdita\Core\Model\Table\Trees $Trees
+ * Menu component.
  */
 class MenuComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * Objects loader instance.
@@ -24,6 +22,13 @@ class MenuComponent extends Component
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
     protected TreeLoader $loader;
+
+    /**
+     * Trees table.
+     *
+     * @var \BEdita\Core\Model\Table\TreesTable
+     */
+    public $Trees;
 
     /**
      * @inheritDoc
@@ -45,7 +50,7 @@ class MenuComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loadModel('Trees');
+        $this->Tress = $this->fetchTable('Trees');
 
         $menuLoader = new ObjectsLoader(
             $this->getConfig('menuLoader.objectTypesConfig', []),

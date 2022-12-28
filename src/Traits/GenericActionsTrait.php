@@ -178,7 +178,7 @@ trait GenericActionsTrait
             }
 
             $out = $route->match(['_entity' => $entity] + $route->defaults + $params, []);
-            if ($out !== false) {
+            if ($out !== null) {
                 return $this->redirect($out);
             }
         }

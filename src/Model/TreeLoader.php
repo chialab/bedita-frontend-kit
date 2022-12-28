@@ -9,18 +9,15 @@ use Cake\Collection\CollectionInterface;
 use Cake\Database\Expression\ComparisonExpression;
 use Cake\Database\Expression\FunctionExpression;
 use Cake\Database\Expression\IdentifierExpression;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 
 /**
- * Class TreeLoader
- *
- * @package Chialab\FrontendKit\Model
- * @property \BEdita\Core\Model\Table\TreesTable $Trees
+ * Class TreeLoader.
  */
 class TreeLoader
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * Objects loader instance.
@@ -28,6 +25,13 @@ class TreeLoader
      * @var \Chialab\FrontendKit\Model\ObjectsLoader
      */
     protected ObjectsLoader $loader;
+
+    /**
+     * Trees table.
+     *
+     * @var \BEdita\Core\Model\Table\TreesTable
+     */
+    public $Trees;
 
     /**
      * Tree loader constructor.
@@ -38,7 +42,7 @@ class TreeLoader
     {
         $this->loader = $loader;
 
-        $this->loadModel('Trees');
+        $this->Trees = $this->fetchTable('Trees');
     }
 
     /**

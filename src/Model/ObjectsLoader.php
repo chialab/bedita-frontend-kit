@@ -12,7 +12,6 @@ use BEdita\Core\Model\Entity\Translation;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -33,7 +32,6 @@ class ObjectsLoader
 {
     use I18nTrait;
     use LocatorAwareTrait;
-    use ModelAwareTrait;
 
     /**
      * Loading configuration on a per-object type basis.
@@ -61,8 +59,8 @@ class ObjectsLoader
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
 
-        $this->loadModel('BEdita/Core.ObjectTypes');
-        $this->loadModel('BEdita/Core.Objects');
+        $this->ObjectTypes = $this->fetchTable('BEdita/Core.ObjectTypes');
+        $this->Objects = $this->fetchTable('BEdita/Core.Objects');
     }
 
     /**

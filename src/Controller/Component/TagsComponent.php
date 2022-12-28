@@ -7,25 +7,30 @@ use BEdita\Core\Model\Entity\Tag;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
 use InvalidArgumentException;
 
 /**
- * Tags component
- *
- * @property-read \BEdita\Core\Model\Table\TagsTable $Tags
+ * Tags component.
  */
 class TagsComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @inheritDoc
      */
     protected $_defaultConfig = [];
+
+    /**
+     * Tags table.
+     *
+     * @var \BEdita\Core\Model\Table\TagsTable
+     */
+    public $Tags;
 
     /**
      * @inheritDoc
@@ -34,7 +39,7 @@ class TagsComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loadModel('Tags');
+        $this->Tags = $this->fetchTable('Tags');
     }
 
     /**
