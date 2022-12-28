@@ -44,10 +44,6 @@ class AppView extends TwigView implements TemplateExistsInterface
     {
         parent::initialize();
 
-        $this->getTwig()->addExtension(new FileExtension());
-        $this->getTwig()->addExtension(new I18nExtension());
-        $this->getTwig()->addExtension(new SortByExtension());
-
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
         $this->loadHelper('Html');
@@ -77,6 +73,19 @@ class AppView extends TwigView implements TemplateExistsInterface
         if ($isStaging) {
             $this->loadHelper('Authentication.Identity');
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function initializeExtensions(): void
+    {
+        parent::initializeExtensions();
+
+        $twig = $this->getTwig();
+        $twig->addExtension(new FileExtension());
+        $twig->addExtension(new I18nExtension());
+        $twig->addExtension(new SortByExtension());
     }
 
     /**
