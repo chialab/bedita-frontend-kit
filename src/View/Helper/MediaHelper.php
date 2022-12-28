@@ -93,7 +93,7 @@ class MediaHelper extends Helper
             return false;
         }
 
-        return !$filesystemCheck || FilesystemRegistry::getMountManager()->has($stream->uri);
+        return !$filesystemCheck || FilesystemRegistry::getMountManager()->fileExists($stream->uri);
     }
 
     /**
