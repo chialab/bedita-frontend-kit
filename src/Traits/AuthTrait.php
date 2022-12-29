@@ -15,8 +15,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Traits;
 
 use Cake\Controller\Component;
-use Cake\Core\Configure;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Psr\Http\Message\UriInterface;
@@ -24,6 +23,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * Auth trait for BEdita frontends.
  *
+ * @property \Chialab\FrontendKit\Controller\Component\StagingComponent $Staging
  * @property \Authentication\Controller\Component\AuthenticationComponent|null $Authentication
  */
 trait AuthTrait
@@ -61,15 +61,13 @@ trait AuthTrait
     abstract protected function getHomeRoute(): array|string;
 
     /**
-     * {@inheritDoc}
-     *
-     * @return \Cake\Http\Response|null
+     * @inheritDoc
      */
-    public function beforeFilter(Event $event): Response|null
+    public function beforeFilter(EventInterface $event): Response|null
     {
         parent::beforeFilter($event);
 
-        if (!Configure::read('StagingSite')) {
+        if (!$this->Staging->isAuthRequired()) {
             return $this->redirect($this->getHomeRoute());
         }
 
@@ -91,7 +89,7 @@ trait AuthTrait
             return $this->redirect($this->Authentication->getLoginRedirect() ?? $this->getHomeRoute());
         }
 
-        if ($this->getRequest()->is('post') && !$result->isValid()) {
+        if ($this->getRequest()->is('post')) {
             $this->loadComponent('Flash');
             $this->Flash->error(__('Username and password mismatch'));
         }
