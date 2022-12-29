@@ -53,6 +53,7 @@ class AppView extends TwigView implements TemplateExistsInterface
         $this->loadHelper('BEdita/I18n.I18n');
         $this->loadHelper('Chialab/Rna.Rna');
         $this->loadHelper('Chialab/FrontendKit.Metadata');
+        $this->loadHelper('Chialab/FrontendKit.DateRanges');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
 
