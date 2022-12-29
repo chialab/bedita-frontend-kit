@@ -67,7 +67,7 @@ class MetadataHelper extends Helper
     {
         $chunks = array_filter([
             $object?->title,
-            $publication?->title ?? $publication?->uname
+            $publication?->title ?? $publication?->uname,
         ]);
 
         return strip_tags(join($separator, $chunks));
