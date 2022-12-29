@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 
 /**
  * Staging component
@@ -15,27 +15,27 @@ class StagingComponent extends Component
      * @inheritDoc
      */
     protected $_defaultConfig = [
-        'requireAuth' => null,
+        'requireAuth' => true,
         'authConfig' => [],
     ];
-
-    /**
-     * Check if staging auth is required.
-     *
-     * @return bool
-     */
-    protected function isAuthRequired(): bool
-    {
-        return $this->getConfig('requireAuth', Configure::read('StagingSite', false));
-    }
 
     /**
      * @inheritDoc
      */
     public function initialize(array $config): void
     {
-        if ($this->isAuthRequired()) {
+        parent::initialize($config);
+
+        if ($this->getConfig('requireAuth')) {
             $this->getController()->loadComponent('Authentication.Authentication', $this->getConfig('authConfig'));
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeRender(EventInterface $event): void
+    {
+        $this->getController()->set('_staging', true);
     }
 }
