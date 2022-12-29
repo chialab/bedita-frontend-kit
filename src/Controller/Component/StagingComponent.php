@@ -20,13 +20,23 @@ class StagingComponent extends Component
     ];
 
     /**
+     * Check if authentication is required.
+     *
+     * @return bool
+     */
+    public function isAuthRequired(): bool
+    {
+        return $this->getConfig('requireAuth');
+    }
+
+    /**
      * @inheritDoc
      */
     public function initialize(array $config): void
     {
         parent::initialize($config);
 
-        if ($this->getConfig('requireAuth')) {
+        if ($this->isAuthRequired()) {
             $this->getController()->loadComponent('Authentication.Authentication', $this->getConfig('authConfig'));
         }
     }
