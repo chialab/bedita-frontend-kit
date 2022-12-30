@@ -18,9 +18,7 @@ use Chialab\FrontendKit\Model\ObjectsLoader;
 class ObjectsComponent extends Component
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'objectTypesConfig' => [
@@ -36,12 +34,12 @@ class ObjectsComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\ObjectsLoader
      */
-    protected $loader;
+    protected ObjectsLoader $loader;
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -70,7 +68,7 @@ class ObjectsComponent extends Component
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadObject(string $id, string $type = 'objects', array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         return $this->loader->loadObject($id, $type, $options, $hydrate);
     }
@@ -84,7 +82,7 @@ class ObjectsComponent extends Component
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, ?string $type = null, ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         return $this->loader->loadFullObject($id, $type, $options, $hydrate);
     }
@@ -96,9 +94,9 @@ class ObjectsComponent extends Component
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): Query
     {
         return $this->loader->loadObjects($filter, $type, $options, $hydrate);
     }
@@ -106,8 +104,8 @@ class ObjectsComponent extends Component
     /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function hydrateObjects(array $objects): CollectionInterface
     {
@@ -123,9 +121,9 @@ class ObjectsComponent extends Component
      * @param null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): Query
     {
         return $this->loader->loadRelatedObjects($id, $type, $relation, $filter, $options, $hydrate);
     }

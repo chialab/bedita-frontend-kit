@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use Cake\TestSuite\TestCase;
@@ -24,7 +26,7 @@ class MediaHelperTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $view = new View();
@@ -36,7 +38,7 @@ class MediaHelperTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Media);
 

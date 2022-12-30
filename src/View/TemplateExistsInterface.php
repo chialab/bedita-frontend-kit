@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -24,5 +26,5 @@ interface TemplateExistsInterface
      * @param string $name Name of the view to check.
      * @return bool Template exists.
      */
-    public function templateExists($name): bool;
+    public function templateExists(string $name): bool;
 }

@@ -14,13 +14,16 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
-use Cake\Core\Configure;
-use Cake\Event\Event;
+use Cake\Controller\Component;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Auth trait for BEdita frontends.
  *
+ * @property \Chialab\FrontendKit\Controller\Component\StagingComponent $Staging
  * @property \Authentication\Controller\Component\AuthenticationComponent|null $Authentication
  */
 trait AuthTrait
@@ -30,7 +33,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest();
+    abstract public function getRequest(): ServerRequest;
 
     /**
      * Add a component to the controller's registry.
@@ -39,34 +42,32 @@ trait AuthTrait
      * @param array $config The config for the component.
      * @return \Cake\Controller\Component
      */
-    abstract public function loadComponent($name, array $config = []);
+    abstract public function loadComponent(string $name, array $config = []): Component;
 
     /**
      * Redirects to given $url, after turning off $this->autoRender.
      *
-     * @param string|array|\Psr\Http\Message\UriInterface $url A string, array-based URL or UriInterface instance.
+     * @param \Psr\Http\Message\UriInterface|array|string $url A string, array-based URL or UriInterface instance.
      * @param int $status HTTP status code. Defaults to `302`.
      * @return \Cake\Http\Response|null
      */
-    abstract public function redirect($url, $status = 302);
+    abstract public function redirect(string|array|UriInterface $url, int $status = 302): Response|null;
 
     /**
      * Return home route, where users will be redirected after logout or when they try to login to a non-staging site.
      *
      * @return array|string
      */
-    abstract protected function getHomeRoute();
+    abstract protected function getHomeRoute(): array|string;
 
     /**
      * @inheritDoc
-     *
-     * @return \Cake\Http\Response|null
      */
-    public function beforeFilter(Event $event): ?Response
+    public function beforeFilter(EventInterface $event): Response|null
     {
         parent::beforeFilter($event);
 
-        if (!Configure::read('StagingSite')) {
+        if (!$this->Staging->isAuthRequired()) {
             return $this->redirect($this->getHomeRoute());
         }
 
@@ -80,7 +81,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\Response|null
      */
-    public function login(): ?Response
+    public function login(): Response|null
     {
         $result = $this->Authentication->getResult();
         if ($result->isValid()) {
@@ -88,7 +89,7 @@ trait AuthTrait
             return $this->redirect($this->Authentication->getLoginRedirect() ?? $this->getHomeRoute());
         }
 
-        if ($this->getRequest()->is('post') && !$result->isValid()) {
+        if ($this->getRequest()->is('post')) {
             $this->loadComponent('Flash');
             $this->Flash->error(__('Username and password mismatch'));
         }
@@ -101,7 +102,7 @@ trait AuthTrait
      *
      * @return \Cake\Http\Response|null
      */
-    public function logout(): ?Response
+    public function logout(): Response|null
     {
         $this->Authentication->logout();
 

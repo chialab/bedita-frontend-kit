@@ -26,9 +26,9 @@ class ObjectRoute extends DashedRoute
     protected array $filters = [];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function compile(): ?string
+    public function compile(): string
     {
         $compiled = parent::compile();
 
@@ -51,9 +51,9 @@ class ObjectRoute extends DashedRoute
      * @param array $context An array of the current request context.
      *   Contains information such as the current host, scheme, port, and base
      *   directory.
-     * @return bool|string Either false or a string URL.
+     * @return string|null Either false or a string URL.
      */
-    public function match(array $url, array $context = [])
+    public function match(array $url, array $context = []): string|null
     {
         if (empty($this->_compiledRoute)) {
             $this->compile();
@@ -66,11 +66,11 @@ class ObjectRoute extends DashedRoute
             return parent::match($url, $context);
         }
         if (isset($url['locale']) && !in_array('locale', $this->keys)) {
-            return false;
+            return null;
         }
         $this->checkEntity($entity);
         if ($this->checkFilters($entity) === false) {
-            return false;
+            return null;
         }
 
         foreach ($this->keys as $field) {
@@ -89,7 +89,7 @@ class ObjectRoute extends DashedRoute
      * @return void
      * @throws \RuntimeException
      */
-    protected function checkEntity($entity)
+    protected function checkEntity(ArrayAccess|array $entity): void
     {
         if (!$entity instanceof ArrayAccess && !is_array($entity)) {
             throw new RuntimeException(sprintf(
@@ -106,7 +106,7 @@ class ObjectRoute extends DashedRoute
      * @param \ArrayAccess|array $entity Entity value from the URL options.
      * @return bool
      */
-    protected function checkFilters($entity): bool
+    protected function checkFilters(ArrayAccess|array $entity): bool
     {
         if (empty($this->filters)) {
             return true;

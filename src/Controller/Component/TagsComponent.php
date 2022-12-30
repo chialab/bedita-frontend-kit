@@ -1,38 +1,46 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Tag;
+use BEdita\Core\Model\Table\TagsTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
 use InvalidArgumentException;
 
 /**
- * Tags component
- *
- * @property-read \BEdita\Core\Model\Table\TagsTable $Tags
+ * Tags component.
  */
 class TagsComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [];
 
-    /** {@inheritDoc} */
-    public function initialize(array $config)
+    /**
+     * Tags table.
+     *
+     * @var \BEdita\Core\Model\Table\TagsTable
+     */
+    public TagsTable $Tags;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
-        $this->loadModel('Tags');
+        $this->Tags = $this->fetchTable('Tags');
     }
 
     /**
@@ -59,7 +67,7 @@ class TagsComponent extends Component
      * Build tags subquery for filtering.
      *
      * @param \Cake\ORM\Table $table Tags table instance.
-     * @param (string|int)[] $tags Tags ids or names.
+     * @param array<string|int> $tags Tags ids or names.
      * @return \Cake\ORM\Query
      */
     protected function buildTagsSubquery(Table $table, array $tags): Query
@@ -85,14 +93,14 @@ class TagsComponent extends Component
      * Filter contents that has at least one of the given tags.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $tags Array of tag ids or names.
+     * @param array<string|int> $tags Array of tag ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
     public function filterByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
 
@@ -119,14 +127,14 @@ class TagsComponent extends Component
      * Filter contents that does not have any of the given tags
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $tags Array of tags ids or names.
+     * @param array<string|int> $tags Array of tags ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
     public function filterExcludeByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
 

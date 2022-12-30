@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use ArrayAccess;
@@ -6,10 +8,12 @@ use Cake\View\Helper;
 
 /**
  * Helper to set BEdita Manager refs
- *
  */
 class ManagerHelper extends Helper
 {
+    /**
+     * @inheritDoc
+     */
     protected $_defaultConfig = [
         'enabled' => true,
         'managerUrl' => null,
@@ -18,9 +22,9 @@ class ManagerHelper extends Helper
     /**
      * Return current object var from view vars
      *
-     * @return array|\ArrayAccess
+     * @return \ArrayAccess|array
      */
-    protected function getObject()
+    protected function getObject(): ArrayAccess|array|null
     {
         $candidates = array_filter([
             $this->getView()->get('_main'),
@@ -29,7 +33,7 @@ class ManagerHelper extends Helper
         ]);
         foreach ($candidates as $varName) {
             $var = $this->getView()->get($varName);
-            if (!empty($var) && (is_array($var) || $var instanceof \ArrayAccess)) {
+            if (!empty($var) && (is_array($var) || $var instanceof ArrayAccess)) {
                 return $var;
             }
         }
@@ -42,7 +46,7 @@ class ManagerHelper extends Helper
      *
      * @return string|null
      */
-    public function getViewUrl(): ?string
+    public function getViewUrl(): string|null
     {
         if (!$this->isEnabled()) {
             return null;
@@ -59,7 +63,7 @@ class ManagerHelper extends Helper
             return null;
         }
 
-        $managerEditUrl = $managerUrl . "/view/" . $object['id'];
+        $managerEditUrl = $managerUrl . '/view/' . $object['id'];
 
         return $managerEditUrl;
     }

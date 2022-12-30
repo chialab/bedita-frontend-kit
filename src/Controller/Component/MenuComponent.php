@@ -1,32 +1,38 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
+use BEdita\Core\Model\Table\TreesTable;
 use Cake\Controller\Component;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 
 /**
- * Menu component
- *
- * @property-read \BEdita\Core\Model\Table\Trees $Trees
+ * Menu component.
  */
 class MenuComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * Objects loader instance.
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
-    protected $loader;
+    protected TreeLoader $loader;
 
     /**
-     * Default configuration.
+     * Trees table.
      *
-     * @var array
+     * @var \BEdita\Core\Model\Table\TreesTable
+     */
+    public TreesTable $Trees;
+
+    /**
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'depth' => 3,
@@ -38,12 +44,14 @@ class MenuComponent extends Component
         ],
     ];
 
-    /** {@inheritDoc} */
-    public function initialize(array $config)
+    /**
+     * @inheritDoc
+     */
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
-        $this->loadModel('Trees');
+        $this->Tress = $this->fetchTable('Trees');
 
         $menuLoader = new ObjectsLoader(
             $this->getConfig('menuLoader.objectTypesConfig', []),
@@ -62,7 +70,7 @@ class MenuComponent extends Component
      * @param int $depth The depth of the menu for recursive loading.
      * @return \BEdita\Core\Model\Entity\Folder The root menu folder.
      */
-    public function load(string $id, ?array $options = null, ?array $hydrate = null, ?int $depth = null): Folder
+    public function load(string $id, array|null $options = null, array|null $hydrate = null, int|null $depth = null): Folder
     {
         if ($depth === null) {
             $depth = $this->getConfig('depth') ?? 1;

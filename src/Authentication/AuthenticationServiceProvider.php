@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Authentication;
 
 use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
 use Authentication\AuthenticationServiceProviderInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -15,9 +16,9 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
     /**
      * The auth service instance.
      *
-     * @var \Authentication\AuthenticationService
+     * @var \Authentication\AuthenticationServiceInterface
      */
-    protected AuthenticationService $authService;
+    protected AuthenticationServiceInterface $authService;
 
     /**
      * Create auth service provider.
@@ -25,7 +26,7 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
      * @param string|null $loginUrl The url of the login page.
      * @return void
      */
-    public function __construct($loginUrl = '/login')
+    public function __construct(string|null $loginUrl = '/login')
     {
         $this->authService = new AuthenticationService();
         $this->authService->setConfig([
@@ -59,7 +60,7 @@ class AuthenticationServiceProvider implements AuthenticationServiceProviderInte
     /**
      * @inheritDoc
      */
-    public function getAuthenticationService(ServerRequestInterface $request, ResponseInterface $response)
+    public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
     {
         return $this->authService;
     }

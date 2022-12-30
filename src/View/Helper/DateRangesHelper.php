@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\DateRange;
@@ -8,6 +10,7 @@ use Cake\Log\Log;
 use Cake\View\Helper;
 use DateTimeInterface;
 use Generator;
+use const SORT_ASC;
 
 /**
  * Date helper
@@ -15,9 +18,7 @@ use Generator;
 class DateRangesHelper extends Helper
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'single' => '{0,date,long}, {0,time,short}',
@@ -79,7 +80,7 @@ class DateRangesHelper extends Helper
      *
      * @param \Cake\I18n\FrozenTime $start Beginning of range.
      * @param \Cake\I18n\FrozenTime $end End of range.
-     * @return \Generator|string[]
+     * @return \Generator|array<string>
      */
     protected function getFormats(FrozenTime $start, FrozenTime $end): Generator
     {
@@ -106,18 +107,18 @@ class DateRangesHelper extends Helper
     /**
      * Find closest range in a list of date ranges.
      *
-     * @param \BEdita\Core\Model\Entity\DateRange[] $ranges Date ranges.
+     * @param array<\BEdita\Core\Model\Entity\DateRange> $ranges Date ranges.
      * @param string|null $now Relative to date.
      * @return \BEdita\Core\Model\Entity\DateRange|null
      */
-    public function getClosestRange(array $ranges, string $now = null): ?DateRange
+    public function getClosestRange(array $ranges, string|null $now = null): DateRange|null
     {
         $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
         $sorted = collection($ranges)
             ->filter(fn (DateRange $dr): bool => $dr->start_date !== null)
             ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
-            ->filter(fn (DateRange $dr): bool => $dr->start_date->gte($now) || ($dr->end_date !== null && $dr->end_date->gte($now)))
+            ->filter(fn (DateRange $dr): bool => (new FrozenTime($dr->start_date))->gte($now) || ($dr->end_date !== null && (new FrozenTime($dr->end_date))->gte($now)))
             ->first();
         if ($currentOrFuture !== null) {
             // Found an event overlapping `$now` point in time, or the closest one in the future.
@@ -130,14 +131,14 @@ class DateRangesHelper extends Helper
     /**
      * Sort a list of objects by their closest date.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to sort.
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects to sort.
      * @param int $dir either SORT_DESC or SORT_ASC.
      * @return \Cake\Collection\Collection Sorted objects.
      */
-    public function sortByClosestRange(iterable $objects, $dir = \SORT_ASC): iterable
+    public function sortByClosestRange(iterable $objects, int $dir = SORT_ASC): iterable
     {
         return collection($objects)
-            ->sortBy(function (ObjectEntity $obj): ?int {
+            ->sortBy(function (ObjectEntity $obj): int|null {
                 $range = $this->getClosestRange($obj->date_ranges ?? []);
                 if ($range === null) {
                     return PHP_INT_MIN;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Chialab\FrontendKit;
 
@@ -11,9 +12,9 @@ use Cake\Core\Configure;
 class Plugin extends BasePlugin
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 

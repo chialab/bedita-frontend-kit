@@ -1,38 +1,46 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Category;
+use BEdita\Core\Model\Table\CategoriesTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
 use InvalidArgumentException;
 
 /**
- * Categories component
- *
- * @property-read \BEdita\Core\Model\Table\CategoriesTable $Categories
+ * Categories component.
  */
 class CategoriesComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [];
 
-    /** {@inheritDoc} */
-    public function initialize(array $config)
+    /**
+     * Categories table.
+     *
+     * @var \BEdita\Core\Model\Table\CategoriesTable
+     */
+    public CategoriesTable $Categories;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
-        $this->loadModel('Categories');
+        $this->Categories = $this->fetchTable('Categories');
     }
 
     /**
@@ -42,7 +50,7 @@ class CategoriesComponent extends Component
      * @param int|null $parentId ID of parent category.
      * @return \Cake\ORM\Query
      */
-    public function load(?string $type = null, ?int $parentId = null): Query
+    public function load(string|null $type = null, int|null $parentId = null): Query
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true]);
@@ -99,31 +107,17 @@ class CategoriesComponent extends Component
     }
 
     /**
-     * Add a filter by category id.
-     *
-     * @param \Cake\ORM\Query $query The current query.
-     * @param int $id ID of the category.
-     * @return \Cake\ORM\Query
-     *
-     * @deprecated Use {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent::filterByCategories()} instead.
-     */
-    public function filterById(Query $query, int $id): Query
-    {
-        return $this->filterByCategories($query, [$id]);
-    }
-
-    /**
      * Build categories subquery for filtering.
      *
      * @param \Cake\ORM\Table $table Categories table instance.
-     * @param (string|int)[] $categories Categories ids or names.
+     * @param array<string|int> $categories Categories ids or names.
      * @return \Cake\ORM\Query
      */
     protected function buildCategoriesSubquery(Table $table, array $categories): Query
     {
         return $table->find()
             ->where(fn (QueryExpression $exp): QueryExpression => $exp
-                ->or_(function (QueryExpression $exp) use ($categories, $table): QueryExpression {
+                ->or(function (QueryExpression $exp) use ($categories, $table): QueryExpression {
                     $ids = array_filter($categories, 'is_numeric');
                     if (!empty($ids)) {
                         $exp = $exp->in($table->aliasField('id'), $ids);
@@ -142,14 +136,14 @@ class CategoriesComponent extends Component
      * Filter contents that are in one or more of the given categories.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $categories Array of category ids or names.
+     * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
     public function filterByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
 
@@ -176,14 +170,14 @@ class CategoriesComponent extends Component
      * Filter contents that are not in any of the given categories.
      *
      * @param \Cake\ORM\Query $query The current query.
-     * @param (string|int)[] $categories Array of category ids or names.
+     * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
      * @return \Cake\ORM\Query
      */
     public function filterExcludeByCategories(Query $query, array $categories, string $strategy = 'in'): Query
     {
         return $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
-            /** @var \Cake\ORM\Table */
+            /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
 

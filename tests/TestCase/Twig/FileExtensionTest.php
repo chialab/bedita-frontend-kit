@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\Twig;
 
 use Cake\TestSuite\TestCase;
@@ -48,7 +50,6 @@ class FileExtensionTest extends TestCase
      * Test {@see FileExtension::formatFileSize()}.
      *
      * @return void
-     *
      * @dataProvider formatFileSizeProvider()
      * @covers ::formatFileSize()
      */
@@ -76,7 +77,6 @@ class FileExtensionTest extends TestCase
      * Test {@see FileExtension::mediaTypeCategory()}.
      *
      * @return void
-     *
      * @dataProvider mediaTypeCateoryProvider()
      * @covers ::mediaTypeCategory()
      */

@@ -12,10 +12,11 @@ use BEdita\Core\Model\Entity\Translation;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
+use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use Iterator;
@@ -24,7 +25,6 @@ use Iterator;
  * Objects loader.
  *
  * @package Chialab\FrontendKit\Model
- *
  * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
  * @property \BEdita\Core\Model\Table\ObjectsTable $Objects
  */
@@ -32,22 +32,21 @@ class ObjectsLoader
 {
     use I18nTrait;
     use LocatorAwareTrait;
-    use ModelAwareTrait;
 
     /**
      * Loading configuration on a per-object type basis.
      *
-     * @var array[]
+     * @var array<array>
      */
-    protected $objectTypesConfig = [];
+    protected array $objectTypesConfig = [];
 
     /**
      * Map of associations that need to be hydrated to the actual object types
      * every time they are fetched, to the maximum depth for this auto-hydration.
      *
-     * @var int[]
+     * @var array<int>
      */
-    protected $autoHydrateAssociations = [];
+    protected array $autoHydrateAssociations = [];
 
     /**
      * Objects loader constructor.
@@ -60,8 +59,8 @@ class ObjectsLoader
         $this->objectTypesConfig = $objectTypesConfig;
         $this->autoHydrateAssociations = $autoHydrateAssociations;
 
-        $this->loadModel('BEdita/Core.ObjectTypes');
-        $this->loadModel('BEdita/Core.Objects');
+        $this->ObjectTypes = $this->fetchTable('BEdita/Core.ObjectTypes');
+        $this->Objects = $this->fetchTable('BEdita/Core.Objects');
     }
 
     /**
@@ -73,7 +72,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadObject(string $id, string $type = 'objects', ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadObject(string $id, string $type = 'objects', array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -91,7 +90,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, ?string $type = null, ?array $options = null, ?array $hydrate = null): ObjectEntity
+    public function loadFullObject(string $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -128,9 +127,9 @@ class ObjectsLoader
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadObjects(array $filter, string $type = 'objects', ?array $options = null, ?array $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): Query
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
@@ -147,9 +146,9 @@ class ObjectsLoader
      * @param array|null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadRelatedObjects(string $id, string $type, string $relation, ?array $filter = null, ?array $options = null, ?array $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): Query
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);
@@ -161,12 +160,31 @@ class ObjectsLoader
     /**
      * Hydrate an heterogeneous list of objects to their type-specific properties and relations.
      *
-     * @param \BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @param array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     public function hydrateObjects(array $objects): CollectionInterface
     {
         return $this->toConcreteTypes($objects, 1);
+    }
+
+    /**
+     * Get assocation by relation name.
+     *
+     * @param \Cake\ORM\Table The table.
+     * @param string $name The relation name.
+     * @return \Cake\ORM\Association|null The association object, if found.
+     */
+    protected function getAssociation(Table $table, string $name): Association|null
+    {
+        $associations = $table->associations()->keys();
+        foreach ($associations as $key) {
+            if (strtolower($key) === strtolower($name)) {
+                return $table->getAssociation($key);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -179,7 +197,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function loadSingle(int $primaryKey, ObjectType $objectType, ?array $options, int $depth = 1, ?array $hydrate = null): ObjectEntity
+    protected function loadSingle(int $primaryKey, ObjectType $objectType, array|null $options, int $depth = 1, array|null $hydrate = null): ObjectEntity
     {
         // Fetch default options.
         if ($options === null) {
@@ -207,9 +225,9 @@ class ObjectsLoader
      * @param array|null $options Options.
      * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    protected function loadMulti(ObjectType $objectType, array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
+    protected function loadMulti(ObjectType $objectType, array $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -225,7 +243,7 @@ class ObjectsLoader
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
         $query = $action(static::includeTranslations($contain) ? compact('filter', 'contain') : compact('filter', 'lang', 'contain'));
-        /** @var \Cake\ORM\Table */
+        /** @var \Cake\ORM\Table $table */
         $table = $query->getRepository();
 
         return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $lateContain, $table, $lang): iterable {
@@ -252,7 +270,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \Cake\ORM\Query
      */
-    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, ?array $filter, ?array $options, int $depth = 1, ?array $hydrate = null): Query
+    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, array|null $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
     {
         // Fetch default options.
         if ($options === null) {
@@ -262,7 +280,7 @@ class ObjectsLoader
         $lang = Hash::get($options, 'lang', $this->getLang());
         $contain = static::prepareContains(Hash::get($options, 'include', ''), false);
         $table = $this->getTableLocator()->get($objectType->alias);
-        $association = $table->getAssociation($relation);
+        $association = $this->getAssociation($table, $relation);
         $action = new ListRelatedObjectsAction(compact('association'));
 
         /** @var \Cake\ORM\Query $query */
@@ -292,9 +310,9 @@ class ObjectsLoader
     /**
      * Set `relation` property for contained entities, using what is stored in `_joinData`, if present.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects List of objects.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects List of objects.
      * @param array $containedAssociations List of contained associations.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function setJoinData(iterable $objects, array $containedAssociations): CollectionInterface
     {
@@ -314,7 +332,7 @@ class ObjectsLoader
                     if (!$table->associations()->has($name)) {
                         continue;
                     }
-                    $prop = $table->getAssociation($name)->getProperty();
+                    $prop = $this->getAssociation($table, $name)->getProperty();
 
                     if (!$object->has($prop) || $object->isEmpty($prop)) {
                         continue;
@@ -331,7 +349,7 @@ class ObjectsLoader
                         return;
                     }
 
-                    (new Collection($related))->each(function (Entity $e) use ($fix) {
+                    (new Collection($related))->each(function (Entity $e) use ($fix): void {
                         // related entity (such as a Translation) may not be an ObjectEntity.
                         if ($e instanceof ObjectEntity) {
                             $fix($e);
@@ -344,9 +362,9 @@ class ObjectsLoader
     /**
      * Given a set of objects, re-map them to their concrete type implementation.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects to re-map to their concrete types.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects to re-map to their concrete types.
      * @param int $depth Depth level.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
     protected function toConcreteTypes(iterable $objects, int $depth): CollectionInterface
     {
@@ -384,7 +402,7 @@ class ObjectsLoader
      * @param string|null $lang Language code to use.
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    protected function dangerouslyTranslateFields(ObjectEntity $object, ?string $lang): ObjectEntity
+    protected function dangerouslyTranslateFields(ObjectEntity $object, string|null $lang): ObjectEntity
     {
         if ($lang === null || $lang === $object->lang) {
             return $object;
@@ -423,12 +441,12 @@ class ObjectsLoader
     /**
      * Automatically hydrate related objects, up to the configured maximum depth.
      *
-     * @param iterable|\BEdita\Core\Model\Entity\ObjectEntity[] $objects Objects whose related resources must be hydrated.
+     * @param iterable|array<\BEdita\Core\Model\Entity\ObjectEntity> $objects Objects whose related resources must be hydrated.
      * @param int $depth Maximum depth.
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[]
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    protected function autoHydrateAssociations(iterable $objects, int $depth, ?array $options = null): CollectionInterface
+    protected function autoHydrateAssociations(iterable $objects, int $depth, array|null $options = null): CollectionInterface
     {
         if (!($objects instanceof CollectionInterface)) {
             $objects = new Collection($objects);
@@ -515,9 +533,9 @@ class ObjectsLoader
      *
      * @param int $depth Depth level.
      * @param array|null $options Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return string[]
+     * @return array<string>
      */
-    protected function getAssociationsToHydrate(int $depth, ?array $options = null): array
+    protected function getAssociationsToHydrate(int $depth, array|null $options = null): array
     {
         $hydrateAssociations = $this->autoHydrateAssociations;
         if ($options !== null) {
@@ -541,7 +559,7 @@ class ObjectsLoader
      * @param bool|null $limited Include only associations with or without a limit.
      * @return array
      */
-    protected static function prepareContains(string $include, ?bool $limited = null): array
+    protected static function prepareContains(string $include, bool|null $limited = null): array
     {
         $contains = explode(',', $include);
 
@@ -564,7 +582,7 @@ class ObjectsLoader
                 return $contains;
             }
 
-            $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
+            $contains[$assoc] = fn (Query $query): Query => $query->limit($limit);
 
             return $contains;
         }, []);

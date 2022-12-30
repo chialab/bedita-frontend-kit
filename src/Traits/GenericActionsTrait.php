@@ -17,6 +17,7 @@ namespace Chialab\FrontendKit\Traits;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
@@ -37,22 +38,24 @@ trait GenericActionsTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest();
+    abstract public function getRequest(): ServerRequest;
 
     /**
      * Handles pagination of records in Table objects.
      *
-     * @param \Cake\ORM\Table|string|\Cake\ORM\Query|null $object Table to paginate
+     * @param \Cake\ORM\Table|\Cake\ORM\Query|string|null $object Table to paginate
      * @param array $settings The settings/configuration used for pagination.
      * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     abstract public function paginate($object = null, array $settings = []);
 
     /**
      * Load folder's children using paginations and query filters.
      *
-     * @param \BEdita\Core\Model\Entity\Folder $folder to load children.
-     * @return \BEdita\Core\Model\Entity\ObjectEntity[] An array of children.
+     * @param string|int $id Folder id to load children.
+     * @return array<\BEdita\Core\Model\Entity\ObjectEntity> An array of children.
      */
     protected function loadFilteredChildren(Folder $folder): array
     {
@@ -60,7 +63,7 @@ trait GenericActionsTrait
         if ($order) {
             $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
         } else {
-            $order = ['Trees.tree_left'];
+            $order = ['Trees.tree_left' => 'ASC'];
         }
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
@@ -75,7 +78,7 @@ trait GenericActionsTrait
      * @param string $type Object type.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchBeforeLoadEvent(string $uname, string $type): ?ObjectEntity
+    protected function dispatchBeforeLoadEvent(string $uname, string $type): ObjectEntity|null
     {
         $event = $this->dispatchEvent('Controller.beforeObjectLoad', compact('uname', 'type'));
         $result = $event->getResult();
@@ -92,7 +95,7 @@ trait GenericActionsTrait
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null The requested object entity.
      */
-    protected function dispatchAfterLoadEvent(ObjectEntity $object): ?ObjectEntity
+    protected function dispatchAfterLoadEvent(ObjectEntity $object): ObjectEntity|null
     {
         $event = $this->dispatchEvent('Controller.afterObjectLoad', compact('object'));
         $result = $event->getResult();
@@ -109,7 +112,7 @@ trait GenericActionsTrait
      * @param \BEdita\Core\Model\Entity\ObjectEntity $object Loaded object.
      * @return \Cake\Http\Response|null The resulting response of the events.
      */
-    protected function dispatchBeforeRenderEvent(ObjectEntity $object): ?Response
+    protected function dispatchBeforeRenderEvent(ObjectEntity $object): Response|null
     {
         $event = $this->dispatchEvent('Controller.beforeObjectRender', compact('object'));
         $result = $event->getResult();
@@ -126,7 +129,7 @@ trait GenericActionsTrait
      * @param string $uname Object id or uname.
      * @return \Cake\Http\Response|null
      */
-    public function objects(string $uname): ?Response
+    public function objects(string $uname): Response|null
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
@@ -162,7 +165,7 @@ trait GenericActionsTrait
      * @param string $uname Object `id` or `uname`.
      * @return \Cake\Http\Response|null
      */
-    public function object(string $uname): ?Response
+    public function object(string $uname): Response|null
     {
         $entity = $this->Objects->loadObject($uname, 'objects', [], []);
         $currentRoute = $this->getRequest()->getParam('_matchedRoute');
@@ -175,7 +178,7 @@ trait GenericActionsTrait
             }
 
             $out = $route->match(['_entity' => $entity] + $route->defaults + $params, []);
-            if ($out !== false) {
+            if ($out !== null) {
                 return $this->redirect($out);
             }
         }
@@ -218,7 +221,7 @@ trait GenericActionsTrait
      * @param string $path Object path.
      * @return \Cake\Http\Response|null
      */
-    public function fallback(string $path): ?Response
+    public function fallback(string $path): Response|null
     {
         $ancestors = $this->Publication->loadObjectPath($path)->toList();
         $leaf = array_pop($ancestors);

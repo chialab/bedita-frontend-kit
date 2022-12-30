@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
+use BEdita\Core\Model\Table\TreesTable;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 use InvalidArgumentException;
@@ -17,21 +18,18 @@ use InvalidArgumentException;
  * Publication component
  *
  * @property-read \Chialab\FrontendKit\Controller\Component\ObjectsComponent $Objects
- * @property-read \BEdita\Core\Model\Table\TreesTable $Trees
  */
 class PublicationComponent extends Component
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public $components = ['Chialab/FrontendKit.Objects'];
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'publication' => null,
@@ -46,14 +44,21 @@ class PublicationComponent extends Component
      *
      * @var \Chialab\FrontendKit\Model\TreeLoader
      */
-    protected $loader;
+    protected TreeLoader $loader;
 
     /**
      * Current publication
      *
      * @var \BEdita\Core\Model\Entity\Folder
      */
-    protected $publication;
+    protected Folder $publication;
+
+    /**
+     * Trees table.
+     *
+     * @var \BEdita\Core\Model\Table\TreesTable
+     */
+    public TreesTable $Trees;
 
     /**
      * Initialization hook method.
@@ -65,7 +70,7 @@ class PublicationComponent extends Component
     {
         parent::initialize($config);
 
-        $this->loadModel('BEdita/Core.Trees');
+        $this->Trees = $this->fetchTable('BEdita/Core.Trees');
 
         $publicationUname = $this->getConfig('publication');
         if (empty($publicationUname)) {
@@ -103,7 +108,7 @@ class PublicationComponent extends Component
      * Load all objects in a path.
      *
      * @param string $path Path.
-     * @return \Cake\Collection\CollectionInterface|\BEdita\Core\Model\Entity\ObjectEntity[] List of objects, the root element in the path being the first in the list, the leaf being the latter.
+     * @return \Cake\Collection\CollectionInterface|array<\BEdita\Core\Model\Entity\ObjectEntity> List of objects, the root element in the path being the first in the list, the leaf being the latter.
      */
     public function loadObjectPath(string $path): CollectionInterface
     {
@@ -117,7 +122,7 @@ class PublicationComponent extends Component
      * @param int|null $via If set, restrict paths that include this parent ID.
      * @return array
      */
-    public function getViablePaths(int $id, ?int $via = null): array
+    public function getViablePaths(int $id, int|null $via = null): array
     {
         return $this->loader->getViablePaths($id, $this->getPublication()->id, $via);
     }

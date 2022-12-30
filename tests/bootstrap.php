@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Test suite bootstrap for Plugin.
  *
@@ -20,15 +22,6 @@ use Cake\Routing\Router;
 use Cake\Utility\Security;
 use Chialab\FrontendKit\Test\TestApp\Application;
 use Chialab\FrontendKit\Test\TestApp\Filesystem\Adapter\NullAdapter;
-
-// Tokens introduced in PHP 7.4
-class PHP_Token_COALESCE_EQUAL extends PHP_Token
-{
-}
-
-class PHP_Token_FN extends PHP_Token
-{
-}
 
 $findRoot = function ($root) {
     do {
@@ -55,6 +48,7 @@ define('CONFIG', ROOT . DS . 'config' . DS);
 define('CACHE', TMP . 'cache' . DS);
 define('CORE_PATH', $root . DS . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 
+Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 Configure::write('debug', true);
 Configure::write('App', [
     'namespace' => 'Chialab\FrontendKit\Test\TestApp',
@@ -95,7 +89,7 @@ ConnectionManager::setConfig('test', [
 ConnectionManager::alias('test', 'default');
 
 Router::reload();
-Security::setSalt('BEDITA');
+Security::setSalt('BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA|BEDITA');
 
 FilesystemRegistry::setConfig([
     'default' => ['className' => NullAdapter::class],
@@ -108,6 +102,6 @@ $app->pluginBootstrap();
 
 // clear all before running tests
 TableRegistry::getTableLocator()->clear();
-Cache::clear(false, '_cake_core_');
-Cache::clear(false, '_cake_model_');
-Cache::clear(false, '_bedita_object_types_');
+Cache::clear('_cake_core_');
+Cache::clear('_cake_model_');
+Cache::clear('_bedita_object_types_');

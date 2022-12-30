@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
@@ -46,7 +48,7 @@ class GenericActionsTraitTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -64,7 +66,7 @@ class GenericActionsTraitTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->controller);
 
@@ -139,16 +141,16 @@ class GenericActionsTraitTest extends TestCase
     public function testFallback($url, $objectUname, $children, $related, $parentUname, $ancestorUnames, $body)
     {
         [$path, $filters] = $url;
-        $this->controller->request = $this->controller->request->withQueryParams($filters);
+        $this->controller->request = $this->controller->getRequest()->withQueryParams($filters);
 
         $response = $this->controller->fallback($path);
 
-        /** @var \BEdita\Core\Model\Entity\Folder */
-        $object = $this->controller->viewVars['object'];
-        /** @var \BEdita\Core\Model\Entity\Folder */
-        $parent = $this->controller->viewVars['parent'];
-        /** @var \BEdita\Core\Model\Entity\Folder[] */
-        $ancestors = $this->controller->viewVars['ancestors'];
+        /** @var \BEdita\Core\Model\Entity\Folder $object */
+        $object = $this->controller->viewBuilder()->getVar('object');
+        /** @var \BEdita\Core\Model\Entity\Folder $parent */
+        $parent = $this->controller->viewBuilder()->getVar('parent');
+        /** @var \BEdita\Core\Model\Entity\Folder[] $ancestors */
+        $ancestors = $this->controller->viewBuilder()->getVar('ancestors');
 
         // assert the object has been correctly load
         static::assertNotNull($object);
@@ -156,10 +158,10 @@ class GenericActionsTraitTest extends TestCase
 
         if ($children) {
             // if folder, check the children are loaded too
-            static::assertSame(array_keys($children), collection($this->controller->viewVars['children'])->extract('uname')->toArray());
+            static::assertSame(array_keys($children), collection($this->controller->viewBuilder()->getVar('children'))->extract('uname')->toArray());
 
             // check children tree params
-            foreach ($this->controller->viewVars['children'] as $child) {
+            foreach ($this->controller->viewBuilder()->getVar('children') as $child) {
                 $params = $children[$child->uname];
                 foreach ($params as $key => $param) {
                     static::assertSame($param, $child->relation[$key]);
@@ -167,7 +169,7 @@ class GenericActionsTraitTest extends TestCase
             }
         } else {
             // children variable should not be set if not a folder
-            static::assertFalse(isset($this->controller->viewVars['children']));
+            static::assertNull($this->controller->viewBuilder()->getVar('children'));
         }
 
         // assert main object relations are loaded

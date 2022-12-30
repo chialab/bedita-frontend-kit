@@ -6,28 +6,30 @@ namespace Chialab\FrontendKit\Middleware;
 use Cake\Http\ServerRequest;
 use Chialab\Ip\Address;
 use Chialab\Ip\Subnet;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Traversable;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Middleware to set trusted proxies on the incoming request, thus reliably reading actual client IP.
  */
-class TrustedProxiesMiddleware
+class TrustedProxiesMiddleware implements MiddlewareInterface
 {
     /**
      * List of trusted proxies.
      *
-     * @var string[]
+     * @var array<string>
      */
     protected array $trustedProxies = [];
 
     /**
      * Compiled list of subnets.
      *
-     * @var \Chialab\Ip\Subnet[]|null
+     * @var array<\Chialab\Ip\Subnet>|null
      */
-    protected ?array $subnets;
+    protected array|null $subnets;
 
     /**
      * Middleware constructor.
@@ -43,7 +45,7 @@ class TrustedProxiesMiddleware
     /**
      * Iterate through trusted proxies, compiled as {@see \Chialab\Ip\Subnet} objects.
      *
-     * @return \Chialab\Ip\Subnet[]
+     * @return array<\Chialab\Ip\Subnet>
      */
     protected function compile(): array
     {
@@ -78,7 +80,7 @@ class TrustedProxiesMiddleware
     {
         try {
             $address = Address::parse($remoteAddress);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return false;
         }
 
@@ -92,17 +94,12 @@ class TrustedProxiesMiddleware
     }
 
     /**
-     * Invoke method.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Message\ResponseInterface $response The response.
-     * @param callable $next Callback to invoke the next middleware.
-     * @return \Psr\Http\Message\ResponseInterface A response
+     * @inheritDoc
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (!$request instanceof ServerRequest || empty($this->trustedProxies)) {
-            return $next($request, $response);
+            return $handler->handle($request);
         }
 
         while (true) {
@@ -120,6 +117,6 @@ class TrustedProxiesMiddleware
             $request->setTrustedProxies(array_merge($trustedProxies, [$remoteAddress]));
         }
 
-        return $next($request, $response);
+        return $handler->handle($request);
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -14,18 +16,18 @@
 namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
+use Cake\TwigView\View\TwigView;
 use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
-use WyriHaximus\TwigView\View\TwigView;
 
 /**
  * Application View
  *
  * Your application's default view class
  *
- * @link https://book.cakephp.org/3/en/views.html#the-app-view
+ * @link https://book.cakephp.org/4/en/views.html#the-app-view
  */
 class AppView extends TwigView implements TemplateExistsInterface
 {
@@ -38,13 +40,9 @@ class AppView extends TwigView implements TemplateExistsInterface
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
-
-        $this->getTwig()->addExtension(new FileExtension());
-        $this->getTwig()->addExtension(new I18nExtension());
-        $this->getTwig()->addExtension(new SortByExtension());
 
         $this->loadHelper('Flash');
         $this->loadHelper('Form');
@@ -54,7 +52,9 @@ class AppView extends TwigView implements TemplateExistsInterface
         $this->loadHelper('Url');
         $this->loadHelper('BEdita/I18n.I18n');
         $this->loadHelper('Chialab/Rna.Rna');
+        $this->loadHelper('Chialab/FrontendKit.Metadata');
         $this->loadHelper('Chialab/FrontendKit.DateRanges');
+        $this->loadHelper('Chialab/FrontendKit.Placeholders');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
 
         $fallbackImage = Configure::read('FallbackImage');
@@ -80,10 +80,23 @@ class AppView extends TwigView implements TemplateExistsInterface
     /**
      * @inheritDoc
      */
+    protected function initializeExtensions(): void
+    {
+        parent::initializeExtensions();
+
+        $twig = $this->getTwig();
+        $twig->addExtension(new FileExtension());
+        $twig->addExtension(new I18nExtension());
+        $twig->addExtension(new SortByExtension());
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function templateExists($name): bool
     {
         try {
-            return is_string($this->_getViewFileName($name));
+            return is_string($this->_getTemplateFileName($name));
         } catch (MissingTemplateException $err) {
             return false;
         }

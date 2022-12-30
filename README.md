@@ -1,6 +1,6 @@
 # Chialab/FrontendKit
 
-The **Frontend Kit** is a [BEdita 4](https://www.bedita.com/) plugin designed to help in developing frontends.  
+The **Frontend Kit** is a [BEdita 5](https://www.bedita.com/) plugin designed to help in developing frontends.
 It covers objects routing and loading, views composition and auth-based staging sites.
 
 ## Usage

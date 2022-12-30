@@ -43,7 +43,7 @@ class LocaleUrlFilter
      * @param \Cake\Http\ServerRequest|null $request The request.
      * @return array Updated params.
      */
-    public function __invoke(array $params, ?ServerRequest $request = null): array
+    public function __invoke(array $params, ServerRequest|null $request = null): array
     {
         if (isset($params[$this->param])) {
             if ($params[$this->param] === false) {

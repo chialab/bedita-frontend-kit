@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
@@ -46,7 +48,7 @@ class CategoriesComponentTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $registry = new ComponentRegistry();
@@ -58,7 +60,7 @@ class CategoriesComponentTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Categories);
 
@@ -89,7 +91,6 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     *
      * @covers ::filterByCategories()
      * @dataProvider filterByCategoriesProvider()
      */
@@ -127,7 +128,6 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     *
      * @covers ::filterExcludeByCategories()
      * @dataProvider filterExcludeByCategoriesProvider()
      */

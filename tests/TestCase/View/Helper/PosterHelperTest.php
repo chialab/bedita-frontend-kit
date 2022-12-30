@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use BEdita\Core\Model\Entity\Media;
@@ -35,7 +37,7 @@ class PosterHelperTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +50,7 @@ class PosterHelperTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Poster);
 
@@ -98,7 +100,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     *
      * @covers ::orientation()
      */
     public function testOrientationWithPosterArray()
@@ -115,7 +116,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     *
      * @covers ::orientation()
      */
     public function testOrientationWithPosterCollection()
@@ -132,7 +132,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::exists()}.
      *
      * @return void
-     *
      * @covers ::exists()
      */
     public function testExistsWithProviderThumbnail()
@@ -147,7 +146,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::url()}.
      *
      * @return void
-     *
      * @covers ::url()
      */
     public function testUrlWithProviderThumbnail()

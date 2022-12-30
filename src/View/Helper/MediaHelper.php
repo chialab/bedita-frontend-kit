@@ -17,7 +17,7 @@ use Cake\View\Helper;
 class MediaHelper extends Helper
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'fallbackImage' => null,
@@ -28,7 +28,7 @@ class MediaHelper extends Helper
      *
      * @return string|null
      */
-    public function getFallbackImage(): ?string
+    public function getFallbackImage(): string|null
     {
         return $this->getConfig('fallbackImage');
     }
@@ -40,7 +40,7 @@ class MediaHelper extends Helper
      * @param string|null $type Object type name to check, or `null` to accept any Media entity regardless of concrete type.
      * @return bool
      */
-    public function isMedia(?ObjectEntity $object, ?string $type = null): bool
+    public function isMedia(ObjectEntity|null $object, string|null $type = null): bool
     {
         if ($object === null || !$object instanceof Media) {
             return false;
@@ -59,7 +59,7 @@ class MediaHelper extends Helper
      * @param \BEdita\Core\Model\Entity\Media $media Media entity.
      * @return \BEdita\Core\Model\Entity\Stream|null
      */
-    public function getStream(Media $media): ?Stream
+    public function getStream(Media $media): Stream|null
     {
         if (empty($media->media_url)) {
             // Dirty workaround to load streams that are fetched only on media_url property access.
@@ -93,7 +93,7 @@ class MediaHelper extends Helper
             return false;
         }
 
-        return !$filesystemCheck || FilesystemRegistry::getMountManager()->has($stream->uri);
+        return !$filesystemCheck || FilesystemRegistry::getMountManager()->fileExists($stream->uri);
     }
 
     /**

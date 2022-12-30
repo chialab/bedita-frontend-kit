@@ -3,16 +3,19 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Middleware;
 
+use Laminas\Diactoros\Response\EmptyResponse;
 use Migrations\Migrations;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Status middleware, useful to create an endpoint for healthchecks.
  *
  * The endpoint will return a 500 error code if any migration has failed or is missing, or a 204 if everything is ok.
  */
-class StatusMiddleware
+class StatusMiddleware implements MiddlewareInterface
 {
     /**
      * List of plugins to check for migrations.
@@ -41,19 +44,15 @@ class StatusMiddleware
     }
 
     /**
-     * Invoke method.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Message\ResponseInterface $response The response.
-     * @param callable $next Callback to invoke the next middleware.
-     * @return \Psr\Http\Message\ResponseInterface A response
+     * @inheritDoc
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($request->getUri()->getPath() !== $this->path) {
-            return $next($request, $response);
+            return $handler->handle($request);
         }
 
+        $response = new EmptyResponse();
         $migrations = new Migrations();
         if (!$this->checkMigrated($migrations->status())) {
             return $response->withStatus(500);

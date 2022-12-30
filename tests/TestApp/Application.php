@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Test\TestApp;
 
 use Cake\Http\BaseApplication;
+use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\RoutingMiddleware;
 
 /**
@@ -14,9 +16,9 @@ use Cake\Routing\Middleware\RoutingMiddleware;
 class Application extends BaseApplication
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function bootstrap()
+    public function bootstrap(): void
     {
         $this->addPlugin('BEdita/Core');
     }
@@ -25,7 +27,7 @@ class Application extends BaseApplication
      * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue to set in your App Class
      * @return \Cake\Http\MiddlewareQueue
      */
-    public function middleware($middlewareQueue)
+    public function middleware($middlewareQueue): MiddlewareQueue
     {
         return $middlewareQueue->add(new RoutingMiddleware($this));
     }

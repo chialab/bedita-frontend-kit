@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\Controller\Component;
 
 use Cake\Controller\Component;
@@ -10,9 +12,7 @@ use Cake\Utility\Hash;
 class FiltersComponent extends Component
 {
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'params' => [

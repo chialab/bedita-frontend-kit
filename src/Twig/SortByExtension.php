@@ -53,8 +53,8 @@ class SortByExtension extends AbstractExtension
         }
 
         usort($items, function ($a, $b) use ($fields) {
-            $aVals = array_filter(array_map(fn($attr) => Hash::get($a, $attr), $fields));
-            $bVals = array_filter(array_map(fn($attr) => Hash::get($b, $attr), $fields));
+            $aVals = array_filter(array_map(fn ($attr) => Hash::get($a, $attr), $fields));
+            $bVals = array_filter(array_map(fn ($attr) => Hash::get($b, $attr), $fields));
 
             while (true) {
                 $aVal = array_shift($aVals);

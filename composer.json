@@ -1,22 +1,23 @@
 {
     "name": "chialab/frontend-kit",
-    "description": "BEdita 4 plugin to help with development of websites.",
+    "description": "BEdita 5 plugin to help with development of websites.",
     "type": "cakephp-plugin",
     "license": "MIT",
     "require": {
+        "php": ">=8.1",
         "ext-json": "*",
-        "bedita/core": "^4.7.0",
-        "cakephp/cakephp": "^3.8",
-        "wyrihaximus/twig-view": "^4.3",
+        "bedita/core": "^5.0.0",
+        "bedita/i18n": "^4.0",
+        "cakephp/cakephp": "^4.0",
+        "cakephp/authentication": "^2.0",
+        "cakephp/twig-view": "^1.3",
         "chialab/rna-cakephp": "^0.2.1",
-        "bedita/i18n": "^3.2",
-        "cakephp/authentication": "^1.0",
         "chialab/ip": "^1.0"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "^3.0",
+        "cakephp/cakephp-codesniffer": "^5.0",
         "cakephp/plugin-installer": "^1.0",
-        "phpunit/phpunit": "^5.7.14|^6.0"
+        "phpunit/phpunit": "~8.5.0 || ^9.3"
     },
     "autoload": {
         "psr-4": {
@@ -31,18 +32,14 @@
         }
     },
     "scripts": {
-        "cs-setup": [
-            "vendor/bin/phpcs --config-set installed_paths vendor/cakephp/cakephp-codesniffer",
-            "vendor/bin/phpcs --config-set default_standard CakePHP",
-            "vendor/bin/phpcs --config-set colors 1"
-        ],
-        "cs-check": "vendor/bin/phpcs --colors -p --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests",
-        "cs-fix": "vendor/bin/phpcbf --colors --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests",
+        "cs-check": "vendor/bin/phpcs",
+        "cs-fix": "vendor/bin/phpcbf",
         "test": "vendor/bin/phpunit --colors=always"
     },
     "config": {
         "allow-plugins": {
-            "cakephp/plugin-installer": true
+            "cakephp/plugin-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

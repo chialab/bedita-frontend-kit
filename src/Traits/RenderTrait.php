@@ -17,8 +17,11 @@ namespace Chialab\FrontendKit\Traits;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
 use Cake\View\Exception\MissingTemplateException;
+use Cake\View\View;
 use Chialab\FrontendKit\View\TemplateExistsInterface;
+use Generator;
 
 /**
  * Render for BEdita frontends.
@@ -30,7 +33,7 @@ trait RenderTrait
      *
      * @return \Cake\Http\ServerRequest
      */
-    abstract public function getRequest();
+    abstract public function getRequest(): ServerRequest;
 
     /**
      * Constructs the view class instance based on the current configuration.
@@ -38,7 +41,7 @@ trait RenderTrait
      * @param string|null $viewClass Optional namespaced class name of the View class to instantiate.
      * @return \Cake\View\View
      */
-    abstract public function createView($viewClass = null);
+    abstract public function createView(string|null $viewClass = null): View;
 
     /**
      * The render method of the controller.
@@ -47,14 +50,14 @@ trait RenderTrait
      * @param string|null $layout Layout to use
      * @return \Cake\Http\Response A response object containing the rendered view.
      */
-    abstract public function render($view = null, $layout = null);
+    abstract public function render(string|null $view = null, string|null $layout = null): Response;
 
     /**
-     * Get the viewPath based on controller name and request prefix.
+     * Get the templatePath based on controller name and request prefix.
      *
      * @return string
      */
-    abstract protected function _viewPath();
+    abstract protected function _templatePath(): string;
 
     /**
      * Generate a list of templates to try to use for the given object.
@@ -63,7 +66,7 @@ trait RenderTrait
      * @param \BEdita\Core\Model\Entity\Folder $ancestors A list of ancestors.
      * @return \Generator A generator function.
      */
-    public function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): \Generator
+    public function getTemplatesToIterate(ObjectEntity $object, Folder ...$ancestors): Generator
     {
         yield $object->uname;
 
@@ -85,7 +88,7 @@ trait RenderTrait
     /**
      * Render first found template.
      *
-     * @param string[] $templates Templates to search.
+     * @param string $templates Templates to search.
      * @return \Cake\Http\Response
      */
     public function renderFirstTemplate(string ...$templates): Response
@@ -100,10 +103,13 @@ trait RenderTrait
          * We are using the same logic here to check the very same template file.
          */
         if (!$view->getTemplatePath()) {
-            $view->setTemplatePath($this->_viewPath());
+            $view->setTemplatePath($this->_templatePath());
         }
         if (!$view->getTemplate()) {
-            $view->setTemplate($this->getRequest()->getParam('action'));
+            $action = $this->getRequest()->getParam('action');
+            if ($action !== null) {
+                $view->setTemplate($this->getRequest()->getParam('action'));
+            }
         }
 
         foreach ($templates as $template) {
@@ -113,11 +119,11 @@ trait RenderTrait
                 }
 
                 return $this->render($template);
-            } catch (MissingTemplateException $e) {
+            } catch (MissingTemplateException) {
                 continue;
             }
         }
 
-        throw new MissingTemplateException(__('None of the searched templates was found'));
+        throw new MissingTemplateException(array_pop($template));
     }
 }
