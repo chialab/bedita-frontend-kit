@@ -71,9 +71,12 @@ trait GenericActionsTrait
             default => [$field => $dir],
         };
 
+        $sortableFields = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
+        $this->paginate['sortableFields'] = array_merge($sortableFields, [$field]);
+
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate($children, ['order' => $order])->toList();
+        return $this->paginate($children->order([], true), ['order' => $order])->toList();
     }
 
     /**
