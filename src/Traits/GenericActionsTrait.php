@@ -59,12 +59,20 @@ trait GenericActionsTrait
      */
     protected function loadFilteredChildren(Folder $folder): array
     {
-        $order = Hash::get($folder, 'custom_props.children_order', null);
-        if ($order) {
-            $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
-        } else {
-            $order = ['Trees.tree_left' => 'ASC'];
+        $field = Hash::get($folder, 'custom_props.children_order') ?: 'position';
+        $dir = 'ASC';
+        if (str_starts_with($field, '-')) {
+            $dir = 'DESC';
+            $field = substr($field, 1);
         }
+
+        $order = match ($field) {
+            'position' => ['Trees.tree_left' => $dir],
+            default => [$field => $dir],
+        };
+
+        $sortableFields = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
+        $this->paginate['sortableFields'] = array_merge($sortableFields, [$field]);
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
