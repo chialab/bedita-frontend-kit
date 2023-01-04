@@ -61,14 +61,18 @@ trait GenericActionsTrait
     {
         $order = Hash::get($folder, 'custom_props.children_order', null);
         if ($order) {
-            $order = str_starts_with($order, '-') ? [substr($order, 1) => 'DESC'] : [$order => 'ASC'];
+            $type = str_starts_with($order, '-') ? substr($order, 1) : $order;
+            if ($type === 'position') {
+                $type = 'Trees.tree_left';
+            }
+            $order = str_starts_with($order, '-') ? [$type => 'DESC'] : [$type => 'ASC'];
         } else {
-            $order = ['Trees.tree_left' => 'ASC'];
+            $order = ['Trees.tree_left'];
         }
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate($children->order([], true), ['order' => $order])->toList();
+        return $this->paginate($children->order([], false), ['order' => $order])->toList();
     }
 
     /**
