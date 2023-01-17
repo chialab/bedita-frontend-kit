@@ -74,7 +74,7 @@ class TagsComponent extends Component
     {
         return $table->find()
             ->where(fn (QueryExpression $exp): QueryExpression => $exp
-                ->or_(function (QueryExpression $exp) use ($tags, $table): QueryExpression {
+                ->or(function (QueryExpression $exp) use ($tags, $table): QueryExpression {
                     $ids = array_filter($tags, 'is_numeric');
                     if (!empty($ids)) {
                         $exp = $exp->in($table->aliasField('id'), $ids);
