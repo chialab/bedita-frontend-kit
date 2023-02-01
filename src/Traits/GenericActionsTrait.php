@@ -14,12 +14,16 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use BEdita\Core\Filesystem\FilesystemRegistry;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
+use Laminas\Diactoros\Stream;
 use UnexpectedValueException;
 
 /**
@@ -38,6 +42,22 @@ trait GenericActionsTrait
      * @return \Cake\Http\ServerRequest
      */
     abstract public function getRequest();
+
+    /**
+     * Gets the response instance.
+     *
+     * @return \Cake\Http\Response
+     */
+    abstract public function getResponse();
+
+    /**
+     * Redirects to given URL.
+     *
+     * @param \Psr\Http\Message\UriInterface|array|string $url A string, array-based URL or UriInterface instance.
+     * @param int $status HTTP status code. Defaults to `302`.
+     * @return \Cake\Http\Response|null
+     */
+    abstract public function redirect($url, int $status = 302);
 
     /**
      * Handles pagination of records in Table objects.
@@ -256,5 +276,36 @@ trait GenericActionsTrait
         }
 
         return null;
+    }
+
+    /**
+     * Download a media given its `uname`.
+     *
+     * @param string $uname Media `uname`.
+     * @param string|null $filename Original file name. If not provided or not updated, redirect to the correct URL.
+     * @return \Cake\Http\Response
+     */
+    public function download(string $uname, ?string $filename = null): Response
+    {
+        /** @var \BEdita\Core\Model\Entity\Media $media */
+        $media = $this->Objects->loadObject($uname, 'media', [], []);
+        if (empty($media->streams)) {
+            throw new NotFoundException();
+        }
+
+        $stream = collection($media->streams)->first();
+        if ($filename === null || $filename !== $stream->file_name) {
+            return $this->redirect(['action' => 'download', $media->uname, $stream->file_name]);
+        }
+
+        $fh = FilesystemRegistry::getMountManager()->readStream($stream->uri);
+        if ($fh === false) {
+            throw new InternalErrorException('Cannot open stream');
+        }
+
+        return $this->getResponse()
+            ->withHeader('Content-Type', $stream->mime_type)
+            ->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $stream->file_name))
+            ->withBody(new Stream($fh));
     }
 }
