@@ -293,7 +293,7 @@ trait GenericActionsTrait
             throw new NotFoundException();
         }
 
-        $stream = $media->streams[0];
+        $stream = collection($media->streams)->first();
         if ($filename === null || $filename !== $stream->file_name) {
             return $this->redirect(['action' => 'download', $media->uname, $stream->file_name]);
         }
