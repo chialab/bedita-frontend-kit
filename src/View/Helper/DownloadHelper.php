@@ -13,12 +13,13 @@ use Cake\View\Helper;
  */
 class DownloadHelper extends Helper
 {
+    /**
+     * @inheritDoc
+     */
     protected $helpers = ['Url'];
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @inheritDoc
      */
     protected $_defaultConfig = [
         'route' => ['_name' => 'pages:download:filename'],

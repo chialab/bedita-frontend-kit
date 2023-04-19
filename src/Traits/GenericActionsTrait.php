@@ -25,6 +25,7 @@ use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use Laminas\Diactoros\Stream;
+use Psr\Http\Message\UriInterface;
 use UnexpectedValueException;
 
 /**
@@ -58,7 +59,7 @@ trait GenericActionsTrait
      * @param int $status HTTP status code. Defaults to `302`.
      * @return \Cake\Http\Response|null
      */
-    abstract public function redirect($url, int $status = 302): ?Response;
+    abstract public function redirect(UriInterface|array|string $url, int $status = 302): Response|null;
 
     /**
      * Handles pagination of records in Table objects.
@@ -259,7 +260,7 @@ trait GenericActionsTrait
             $object = $this->Objects->loadFullObject((string)$leaf->id, $leaf->type);
         }
 
-        $objects = $this->dispatchAfterLoadEvent($object) ?? $object;
+        $object = $this->dispatchAfterLoadEvent($object) ?? $object;
         if ($object->type === 'folders' && !isset($object['children'])) {
             $object['children'] = $this->loadFilteredChildren($object);
         }
