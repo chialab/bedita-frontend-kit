@@ -14,13 +14,17 @@ declare(strict_types=1);
  */
 namespace Chialab\FrontendKit\Traits;
 
+use BEdita\Core\Filesystem\FilesystemRegistry;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Chialab\FrontendKit\Routing\Route\ObjectRoute;
+use Laminas\Diactoros\Stream;
 use UnexpectedValueException;
 
 /**
@@ -41,6 +45,22 @@ trait GenericActionsTrait
     abstract public function getRequest(): ServerRequest;
 
     /**
+     * Gets the response instance.
+     *
+     * @return \Cake\Http\Response
+     */
+    abstract public function getResponse();
+
+    /**
+     * Redirects to given URL.
+     *
+     * @param \Psr\Http\Message\UriInterface|array|string $url A string, array-based URL or UriInterface instance.
+     * @param int $status HTTP status code. Defaults to `302`.
+     * @return \Cake\Http\Response|null
+     */
+    abstract public function redirect($url, int $status = 302);
+
+    /**
      * Handles pagination of records in Table objects.
      *
      * @param \Cake\ORM\Table|\Cake\ORM\Query|string|null $object Table to paginate
@@ -59,20 +79,19 @@ trait GenericActionsTrait
      */
     protected function loadFilteredChildren(Folder $folder): array
     {
-        $field = Hash::get($folder, 'custom_props.children_order') ?: 'position';
-        $dir = 'ASC';
-        if (str_starts_with($field, '-')) {
-            $dir = 'DESC';
-            $field = substr($field, 1);
+        $order = Hash::get($folder, 'custom_props.children_order', null);
+        if ($order) {
+            $type = str_starts_with($order, '-') ? substr($order, 1) : $order;
+            if ($type === 'position') {
+                $type = 'Trees.tree_left';
+            }
+            $order = str_starts_with($order, '-') ? [$type => 'DESC'] : [$type => 'ASC'];
+        } else {
+            $order = ['Trees.tree_left'];
         }
 
-        $order = match ($field) {
-            'position' => ['Trees.tree_left' => $dir],
-            default => [$field => $dir],
-        };
-
-        $sortableFields = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
-        $this->paginate['sortableFields'] = array_merge($sortableFields, [$field]);
+        $sortAllowlist = $this->paginate['sortWhitelist'] ?? (array)$this->request->getQuery('sort');
+        $this->paginate['sortWhitelist'] = array_merge($sortAllowlist, array_keys($order));
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
@@ -260,5 +279,36 @@ trait GenericActionsTrait
         }
 
         return null;
+    }
+
+    /**
+     * Download a media given its `uname`.
+     *
+     * @param string $uname Media `uname`.
+     * @param string|null $filename Original file name. If not provided or not updated, redirect to the correct URL.
+     * @return \Cake\Http\Response
+     */
+    public function download(string $uname, ?string $filename = null): Response
+    {
+        /** @var \BEdita\Core\Model\Entity\Media $media */
+        $media = $this->Objects->loadObject($uname, 'media', [], []);
+        if (empty($media->streams)) {
+            throw new NotFoundException();
+        }
+
+        $stream = collection($media->streams)->first();
+        if ($filename === null || $filename !== $stream->file_name) {
+            return $this->redirect(['action' => 'download', $media->uname, $stream->file_name]);
+        }
+
+        $fh = FilesystemRegistry::getMountManager()->readStream($stream->uri);
+        if ($fh === false) {
+            throw new InternalErrorException('Cannot open stream');
+        }
+
+        return $this->getResponse()
+            ->withHeader('Content-Type', $stream->mime_type)
+            ->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $stream->file_name))
+            ->withBody(new Stream($fh));
     }
 }
