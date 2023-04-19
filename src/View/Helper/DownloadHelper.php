@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\Media;
 use Cake\View\Helper;
-use Cake\View\View;
 
 /**
  * Download helper

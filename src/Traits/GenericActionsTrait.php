@@ -49,7 +49,7 @@ trait GenericActionsTrait
      *
      * @return \Cake\Http\Response
      */
-    abstract public function getResponse();
+    abstract public function getResponse(): Response;
 
     /**
      * Redirects to given URL.
@@ -58,7 +58,7 @@ trait GenericActionsTrait
      * @param int $status HTTP status code. Defaults to `302`.
      * @return \Cake\Http\Response|null
      */
-    abstract public function redirect($url, int $status = 302);
+    abstract public function redirect($url, int $status = 302): ?Response;
 
     /**
      * Handles pagination of records in Table objects.
@@ -288,7 +288,7 @@ trait GenericActionsTrait
      * @param string|null $filename Original file name. If not provided or not updated, redirect to the correct URL.
      * @return \Cake\Http\Response
      */
-    public function download(string $uname, ?string $filename = null): Response
+    public function download(string $uname, string|null $filename = null): Response
     {
         /** @var \BEdita\Core\Model\Entity\Media $media */
         $media = $this->Objects->loadObject($uname, 'media', [], []);
