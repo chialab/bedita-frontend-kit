@@ -44,9 +44,10 @@ class DateRangesHelper extends Helper
      * Format a range of dates.
      *
      * @param \BEdita\Core\Model\Entity\DateRange $range Date range.
+     * @param array $options Format options.
      * @return string
      */
-    public function formatRange(DateRange $range): string
+    public function formatRange(DateRange $range, array $options = []): string
     {
         if ($range->start_date === null) {
             Log::warning(sprintf('start_date for object with id %d is null', $range->object_id));
@@ -56,7 +57,7 @@ class DateRangesHelper extends Helper
 
         $start = static::normalize($range->start_date);
         if ($range->end_date === null) {
-            return __x('dateRange', $this->getConfigOrFail('single'), $start);
+            return __x('dateRange', $options['single'] ?? $this->getConfigOrFail('single'), $start);
         }
 
         $end = static::normalize($range->end_date);
@@ -66,13 +67,13 @@ class DateRangesHelper extends Helper
             [$start, $end] = [$end, $start]; // Swap.
         }
         foreach ($this->getFormats($start, $end) as $format) {
-            $fmt = $this->getConfig($format);
+            $fmt = $options[$format] ?? $this->getConfig($format);
             if ($fmt !== null) {
                 return __x('dateRange', $fmt, $start, $end);
             }
         }
 
-        return __x('dateRange', $this->getConfigOrFail('other'), $start, $end);
+        return __x('dateRange', $options['other'] ?? $this->getConfigOrFail('other'), $start, $end);
     }
 
     /**
