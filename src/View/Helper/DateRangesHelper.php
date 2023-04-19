@@ -44,7 +44,7 @@ class DateRangesHelper extends Helper
      * Format a range of dates.
      *
      * @param \BEdita\Core\Model\Entity\DateRange $range Date range.
-     * @param array|null $options Format options.
+     * @param array $options Format options.
      * @return string
      */
     public function formatRange(DateRange $range, array $options = []): string
