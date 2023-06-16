@@ -91,8 +91,8 @@ trait GenericActionsTrait
             $order = ['Trees.tree_left'];
         }
 
-        $sortAllowlist = $this->paginate['sortWhitelist'] ?? (array)$this->request->getQuery('sort');
-        $this->paginate['sortWhitelist'] = array_merge($sortAllowlist, array_keys($order));
+        $sortAllowlist = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
+        $this->paginate['sortableFields'] = array_merge($sortAllowlist, array_keys($order));
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 

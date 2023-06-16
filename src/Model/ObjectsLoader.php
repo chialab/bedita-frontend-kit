@@ -9,6 +9,8 @@ use BEdita\Core\Model\Action\ListRelatedObjectsAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Entity\Translation;
+use BEdita\Core\Model\Table\ObjectsTable;
+use BEdita\Core\Model\Table\ObjectTypesTable;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
@@ -25,8 +27,6 @@ use Iterator;
  * Objects loader.
  *
  * @package Chialab\FrontendKit\Model
- * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
- * @property \BEdita\Core\Model\Table\ObjectsTable $Objects
  */
 class ObjectsLoader
 {
@@ -47,6 +47,16 @@ class ObjectsLoader
      * @var array<int>
      */
     protected array $autoHydrateAssociations = [];
+
+    /**
+     * ObjectTypes table.
+     */
+    public ObjectTypesTable $ObjectTypes;
+
+    /**
+     * Objects table.
+     */
+    public ObjectsTable $Objects;
 
     /**
      * Objects loader constructor.
