@@ -95,7 +95,7 @@ class TreeLoader
             ]));
         }
 
-        return $query->toList();
+        return $query->all()->toList();
     }
 
     /**
