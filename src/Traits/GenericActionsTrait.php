@@ -88,7 +88,7 @@ trait GenericActionsTrait
             }
             $order = str_starts_with($order, '-') ? [$type => 'DESC'] : [$type => 'ASC'];
         } else {
-            $order = ['Trees.tree_left'];
+            $order = ['Trees.tree_left' => 'ASC'];
         }
 
         $sortAllowlist = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
