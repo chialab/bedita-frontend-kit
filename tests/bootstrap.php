@@ -22,6 +22,7 @@ use Cake\Routing\Router;
 use Cake\Utility\Security;
 use Chialab\FrontendKit\Test\TestApp\Application;
 use Chialab\FrontendKit\Test\TestApp\Filesystem\Adapter\NullAdapter;
+use Migrations\TestSuite\Migrator;
 
 $findRoot = function ($root) {
     do {
@@ -105,3 +106,7 @@ TableRegistry::getTableLocator()->clear();
 Cache::clear('_cake_core_');
 Cache::clear('_cake_model_');
 Cache::clear('_bedita_object_types_');
+
+// Run migrations
+$migrator = new Migrator();
+$migrator->run(['plugin' => 'BEdita/Core']);
