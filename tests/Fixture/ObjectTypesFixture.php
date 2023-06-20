@@ -28,6 +28,8 @@ class ObjectTypesFixture extends BEObjectTypesFixture
                 'modified' => '2017-11-10 09:27:23',
                 'enabled' => true,
                 'core_type' => true,
+                'translation_rules' => null,
+                'is_translatable' => true,
             ],
         );
 
