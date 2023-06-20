@@ -100,7 +100,7 @@ class ObjectsLoader
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
      * @return \BEdita\Core\Model\Entity\ObjectEntity
      */
-    public function loadFullObject(string $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
+    public function loadFullObject(string|int $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
         $id = $this->Objects->getId($id);

@@ -141,7 +141,7 @@ class GenericActionsTraitTest extends TestCase
     public function testFallback($url, $objectUname, $children, $related, $parentUname, $ancestorUnames, $body)
     {
         [$path, $filters] = $url;
-        $this->controller->request = $this->controller->getRequest()->withQueryParams($filters);
+        $this->controller->setRequest($this->controller->getRequest()->withQueryParams($filters));
 
         $response = $this->controller->fallback($path);
 
@@ -178,7 +178,7 @@ class GenericActionsTraitTest extends TestCase
         }
 
         // assert the parent has been correctly loaded
-        static::assertSame($parentUname, $parent ? $parent->uname : null);
+        static::assertSame($parentUname, $parent?->uname);
 
         // assert the ancestors have been correctly loaded
         static::assertSame($ancestorUnames, array_map(fn (Folder $ancestor): string => $ancestor->uname, $ancestors));
