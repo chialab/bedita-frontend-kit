@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
+namespace Chialab\FrontendKit\Test\TestCase\Trait;
 
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
