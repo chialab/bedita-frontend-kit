@@ -33,7 +33,7 @@ class TreesFixture extends BETreesFixture
         parent::init();
     }
 
-    private function transformBranch($branch, &$records = null, $parent = null, &$count = 0)
+    private function transformBranch($branch, &$records = null, $parent = null, &$count = 0): array
     {
         if ($records === null) {
             $records = [];
