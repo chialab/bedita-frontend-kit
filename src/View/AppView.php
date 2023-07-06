@@ -51,12 +51,17 @@ class AppView extends TwigView implements TemplateExistsInterface
         $this->loadHelper('Time');
         $this->loadHelper('Url');
         $this->loadHelper('BEdita/I18n.I18n');
-        $this->loadHelper('Chialab/Rna.Rna');
         $this->loadHelper('Chialab/FrontendKit.Metadata');
         $this->loadHelper('Chialab/FrontendKit.DateRanges');
         $this->loadHelper('Chialab/FrontendKit.Download');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
+
+        try {
+            $this->loadHelper('Chialab/Rna.Rna');
+        } catch (\Exception) {
+            // RNA plugin not found
+        }
 
         $fallbackImage = Configure::read('FallbackImage');
         $fallback = $fallbackImage ? $this->Url->image($fallbackImage) : null;
