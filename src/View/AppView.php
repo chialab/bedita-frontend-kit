@@ -17,11 +17,11 @@ namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
 use Cake\TwigView\View\TwigView;
+use Cake\View\Exception\MissingHelperException;
 use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
-use Exception;
 
 /**
  * Application View
@@ -60,7 +60,7 @@ class AppView extends TwigView implements TemplateExistsInterface
 
         try {
             $this->loadHelper('Chialab/Rna.Rna');
-        } catch (Exception) {
+        } catch (MissingHelperException) {
             // RNA plugin not found
         }
 
