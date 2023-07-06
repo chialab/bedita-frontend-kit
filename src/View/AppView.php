@@ -21,6 +21,7 @@ use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
 use Chialab\FrontendKit\Twig\SortByExtension;
+use Exception;
 
 /**
  * Application View
@@ -59,7 +60,7 @@ class AppView extends TwigView implements TemplateExistsInterface
 
         try {
             $this->loadHelper('Chialab/Rna.Rna');
-        } catch (\Exception) {
+        } catch (Exception) {
             // RNA plugin not found
         }
 
