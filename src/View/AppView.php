@@ -17,6 +17,7 @@ namespace Chialab\FrontendKit\View;
 
 use Cake\Core\Configure;
 use Cake\TwigView\View\TwigView;
+use Cake\View\Exception\MissingHelperException;
 use Cake\View\Exception\MissingTemplateException;
 use Chialab\FrontendKit\Twig\FileExtension;
 use Chialab\FrontendKit\Twig\I18nExtension;
@@ -51,12 +52,17 @@ class AppView extends TwigView implements TemplateExistsInterface
         $this->loadHelper('Time');
         $this->loadHelper('Url');
         $this->loadHelper('BEdita/I18n.I18n');
-        $this->loadHelper('Chialab/Rna.Rna');
         $this->loadHelper('Chialab/FrontendKit.Metadata');
         $this->loadHelper('Chialab/FrontendKit.DateRanges');
         $this->loadHelper('Chialab/FrontendKit.Download');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
         $this->loadHelper('Chialab/FrontendKit.Placeholders');
+
+        try {
+            $this->loadHelper('Chialab/Rna.Rna');
+        } catch (MissingHelperException) {
+            // RNA plugin not found
+        }
 
         $fallbackImage = Configure::read('FallbackImage');
         $fallback = $fallbackImage ? $this->Url->image($fallbackImage) : null;
