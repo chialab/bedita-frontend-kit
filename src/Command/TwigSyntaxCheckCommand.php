@@ -24,7 +24,7 @@ use Twig\Source;
 class TwigSyntaxCheckCommand extends Command
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function defaultName(): string
     {
@@ -32,7 +32,7 @@ class TwigSyntaxCheckCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
@@ -50,7 +50,7 @@ class TwigSyntaxCheckCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function execute(Arguments $args, ConsoleIo $io): int
     {
@@ -114,7 +114,7 @@ class TwigSyntaxCheckCommand extends Command
      * List templates within a path.
      *
      * @param string $path Path to search templates into.
-     * @param string[] $extensions Extensions to filter by.
+     * @param array<string> $extensions Extensions to filter by.
      * @return \Iterator<string, string>
      */
     protected static function templatesIterator(string $path, array $extensions): Iterator
@@ -143,7 +143,7 @@ class TwigSyntaxCheckCommand extends Command
      * Filter out ignored paths from an iterator.
      *
      * @param \Iterator<array-key, string> $paths Paths iterator.
-     * @param string[] $ignoredPaths List of ignored paths.
+     * @param array<string> $ignoredPaths List of ignored paths.
      * @return \Iterator<array-key, string>
      */
     protected static function filterIgnoredPaths(Iterator $paths, array $ignoredPaths): Iterator
