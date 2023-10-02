@@ -86,7 +86,7 @@ class DateRangesHelper extends Helper
     protected function getFormats(FrozenTime $start, FrozenTime $end): Generator
     {
         if ($end->isSameDay($start)) {
-            if ($start->equals($start->startOfDay()) && $end->equals($end->endOfDay())) {
+            if ($start->second(0)->equals($start->startOfDay()) && $end->second(59)->equals($end->endOfDay())) {
                 yield 'wholeDay';
             }
             yield 'sameDay';

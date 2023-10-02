@@ -79,6 +79,11 @@ class DateRangesHelperTest extends TestCase
                  new FrozenTime('2021-09-09T00:00:00'),
                  new FrozenTime('2021-09-09T23:59:59'),
             ],
+            'whole day, with approximation to the whole minute ' => [
+                '9 settembre 2021',
+                new FrozenTime('2021-09-09T00:00:01'),
+                new FrozenTime('2021-09-09T23:59:00'),
+            ],
             'time range within same day' => [
                 '9 settembre 2021, dalle 18:15 alle 19:00',
                 new FrozenTime('2021-09-09T18:15:00'),
