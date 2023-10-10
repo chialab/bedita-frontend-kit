@@ -14,6 +14,7 @@ use BEdita\Core\Model\Table\ObjectTypesTable;
 use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
+use Cake\Log\Log;
 use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -187,10 +188,30 @@ class ObjectsLoader
      */
     protected function getAssociation(Table $table, string $name): Association|null
     {
-        $associations = $table->associations()->keys();
-        foreach ($associations as $key) {
-            if (strtolower($key) === strtolower($name)) {
-                return $table->getAssociation($key);
+        $associations = $table->associations();
+
+        $assoc = $associations->get($name) ?? $associations->getByProperty($name);
+        if ($assoc !== null) {
+            return $assoc;
+        }
+
+        /*
+         * @todo The following piece of junk should be removed as soon as practically possible.
+         *      It's left here for backwards compatibility with a longstanding bug, but it's wrong.
+         */
+        $lcName = strtolower($name);
+        foreach ($associations as $assoc) {
+            if (strtolower($assoc->getName()) === $lcName) {
+                Log::notice(sprintf(
+                    'Using lowercased association name is a bug and support for it will be removed soon: please use its correct name in CamelCase or the property name in snake_case. '
+                    . 'Used association name is "%s", it should be one of "%s" or "%s".',
+                    $name,
+                    $assoc->getName(),
+                    $assoc->getProperty(),
+                ));
+                deprecationWarning('Using lowercased association name is a bug and support for it will be removed soon: please use its correct name in CamelCase or the property name in snake_case');
+
+                return $assoc;
             }
         }
 
