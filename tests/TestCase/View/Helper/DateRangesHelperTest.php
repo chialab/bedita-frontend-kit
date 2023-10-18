@@ -105,6 +105,17 @@ class DateRangesHelperTest extends TestCase
                 new FrozenTime('2019-10-01T18:15:00'),
                 new FrozenTime('2020-10-16T19:00:00'),
             ],
+
+            'end date is in the first week of the next year (same year)' => [
+                'dal 1 gen al 31 dic 2024',
+                new FrozenTime('2024-01-01T00:00:00'),
+                new FrozenTime('2024-12-31T00:00:00'),
+            ],
+            'end date is in the first week of the next year (different year)' => [
+                'dal 18 ott 2023 al 31 dic 2024',
+                new FrozenTime('2023-10-18T14:59:34'),
+                new FrozenTime('2024-12-31T00:00:00'),
+            ],
         ];
     }
 
