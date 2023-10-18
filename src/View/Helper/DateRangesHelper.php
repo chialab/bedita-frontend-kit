@@ -25,8 +25,8 @@ class DateRangesHelper extends Helper
         'wholeDay' => '{0,date,long}',
         'sameDay' => '{0,date,long}, dalle {0,time,short} alle {1,time,short}',
         'sameMonth' => 'dal {0,date,d} al {1,date,long}',
-        'sameYear' => 'dal {0,date,d MMM} al {1,date,d MMM Y}',
-        'other' => 'dal {0,date,d MMM Y} al {1,date,d MMM Y}',
+        'sameYear' => 'dal {0,date,d MMM} al {1,date,d MMM y}',
+        'other' => 'dal {0,date,d MMM y} al {1,date,d MMM y}',
     ];
 
     /**
