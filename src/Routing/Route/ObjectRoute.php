@@ -127,6 +127,14 @@ class ObjectRoute extends DashedRoute
         };
 
         foreach ($this->filters as $filter => $values) {
+            if (str_starts_with($filter, 'property:')) {
+                if (!$matchProp($entity, substr($filter, 9), $values)) {
+                    return false;
+                }
+
+                continue;
+            }
+
             switch ($filter) {
                 case 'type':
                     if ($values !== '*' && (empty($entity['type']) || !in_array($entity['type'], (array)$values))) {
@@ -145,9 +153,11 @@ class ObjectRoute extends DashedRoute
                     break;
 
                 case 'uname':
-                    return $matchProp($entity, 'uname', $values);
-                case str_starts_with($filter, 'property:'):
-                    return $matchProp($entity, substr($filter, 9), $values);
+                    if (!$matchProp($entity, 'uname', $values)) {
+                        return false;
+                    }
+
+                    break;
                 default:
                     throw new InvalidArgumentException(sprintf(
                         'Unknown route filter "%s"',
