@@ -47,7 +47,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
      * Test {@see TrustedProxiesMiddleware}.
      *
      * @param string|null $expectedClientIp Expected client IP after middleware execution.
-     * @param string|null $expectedTrustedProxies Expected trusted proxies list after middleware execution.
+     * @param array|null $expectedTrustedProxies Expected trusted proxies list after middleware execution.
      * @param \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware $middleware Middleware instance.
      * @param \Psr\Http\Message\ServerRequestInterface $request Incoming request.
      * @return void
