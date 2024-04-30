@@ -146,6 +146,26 @@ class MetadataHelper extends Helper
     }
 
     /**
+     * Get poster url.
+     * Use main object `poster` relation, fallback to publication `poster`.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null The main object.
+     * @param \BEdita\Core\Model\Entity\Folder|null The publication folder.
+     * @return string|null
+     */
+    public function getPoster(ObjectEntity|null $object = null, Folder|null $publication = null): string|null
+    {
+        if ($object !== null && $this->Poster->exists($object)) {
+            return $this->Poster->url($object, 'default');
+        }
+        if ($publication !== null && $this->Poster->exists($publication)) {
+            return $this->Poster->url($publication, 'default');
+        }
+
+        return null;
+    }
+
+    /**
      * Get publication status of the main object.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity The object.
@@ -184,12 +204,12 @@ class MetadataHelper extends Helper
         $output = '<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />';
         $defaults = [
             'DC.format' => 'text/html',
-            'DC.title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication)),
-            'DC.description' => htmlspecialchars($this->getDescription($object, $publication)),
-            'DC.creator' => htmlspecialchars($this->getCreator($object, $publication)),
-            'DC.publisher' => htmlspecialchars($this->getPublisher($object, $publication)),
-            'DC.rights' => htmlspecialchars($this->getPublisher($object, $publication)),
-            'DC.license' => $publication?->license ?? null,
+            'DC.title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
+            'DC.description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
+            'DC.creator' => htmlspecialchars($this->getCreator($object, $publication) ?? ''),
+            'DC.publisher' => htmlspecialchars($this->getPublisher($object, $publication) ?? ''),
+            'DC.rights' => htmlspecialchars($this->getPublisher($object, $publication) ?? ''),
+            'DC.license' => $object->license ?? $publication?->license ?? null,
         ];
         if ($object !== null) {
             $defaults = [
@@ -199,7 +219,6 @@ class MetadataHelper extends Helper
                 'DC.type' => $object->type,
                 'DC.identifier' => $object->uname,
                 'DC.language' => $object->lang ?? I18n::getLocale(),
-                'DC.license' => $object->license ?? null,
             ] + $defaults;
         }
 
@@ -229,16 +248,15 @@ class MetadataHelper extends Helper
         $output = '';
         $defaults = [
             'og:url' => Router::url(null, true),
-            'og:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication)),
-            'og:description' => htmlspecialchars($this->getDescription($object, $publication)),
-            'og:image' => $publication && $this->Poster->exists($publication) ? $this->Poster->url($publication, 'default') : null,
-            'og:site_name' => htmlspecialchars($this->getPublisher(null, $publication)),
+            'og:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
+            'og:description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
+            'og:image' => $this->getPoster($object, $publication),
+            'og:site_name' => htmlspecialchars($this->getPublisher(null, $publication) ?? ''),
         ];
         if ($object !== null) {
             $defaults = [
                 'og:type' => $object->type,
                 'og:updated_time' => $object->modified,
-                'og:image' => $object && $this->Poster->exists($object) ? $this->Poster->url($object, 'default') : null,
             ] + $defaults;
         }
 
@@ -264,22 +282,17 @@ class MetadataHelper extends Helper
     {
         $object = $object ?? $this->getObject();
         $publication = $publication ?? $this->getPublication();
+        $poster = $this->getPoster($object, $publication);
 
         $output = '';
         $defaults = [
-            'twitter:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication)),
-            'twitter:description' => htmlspecialchars($this->getDescription($object, $publication)),
-            'twitter:site' => htmlspecialchars($this->getPublisher(null, $publication)),
-            'twitter:creator' => htmlspecialchars($this->getCreator($object, $publication)),
-            'twitter:card' => $publication && $this->Poster->exists($publication) ? 'summary_large_image' : null,
-            'twitter:image' => $publication && $this->Poster->exists($publication) ? $this->Poster->url($publication, 'default') : null,
+            'twitter:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
+            'twitter:description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
+            'twitter:site' => htmlspecialchars($this->getPublisher(null, $publication) ?? ''),
+            'twitter:creator' => htmlspecialchars($this->getCreator($object, $publication) ?? ''),
+            'twitter:card' => $poster ? 'summary_large_image' : null,
+            'twitter:image' => $poster,
         ];
-        if ($object !== null) {
-            $defaults = [
-                'twitter:card' => $object && $this->Poster->exists($object) ? 'summary_large_image' : null,
-                'twitter:image' => $object && $this->Poster->exists($object) ? $this->Poster->url($object, 'default') : null,
-            ] + $defaults;
-        }
 
         $data = $data + $defaults;
         foreach ($data as $key => $value) {
