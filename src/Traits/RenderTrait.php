@@ -124,6 +124,6 @@ trait RenderTrait
             }
         }
 
-        throw new MissingTemplateException(array_pop($template));
+        throw new MissingTemplateException(array_pop($templates));
     }
 }
