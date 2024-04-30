@@ -161,6 +161,7 @@ class MetadataHelper extends Helper
         if ($publication !== null && $this->Poster->exists($publication)) {
             return $this->Poster->url($publication, 'default');
         }
+
         return null;
     }
 
