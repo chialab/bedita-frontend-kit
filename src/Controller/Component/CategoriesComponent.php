@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Category;
 use BEdita\Core\Model\Table\CategoriesTable;
+use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
@@ -19,6 +20,7 @@ use InvalidArgumentException;
  */
 class CategoriesComponent extends Component
 {
+    use I18nTrait;
     use LocatorAwareTrait;
 
     /**
@@ -48,9 +50,10 @@ class CategoriesComponent extends Component
      *
      * @param string|null $type Object type name.
      * @param int|null $parentId ID of parent category.
+     * @param string|null $lang Language code to use.
      * @return \Cake\ORM\Query
      */
-    public function load(string|null $type = null, int|null $parentId = null): Query
+    public function load(string|null $type = null, int|null $parentId = null, string|null $lang = null): Query
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true]);
@@ -64,11 +67,14 @@ class CategoriesComponent extends Component
             $query = $query->find('type', [$type]);
         }
 
+        $lang ??= $this->getLang();
         $query
             ->order([$this->Categories->aliasField('name')])
-            ->formatResults(function (CollectionInterface $results): CollectionInterface {
-                return $results->map(function (Category $category): Category {
+            ->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
+                return $results->map(function (Category $category) use ($lang): Category {
                     $category->set('slug', Text::slug($category->name));
+                    $category = $this->dangerouslyTranslateLabel($category, $lang);
+
                     $category->clean();
 
                     return $category;
@@ -81,29 +87,28 @@ class CategoriesComponent extends Component
     /**
      * Load a category by its name and type
      *
-     * @param string|null $name Category name.
-     * @param string|null $type Category type.
+     * @param string $name Category name.
+     * @param string $type Category type.
+     * @param string|null $lang Language code to use.
      * @return \Cake\ORM\Query
      */
-    public function loadByName(string $name, string $type): Query
+    public function loadByName(string $name, string $type, string|null $lang = null): Query
     {
-        $query = $this->Categories->find()
+        $lang ??= $this->getLang();
+
+        return $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true])
-            ->where([$this->Categories->aliasField('name') => $name]);
-
-        $query = $query->find('type', [$type]);
-
-        $query
-            ->formatResults(function (CollectionInterface $results): CollectionInterface {
-                return $results->map(function (Category $category): Category {
+            ->where([$this->Categories->aliasField('name') => $name])
+            ->find('type', [$type])
+            ->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
+                return $results->map(function (Category $category) use ($lang): Category {
                     $category->set('slug', Text::slug($category->name));
+                    $category = $this->dangerouslyTranslateLabel($category, $lang);
                     $category->clean();
 
                     return $category;
                 });
             });
-
-        return $query;
     }
 
     /**
@@ -130,6 +135,26 @@ class CategoriesComponent extends Component
 
                     return $exp;
                 }));
+    }
+
+    /**
+     *  Dangerous processor to set label to its translation.
+     *
+     *  **WARNING**: do NOT save entities that have been processed by this processor.
+     *
+     * @param \BEdita\Core\Model\Entity\Category $category Category entity to process.
+     * @param string|null $lang Language code to use.
+     * @return \BEdita\Core\Model\Entity\Category
+     */
+    protected function dangerouslyTranslateLabel(Category $category, string|null $lang = null): Category
+    {
+        if ($lang === null || !array_key_exists($lang, $category->get('labels'))) {
+            return $category;
+        }
+
+        $category->label = $category->get('labels')[$lang];
+
+        return $category;
     }
 
     /**

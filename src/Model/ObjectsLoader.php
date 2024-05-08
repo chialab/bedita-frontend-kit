@@ -440,9 +440,10 @@ class ObjectsLoader
         }
 
         if (!empty($object->get('categories'))) {
-            foreach ($object->categories as &$category) {
-                if (array_key_exists($lang, $category->labels)) {
-                    $category->label = $category->labels[$lang];
+            foreach ($object->get('categories') as &$category) {
+                /** @type \BEdita\Core\Model\Entity\Category $category */
+                if (array_key_exists($lang, $category->get('labels'))) {
+                    $category->label = $category->get('labels')[$lang];
                 }
             }
             unset($category);
