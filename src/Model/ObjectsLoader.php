@@ -449,6 +449,16 @@ class ObjectsLoader
             unset($category);
         }
 
+        if (!empty($object->get('tags'))) {
+            foreach ($object->get('tags') as &$tag) {
+                /** @type \BEdita\Core\Model\Entity\Tag $tag */
+                if (array_key_exists($lang, $tag->get('labels'))) {
+                    $tag->label = $tag->get('labels')[$lang];
+                }
+            }
+            unset($tag);
+        }
+
         /** @var \BEdita\Core\Model\Entity\Translation|null $requestedTranslation */
         $requestedTranslation = collection($object->translations ?? [])
             ->filter(fn (Translation $tr): bool => $tr->lang === $lang)
