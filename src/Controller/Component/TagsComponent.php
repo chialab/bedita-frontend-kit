@@ -48,9 +48,10 @@ class TagsComponent extends Component
     /**
      * Load Tags.
      *
+     * @param string|null $lang Language code to use.
      * @return \Cake\ORM\Query
      */
-    public function load(): Query
+    public function load(string|null $lang = null): Query
     {
         $lang ??= $this->getLang();
 
