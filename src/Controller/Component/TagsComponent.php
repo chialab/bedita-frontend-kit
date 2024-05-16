@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Tag;
 use BEdita\Core\Model\Table\TagsTable;
+use BEdita\I18n\Core\I18nTrait;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
@@ -19,6 +20,7 @@ use InvalidArgumentException;
  */
 class TagsComponent extends Component
 {
+    use I18nTrait;
     use LocatorAwareTrait;
 
     /**
@@ -46,21 +48,46 @@ class TagsComponent extends Component
     /**
      * Load Tags.
      *
+     * @param string|null $lang Language code to use.
      * @return \Cake\ORM\Query
      */
-    public function load(): Query
+    public function load(string|null $lang = null): Query
     {
+        $lang ??= $this->getLang();
+
         return $this->Tags->find()
             ->where([$this->Tags->aliasField('enabled') => true])
             ->order([$this->Tags->aliasField('name')])
-            ->formatResults(function (CollectionInterface $results): CollectionInterface {
-                return $results->map(function (Tag $tag): Tag {
+            ->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
+                return $results->map(function (Tag $tag) use ($lang): Tag {
                     $tag->set('slug', Text::slug($tag->name));
+                    $tag = $this->dangerouslyTranslateLabel($tag, $lang);
+
                     $tag->clean();
 
                     return $tag;
                 });
             });
+    }
+
+    /**
+     *  Dangerous processor to set label to its translation.
+     *
+     *  **WARNING**: do NOT save entities that have been processed by this processor.
+     *
+     * @param \BEdita\Core\Model\Entity\Tag $tag Tag entity to process.
+     * @param string|null $lang Language code to use.
+     * @return \BEdita\Core\Model\Entity\Tag
+     */
+    protected function dangerouslyTranslateLabel(Tag $tag, string|null $lang = null): Tag
+    {
+        if ($lang === null || !array_key_exists($lang, $tag->get('labels'))) {
+            return $tag;
+        }
+
+        $tag->label = $tag->get('labels')[$lang];
+
+        return $tag;
     }
 
     /**
