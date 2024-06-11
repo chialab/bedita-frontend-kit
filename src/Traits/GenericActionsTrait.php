@@ -93,17 +93,20 @@ trait GenericActionsTrait
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate(
-            $children->order([], true),
-            Hash::merge($this->paginate, [
-                'order' => $order,
-                'sortableFields' => array_merge($this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+        $settings = Hash::merge($this->paginate, [
+            'order' => $order,
+            'sortableFields' => array_merge($this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+        ]);
+        if (isset($settings['Children'])) {
+            $settings = Hash::merge($settings, [
                 'Children' => [
                     'order' => $order,
                     'sortableFields' => array_merge($this->paginate['Children']['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
                 ],
-            ]),
-        )->toList();
+            ]);
+        }
+
+        return $this->paginate($children->order([], true), $settings)->toList();
     }
 
     /**
