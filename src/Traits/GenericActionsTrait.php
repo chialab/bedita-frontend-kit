@@ -91,12 +91,22 @@ trait GenericActionsTrait
             $order = ['Trees.tree_left' => 'ASC'];
         }
 
-        $sortAllowlist = $this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort');
-        $this->paginate['sortableFields'] = array_merge($sortAllowlist, array_keys($order));
-
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
 
-        return $this->paginate($children->order([], true), ['order' => $order])->toList();
+        $settings = Hash::merge($this->paginate, [
+            'order' => $order,
+            'sortableFields' => array_merge($this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+        ]);
+        if (isset($settings['Children'])) {
+            $settings = Hash::merge($settings, [
+                'Children' => [
+                    'order' => $order,
+                    'sortableFields' => array_merge($this->paginate['Children']['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+                ],
+            ]);
+        }
+
+        return $this->paginate($children->order([], true), $settings)->toList();
     }
 
     /**
