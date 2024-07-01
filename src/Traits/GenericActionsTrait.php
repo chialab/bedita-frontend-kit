@@ -17,6 +17,7 @@ namespace Chialab\FrontendKit\Traits;
 use BEdita\Core\Filesystem\FilesystemRegistry;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -200,8 +201,7 @@ trait GenericActionsTrait
     /**
      * Generic object route.
      *
-     * @param string $uname Object `id` or `uname`.
-     * @return \Cake\Http\Response|null
+     * @inheritDoc
      */
     public function object(string $uname): Response|null
     {
@@ -222,8 +222,13 @@ trait GenericActionsTrait
         }
 
         $paths = $this->Publication->getViablePaths($entity->id);
+
         if (!empty($paths)) {
             return $this->redirect(['action' => 'fallback', $paths[0]['path']] + $params);
+        } else {
+            if ($entity->type === 'folders') {
+                throw new RecordNotFoundException();
+            }
         }
 
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
