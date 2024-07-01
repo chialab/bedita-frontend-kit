@@ -201,7 +201,8 @@ trait GenericActionsTrait
     /**
      * Generic object route.
      *
-     * @inheritDoc
+     * @param string $uname Object `id` or `uname`.
+     * @return \Cake\Http\Response|null
      */
     public function object(string $uname): Response|null
     {
