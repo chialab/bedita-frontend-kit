@@ -226,12 +226,19 @@ trait GenericActionsTrait
 
         if (!empty($paths)) {
             return $this->redirect(['action' => 'fallback', $paths[0]['path']] + $params);
-        } else {
-            if ($entity->type === 'folders') {
-                throw new RecordNotFoundException();
-            }
         }
 
+        return $this->renderObject($entity);
+    }
+
+    /**
+     * Render object.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $entity Object entity.
+     * @return \Cake\Http\Response|null
+     */
+    private function renderObject(ObjectEntity $entity): Response|null
+    {
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
         if ($object === null) {
             $object = $this->Objects->loadFullObject((string)$entity->id, $entity->type);
