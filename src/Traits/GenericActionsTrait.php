@@ -236,7 +236,7 @@ trait GenericActionsTrait
      * @param \BEdita\Core\Model\Entity\ObjectEntity $entity Object entity.
      * @return \Cake\Http\Response|null
      */
-    private function renderObject(ObjectEntity $entity): Response|null
+    protected function renderObject(ObjectEntity $entity): Response|null
     {
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
         if ($object === null) {
