@@ -222,10 +222,22 @@ trait GenericActionsTrait
         }
 
         $paths = $this->Publication->getViablePaths($entity->id);
+
         if (!empty($paths)) {
             return $this->redirect(['action' => 'fallback', $paths[0]['path']] + $params);
         }
 
+        return $this->renderObject($entity);
+    }
+
+    /**
+     * Render object.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity $entity Object entity.
+     * @return \Cake\Http\Response|null
+     */
+    protected function renderObject(ObjectEntity $entity): Response|null
+    {
         $object = $this->dispatchBeforeLoadEvent($entity->uname, $entity->type);
         if ($object === null) {
             $object = $this->Objects->loadFullObject((string)$entity->id, $entity->type);
