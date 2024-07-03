@@ -22,6 +22,7 @@ use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
+use InvalidArgumentException;
 use Iterator;
 
 /**
@@ -403,8 +404,8 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (Entity $object): Entity => $object, 'type')
-            ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
+            ->combine('id', fn (Entity $object): Entity => $object, fn (Entity $object): string|null => $object->type ?? (string)$object->id)
+            ->unfold(function (iterable $items, string|int $type) use ($depth): Iterator {
                 if (!$type) {
                     yield from $items;
 
@@ -517,6 +518,7 @@ class ObjectsLoader
                     }
 
                     $related = $object->get($prop);
+
                     if ($related instanceof ObjectEntity) {
                         $original = $related;
 
