@@ -403,9 +403,9 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (Entity $object): Entity => $object, fn (Entity $object): string|null => $object->type ?? (string)$object->id)
-            ->unfold(function (iterable $items, string|int $type) use ($depth): Iterator {
-                if (!$type) {
+            ->combine('id', fn (Entity $object): Entity => $object, fn (Entity $object): string => $object->type ?? '')
+            ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
+                if ($type === '') {
                     yield from $items;
 
                     return;
