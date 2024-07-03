@@ -403,9 +403,9 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (Entity $object): Entity => $object, 'type')
+            ->combine('id', fn (Entity $object): Entity => $object, fn (Entity $object): string => $object->type ?? '')
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
-                if (!$type) {
+                if ($type === '') {
                     yield from $items;
 
                     return;
@@ -517,6 +517,7 @@ class ObjectsLoader
                     }
 
                     $related = $object->get($prop);
+
                     if ($related instanceof ObjectEntity) {
                         $original = $related;
 
