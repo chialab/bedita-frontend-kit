@@ -110,14 +110,14 @@ class PosterHelper extends Helper
     }
 
     /**
-     * Check if object has a mobile variant.
+     * Check if object has a valid mobile variant.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @return bool
      */
     public function mobileExists(ObjectEntity|null $object): bool
     {
-        return !empty($object['has_variant_mobile']);
+        return !empty($object['has_variant_mobile']) && $this->exists($object['has_variant_mobile'][0]);
     }
 
     /**
