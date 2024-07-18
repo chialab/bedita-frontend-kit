@@ -20,6 +20,10 @@ class PosterHelper extends Helper
 {
     protected const OBJECT_TYPE = 'images';
 
+    protected const MOBILE_DEFAULT_WIDTH = 640;
+
+    protected const MOBILE_MAX_WIDTH = 767;
+
     /**
      * @inheritDoc
      */
@@ -103,6 +107,53 @@ class PosterHelper extends Helper
         if ($this->Media->isMedia($object, static::OBJECT_TYPE)) {
             yield $object;
         }
+    }
+
+    /**
+     * Check if object has a mobile variant.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @return bool
+     */
+    public function mobileExists(ObjectEntity|null $object): bool
+    {
+        return !empty($object['has_variant_mobile']);
+    }
+
+    /**
+     * Get mobile variant url, if any.
+     *
+     * @return string|null
+     */
+    public function mobile(ObjectEntity|null $object): string|null
+    {
+        if (!$this->mobileExists($object)) {
+            return null;
+        }
+
+        $variant = $object['has_variant_mobile'][0];
+        $url = $this->url($variant);
+
+        if (!$url) {
+            return null;
+        }
+
+        $intrinsicWidth = Hash::get($variant, '_joinData.params.slot_width') || static::MOBILE_DEFAULT_WIDTH;
+
+        return sprintf('%s %sw', $url, $intrinsicWidth);
+    }
+
+    /**
+     * Get sizes attribute for image.
+     *
+     * @return string
+     */
+    public function sizes(): string
+    {
+        $maxWidth = $this->getConfig('PosterMobile.maxWidth', static::MOBILE_MAX_WIDTH);
+        $slotWidth = $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH);
+
+        return sprintf('(max-width: %spx) %spx', $maxWidth, $slotWidth);
     }
 
     /**
