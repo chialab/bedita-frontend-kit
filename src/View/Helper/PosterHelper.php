@@ -117,12 +117,19 @@ class PosterHelper extends Helper
      */
     public function mobileExists(ObjectEntity|null $object): bool
     {
-        return !empty($object['has_variant_mobile']) && $this->exists($object['has_variant_mobile'][0]);
+        if (empty($object['has_variant_mobile'])) {
+            return false;
+        }
+
+        $variant = Hash::get($object, 'has_variant_mobile.0');
+
+        return $this->exists($variant, ['forceSelf' => true]);
     }
 
     /**
      * Get mobile variant url, if any.
      *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @return string|null
      */
     public function mobile(ObjectEntity|null $object): string|null
@@ -131,14 +138,14 @@ class PosterHelper extends Helper
             return null;
         }
 
-        $variant = $object['has_variant_mobile'][0];
-        $url = $this->url($variant);
+        $variant = Hash::get($object, 'has_variant_mobile.0');
+        $url = $this->url($variant, false, ['forceSelf' => true]);
 
         if (!$url) {
             return null;
         }
 
-        $intrinsicWidth = Hash::get($variant, '_joinData.params.slot_width') || static::MOBILE_DEFAULT_WIDTH;
+        $intrinsicWidth = Hash::get($variant, '_joinData.params.slot_width', static::MOBILE_DEFAULT_WIDTH);
 
         return sprintf('%s %sw', $url, $intrinsicWidth);
     }

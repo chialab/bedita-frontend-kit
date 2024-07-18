@@ -83,6 +83,26 @@ class PosterHelperTest extends TestCase
         ]);
     }
 
+    protected function setVariantProviderThumbnail($originalImage, int $width, int $height): void
+    {
+        $image = new Media([
+            'type' => 'images',
+            'width' => $width,
+            'height' => $height,
+        ]);
+
+        $image->set('streams', [$this->createStream($width, $height)]);
+        $image->set('_joinData', [
+            'params' => [
+                'slot_width' => 640,
+            ],
+        ]);
+
+        $image->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
+
+        $originalImage->set('has_variant_mobile', [$image]);
+    }
+
     protected function createImage(int $width, int $height): Media
     {
         $image = new Media([
@@ -140,6 +160,48 @@ class PosterHelperTest extends TestCase
         $object->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
 
         $this->assertTrue($this->Poster->exists($object));
+    }
+
+    /**
+     * Test {@see PosterHelper::mobileExists()}.
+     *
+     * @return void
+     * @covers ::mobileExists()
+     */
+    public function testExistsVariantMobileProviderThumbnail()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertTrue($this->Poster->mobileExists($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::mobile()}.
+     *
+     * @return void
+     * @covers ::mobile()
+     */
+    public function testMobileProviderThumbnail()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertSame('https://www.bedita.com/favicon.png 640w', $this->Poster->mobile($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::sizes()}.
+     *
+     * @return void
+     * @covers ::sizes()
+     */
+    public function testSizes()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertSame('(max-width: 767px) 640px', $this->Poster->sizes($image));
     }
 
     /**
