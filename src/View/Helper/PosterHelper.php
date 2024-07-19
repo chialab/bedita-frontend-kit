@@ -8,7 +8,6 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
 use Iterator;
-use Twig\Node\Expression\Test\NullTest;
 
 /**
  * Poster helper.
@@ -128,7 +127,7 @@ class PosterHelper extends Helper
     }
 
     /**
-     * Get mobile variant url, if any.
+     * Get mobile variant object (first related object).
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @return \BEdita\Core\Model\Entity\Media|null
@@ -153,6 +152,10 @@ class PosterHelper extends Helper
     public function sourceSet(ObjectEntity|null $object): string|null
     {
         $variant = $this->mobile($object);
+
+        if (!$variant) {
+            return null;
+        }
 
         $url = $this->url($variant, false, ['forceSelf' => true]);
         $width = $this->getStreamWidth($variant);
