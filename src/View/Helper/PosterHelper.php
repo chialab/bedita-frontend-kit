@@ -147,21 +147,21 @@ class PosterHelper extends Helper
      * Get `srcset` attribute for image.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
-     * @return string|null
+     * @return string
      */
-    public function sourceSet(ObjectEntity|null $object): string|null
+    public function sourceSet(ObjectEntity|null $object): string
     {
         $variant = $this->mobile($object);
 
+        $fallbackUrl = $this->url($object, false, ['forceSelf' => true]);
+        $fallbackWidth = $this->getStreamWidth($object);
+
         if (!$variant) {
-            return null;
+            return sprintf('%s %sw', $fallbackUrl, $fallbackWidth);
         }
 
         $url = $this->url($variant, false, ['forceSelf' => true]);
         $width = $this->getStreamWidth($variant);
-
-        $fallbackUrl = $this->url($object, false, ['forceSelf' => true]);
-        $fallbackWidth = $this->getStreamWidth($object);
 
         return sprintf('%s %sw, %s %sw', $url, $width, $fallbackUrl, $fallbackWidth);
     }
@@ -173,9 +173,9 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\Media $media Media entity.
      * @return int
      */
-    private function getStreamWidth(Media $media): int
+    protected function getStreamWidth(Media $media): int
     {
-        return Hash::get($media, 'streams.0.width', static::MOBILE_DEFAULT_WIDTH);
+        return Hash::get($media, 'streams.0.width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
     }
 
     /**
@@ -304,7 +304,7 @@ class PosterHelper extends Helper
      * @param string $prefix Prefix string to add to the position string tokens.
      * @return string position string in the following format: '<x-string> <y-string>'
      */
-    public function position(ObjectEntity|null $object, string $prefix = ''): string
+    public function position(ObjectEntity|null $object, string $prefix = 'mobile'): string
     {
         $props = [];
 
@@ -319,46 +319,59 @@ class PosterHelper extends Helper
             }
         }
 
-        if (empty($props)) {
-            return '';
+        $getPositionValues = function ($props, $prefix = '') {
+            if (empty($props)) {
+                return '';
+            }
+
+            if (!empty($props['position'])) {
+                return $props['position'];
+            }
+
+            if (!isset($props['position_x']) || !isset($props['position_y'])) {
+                return '';
+            }
+
+            $xPos = '';
+            $yPos = '';
+
+            switch ($props['position_x']) {
+                case 0:
+                    $xPos = 'left';
+                    break;
+                case 100:
+                    $xPos = 'right';
+                    break;
+                default:
+                    $xPos = 'center';
+                    break;
+            }
+
+            switch ($props['position_y']) {
+                case 0:
+                    $yPos = 'bottom';
+                    break;
+                case 100:
+                    $yPos = 'top';
+                    break;
+                default:
+                    $yPos = 'center';
+                    break;
+            }
+
+            return $prefix . $xPos . ' ' . $prefix . $yPos;
+        };
+
+        $objPosition = $getPositionValues($props);
+
+        $variant = $this->mobile($object);
+        $variantPosition = '';
+
+        if ($variant) {
+            $variantPosition = $getPositionValues($variant->custom_props, 'mobile');
         }
 
-        if (!empty($props['position'])) {
-            return $props['position'];
-        }
-
-        if (!isset($props['position_x']) || !isset($props['position_y'])) {
-            return '';
-        }
-
-        $xPos = '';
-        $yPos = '';
-
-        switch ($props['position_x']) {
-            case 0:
-                $xPos = 'left';
-                break;
-            case 100:
-                $xPos = 'right';
-                break;
-            default:
-                $xPos = 'center';
-                break;
-        }
-
-        switch ($props['position_y']) {
-            case 0:
-                $yPos = 'bottom';
-                break;
-            case 100:
-                $yPos = 'top';
-                break;
-            default:
-                $yPos = 'center';
-                break;
-        }
-
-        return $prefix . $xPos . ' ' . $prefix . $yPos;
+        return $variantPosition ?: $objPosition;
     }
 
     /**
