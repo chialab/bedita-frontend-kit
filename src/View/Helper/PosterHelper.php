@@ -301,10 +301,10 @@ class PosterHelper extends Helper
      * Get position string to manage object-fit CSS property to crop the object poster image.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom crop the poster image.
-     * @param string $prefix Prefix string to add to the position string tokens.
+     * @param string $prefix Prefix string to add to the position string tokens for the mobile variant image, if available.
      * @return string position string in the following format: '<x-string> <y-string>'
      */
-    public function position(ObjectEntity|null $object, string $prefix = 'mobile'): string
+    public function position(ObjectEntity|null $object, string $variantPrefix = 'mobile-'): string
     {
         $props = [];
 
@@ -365,13 +365,13 @@ class PosterHelper extends Helper
         $objPosition = $getPositionValues($props);
 
         $variant = $this->mobile($object);
-        $variantPosition = '';
 
         if ($variant) {
-            $variantPosition = $getPositionValues($variant->custom_props, 'mobile');
+            $variantPosition = $getPositionValues($variant->custom_props, $variantPrefix) ?? '';
+            $objPosition = $variantPosition . ' ' . $objPosition;
         }
 
-        return $variantPosition ?: $objPosition;
+        return $objPosition;
     }
 
     /**
