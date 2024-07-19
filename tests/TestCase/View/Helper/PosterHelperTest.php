@@ -187,7 +187,23 @@ class PosterHelperTest extends TestCase
         $image = $this->createImage(1500, 1000);
         $this->setVariantProviderThumbnail($image, 640, 480);
 
-        $this->assertSame('https://www.bedita.com/favicon.png 640w', $this->Poster->mobile($image));
+        $this->assertSame($image['has_variant_mobile'][0], $this->Poster->mobile($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::sourceSet()}.
+     *
+     * @return void
+     * @covers ::sourceSet()
+     */
+    public function testSourceSet()
+    {
+        $image = $this->createImage(1500, 1000);
+        $image->set('provider_thumbnail', 'https://www.bedita.com/first.png');
+
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertSame('https://www.bedita.com/favicon.png 640w, https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
     }
 
     /**

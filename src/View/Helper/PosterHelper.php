@@ -8,6 +8,7 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
 use Iterator;
+use Twig\Node\Expression\Test\NullTest;
 
 /**
  * Poster helper.
@@ -130,24 +131,48 @@ class PosterHelper extends Helper
      * Get mobile variant url, if any.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
-     * @return string|null
+     * @return \BEdita\Core\Model\Entity\Media|null
      */
-    public function mobile(ObjectEntity|null $object): string|null
+    public function mobile(ObjectEntity|null $object): Media|null
     {
         if (!$this->mobileExists($object)) {
             return null;
         }
 
         $variant = Hash::get($object, 'has_variant_mobile.0');
+
+        return $variant;
+    }
+
+    /**
+     * Get `srcset` attribute for image.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @return string|null
+     */
+    public function sourceSet(ObjectEntity|null $object): string|null
+    {
+        $variant = $this->mobile($object);
+
         $url = $this->url($variant, false, ['forceSelf' => true]);
+        $width = $this->getStreamWidth($variant);
 
-        if (!$url) {
-            return null;
-        }
+        $fallbackUrl = $this->url($object, false, ['forceSelf' => true]);
+        $fallbackWidth = $this->getStreamWidth($object);
 
-        $intrinsicWidth = Hash::get($variant, '_joinData.params.slot_width', static::MOBILE_DEFAULT_WIDTH);
+        return sprintf('%s %sw, %s %sw', $url, $width, $fallbackUrl, $fallbackWidth);
+    }
 
-        return sprintf('%s %sw', $url, $intrinsicWidth);
+    /**
+     * Get the width of the first stream of a media object.
+     * If the media object has no streams, or the first stream has no width, return a default value.
+     *
+     * @param \BEdita\Core\Model\Entity\Media $media Media entity.
+     * @return int
+     */
+    private function getStreamWidth(Media $media): int
+    {
+        return Hash::get($media, 'streams.0.width', static::MOBILE_DEFAULT_WIDTH);
     }
 
     /**
@@ -273,9 +298,10 @@ class PosterHelper extends Helper
      * Get position string to manage object-fit CSS property to crop the object poster image.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom crop the poster image.
+     * @param string $prefix Prefix string to add to the position string tokens.
      * @return string position string in the following format: '<x-string> <y-string>'
      */
-    public function position(ObjectEntity|null $object): string
+    public function position(ObjectEntity|null $object, string $prefix = ''): string
     {
         $props = [];
 
@@ -329,7 +355,7 @@ class PosterHelper extends Helper
                 break;
         }
 
-        return $xPos . ' ' . $yPos;
+        return $prefix . $xPos . ' ' . $prefix . $yPos;
     }
 
     /**
