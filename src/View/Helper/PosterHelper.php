@@ -147,20 +147,23 @@ class PosterHelper extends Helper
      * Get `srcset` attribute for image.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @param array|string|false $thumbOptions
+     * @param array|string|false $posterOptions
      * @return string
      */
-    public function sourceSet(ObjectEntity|null $object): string
+    public function sourceSet(ObjectEntity|null $object, array|string|false $thumbOptions = false, array $posterOptions = []): string
     {
         $variant = $this->mobile($object);
+        $posterOptions['forceSelf'] = true;
 
-        $fallbackUrl = $this->url($object, false, ['forceSelf' => true]);
+        $fallbackUrl = $this->url($object, $thumbOptions, $posterOptions);
         $fallbackWidth = $this->getStreamWidth($object);
 
         if (!$variant) {
             return sprintf('%s %sw', $fallbackUrl, $fallbackWidth);
         }
 
-        $url = $this->url($variant, false, ['forceSelf' => true]);
+        $url = $this->url($variant, $thumbOptions, $posterOptions);
         $width = $this->getStreamWidth($variant);
 
         return sprintf('%s %sw, %s %sw', $url, $width, $fallbackUrl, $fallbackWidth);
