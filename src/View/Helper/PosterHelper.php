@@ -132,7 +132,7 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @return \BEdita\Core\Model\Entity\Media|null
      */
-    public function mobile(ObjectEntity|null $object): Media|null
+    protected function mobile(ObjectEntity|null $object): Media|null
     {
         if (!$this->mobileExists($object)) {
             return null;
@@ -154,10 +154,11 @@ class PosterHelper extends Helper
     public function sourceSet(ObjectEntity|null $object, array|string|false $thumbOptions = false, array $posterOptions = []): string
     {
         $variant = $this->mobile($object);
+        $fallback = $this->poster($object);
         $posterOptions['forceSelf'] = true;
 
         $fallbackUrl = $this->url($object, $thumbOptions, $posterOptions);
-        $fallbackWidth = $this->getStreamWidth($object);
+        $fallbackWidth = $this->getStreamWidth($fallback);
 
         if (!$variant) {
             return sprintf('%s %sw', $fallbackUrl, $fallbackWidth);
@@ -209,17 +210,35 @@ class PosterHelper extends Helper
      */
     public function exists(ObjectEntity|null $object, array $options = []): bool
     {
+        return $this->poster($object, $options) !== null;
+    }
+
+    /**
+     * Return a valid poster for the object, or the Image itself.
+     *
+     * ### Poster options:
+     *
+     * - `forceSelf`: restrict checks to the object itself, rather than evaluating its `poster` related objects. Default: `false`
+     * - `variant`: poster variant, i.e. priority of the desired poster related object. Default: 0
+     * - `fallbackSelf`: whether to use object itself as a fallback in case poster related objects cannot be used. Default: `true`
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @param array $options Poster options.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity|null
+     */
+    protected function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
+    {
         if ($object !== null && $object->has('provider_thumbnail')) {
-            return true;
+            return $object;
         }
 
         foreach ($this->candidates($object, $options) as $media) {
             if ($media->has('media_url')) {
-                return true;
+                return $media;
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
