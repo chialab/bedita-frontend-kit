@@ -201,8 +201,12 @@ class PosterHelperTest extends TestCase
         $image = $this->createImage(1500, 1000);
         $image->set('provider_thumbnail', 'https://www.bedita.com/first.png');
 
+        // no variant
+        $this->assertSame('https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
+
         $this->setVariantProviderThumbnail($image, 640, 480);
 
+        // variant available
         $this->assertSame('https://www.bedita.com/favicon.png 640w, https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
     }
 
@@ -217,7 +221,17 @@ class PosterHelperTest extends TestCase
         $image = $this->createImage(1500, 1000);
         $this->setVariantProviderThumbnail($image, 640, 480);
 
+        // no slot_width set, using image width
         $this->assertSame('(max-width: 767px) 640px', $this->Poster->sizes($image));
+
+        // variant with slot_width set
+        $image->get('has_variant_mobile')[0]->set('_joinData', [
+            'params' => [
+                'slot_width' => 320,
+            ],
+        ]);
+
+        $this->assertSame('(max-width: 767px) 320px', $this->Poster->sizes($image));
     }
 
     /**

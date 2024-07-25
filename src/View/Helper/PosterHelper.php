@@ -132,7 +132,7 @@ class PosterHelper extends Helper
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @return \BEdita\Core\Model\Entity\Media|null
      */
-    protected function mobile(ObjectEntity|null $object): Media|null
+    public function mobile(ObjectEntity|null $object): Media|null
     {
         if (!$this->mobileExists($object)) {
             return null;
@@ -185,12 +185,14 @@ class PosterHelper extends Helper
     /**
      * Get sizes attribute for image.
      *
+     * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
      * @return string
      */
-    public function sizes(): string
+    public function sizes(Media $poster): string
     {
+        $variant = $this->mobile($poster);
         $maxWidth = $this->getConfig('PosterMobile.maxWidth', static::MOBILE_MAX_WIDTH);
-        $slotWidth = $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH);
+        $slotWidth = Hash::get($variant ?? [], '_joinData.params.slot_width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
 
         return sprintf('(max-width: %spx) %spx', $maxWidth, $slotWidth);
     }
