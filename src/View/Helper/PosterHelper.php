@@ -165,9 +165,9 @@ class PosterHelper extends Helper
         }
 
         $url = $this->url($variant, $thumbOptions, $posterOptions);
-        $width = $this->getStreamWidth($variant);
+        $slotWidth = $this->getSlotWidth($variant);
 
-        return sprintf('%s %sw, %s %sw', $url, $width, $fallbackUrl, $fallbackWidth);
+        return sprintf('%s %sw, %s %sw', $url, $slotWidth, $fallbackUrl, $fallbackWidth);
     }
 
     /**
@@ -183,6 +183,17 @@ class PosterHelper extends Helper
     }
 
     /**
+     * Get the slot width of a media object.
+     * 
+     * @param \BEdita\Core\Model\Entity\Media $variant Media entity.
+     * @return int
+     */
+    protected function getSlotWidth(Media $variant): int 
+    {
+        return Hash::get($variant ?? [], '_joinData.params.slot_width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
+    }
+
+    /**
      * Get sizes attribute for image.
      *
      * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
@@ -192,7 +203,7 @@ class PosterHelper extends Helper
     {
         $variant = $this->mobile($poster);
         $maxWidth = $this->getConfig('PosterMobile.maxWidth', static::MOBILE_MAX_WIDTH);
-        $slotWidth = Hash::get($variant ?? [], '_joinData.params.slot_width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
+        $slotWidth = $this->getSlotWidth($variant);
 
         return sprintf('(max-width: %spx) %spx', $maxWidth, $slotWidth);
     }
