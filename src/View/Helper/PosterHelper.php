@@ -185,7 +185,6 @@ class PosterHelper extends Helper
     /**
      * Get sizes attribute for image.
      *
-     * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
      * @return string
      */
     public function sizes(Media $poster): string
@@ -388,14 +387,14 @@ class PosterHelper extends Helper
 
         $objPosition = $getPositionValues($props);
 
-        $variant = $this->mobile($object);
+        $variant = $this->mobile($poster ?? $object);
 
         if ($variant) {
             $variantPosition = $getPositionValues($variant->custom_props, $variantPrefix) ?? '';
             $objPosition = $variantPosition . ' ' . $objPosition;
         }
 
-        return $objPosition;
+        return trim($objPosition);
     }
 
     /**

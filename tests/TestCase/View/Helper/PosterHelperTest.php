@@ -235,6 +235,33 @@ class PosterHelperTest extends TestCase
     }
 
     /**
+     * Test {@see PosterHelper::position()}.
+     *
+     * @return void
+     * @covers ::position()
+     */
+    public function testPosition()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+        $image['custom_props'] = [
+            'position_x' => '0',
+            'position_y' => '100',
+        ];
+
+        $this->assertSame('left top', $this->Poster->position($image));
+
+        $image['has_variant_mobile'][0]['custom_props'] = [
+            'position_x' => '100',
+            'position_y' => '0',
+        ];
+
+        $this->assertSame('mobile-right mobile-bottom left top', $this->Poster->position($image));
+
+        $this->assertSame('prefix-right prefix-bottom left top', $this->Poster->position($image, 'prefix-'));
+    }
+
+    /**
      * Test {@see PosterHelper::url()}.
      *
      * @return void
