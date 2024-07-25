@@ -184,11 +184,11 @@ class PosterHelper extends Helper
 
     /**
      * Get the slot width of a media object.
-     * 
+     *
      * @param \BEdita\Core\Model\Entity\Media $variant Media entity.
      * @return int
      */
-    protected function getSlotWidth(Media $variant): int 
+    protected function getSlotWidth(Media $variant): int
     {
         return Hash::get($variant ?? [], '_joinData.params.slot_width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
     }
