@@ -184,7 +184,7 @@ class PosterHelper extends Helper
 
     /**
      * Get sizes attribute for image.
-     * 
+     *
      * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
      * @return string
      */
