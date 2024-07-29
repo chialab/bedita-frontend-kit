@@ -174,21 +174,21 @@ class PosterHelper extends Helper
      * Get the width of the first stream of a media object.
      * If the media object has no streams, or the first stream has no width, return a default value.
      *
-     * @param \BEdita\Core\Model\Entity\Media $media Media entity.
+     * @param \BEdita\Core\Model\Entity\Media|null $media Media entity.
      * @return int
      */
-    protected function getStreamWidth(Media $media): int
+    protected function getStreamWidth(Media|null $media): int
     {
-        return Hash::get($media, 'streams.0.width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
+        return Hash::get($media ?? [], 'streams.0.width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
     }
 
     /**
      * Get the slot width for the variant mobile image.
      *
-     * @param \BEdita\Core\Model\Entity\Media $variant Media entity.
+     * @param \BEdita\Core\Model\Entity\Media|null $variant Media entity.
      * @return int
      */
-    protected function getSlotWidth(Media $variant): int
+    protected function getSlotWidth(Media|null $variant): int
     {
         $slotWidth = Hash::get($variant ?? [], '_joinData.params.slot_width');
 
