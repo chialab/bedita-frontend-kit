@@ -195,8 +195,9 @@ class PosterHelper extends Helper
         if (is_numeric($slotWidth)) {
             return (int)$slotWidth;
         }
-        
+
         $slotWidth = $this->getConfig('PosterMobile.slotWidth');
+
         return is_numeric($slotWidth) ? (int)$slotWidth : static::MOBILE_DEFAULT_WIDTH;
     }
 
