@@ -20,6 +20,10 @@ class PosterHelper extends Helper
 {
     protected const OBJECT_TYPE = 'images';
 
+    protected const MOBILE_DEFAULT_WIDTH = 640;
+
+    protected const MOBILE_MAX_WIDTH = 767;
+
     /**
      * @inheritDoc
      */
@@ -106,6 +110,105 @@ class PosterHelper extends Helper
     }
 
     /**
+     * Check if object has a valid mobile variant.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @return bool
+     */
+    public function mobileExists(ObjectEntity|null $object): bool
+    {
+        if (empty($object['has_variant_mobile'])) {
+            return false;
+        }
+
+        $variant = Hash::get($object, 'has_variant_mobile.0');
+
+        return $this->exists($variant, ['forceSelf' => true]);
+    }
+
+    /**
+     * Get mobile variant object (first related object).
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @return \BEdita\Core\Model\Entity\Media|null
+     */
+    public function mobile(ObjectEntity|null $object): Media|null
+    {
+        if (!$this->mobileExists($object)) {
+            return null;
+        }
+
+        $variant = Hash::get($object, 'has_variant_mobile.0');
+
+        return $variant;
+    }
+
+    /**
+     * Get `srcset` attribute for image.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @param array|string|false $thumbOptions
+     * @param array|string|false $posterOptions
+     * @return string
+     */
+    public function sourceSet(ObjectEntity|null $object, array|string|false $thumbOptions = false, array $posterOptions = []): string
+    {
+        $variant = $this->mobile($object);
+        $fallback = $this->poster($object);
+        $posterOptions['forceSelf'] = true;
+
+        $fallbackUrl = $this->url($object, $thumbOptions, $posterOptions);
+        $fallbackWidth = $this->getStreamWidth($fallback);
+
+        if (!$variant) {
+            return sprintf('%s %sw', $fallbackUrl, $fallbackWidth);
+        }
+
+        $url = $this->url($variant, $thumbOptions, $posterOptions);
+        $slotWidth = $this->getSlotWidth($variant);
+
+        return sprintf('%s %sw, %s %sw', $url, $slotWidth, $fallbackUrl, $fallbackWidth);
+    }
+
+    /**
+     * Get the width of the first stream of a media object.
+     * If the media object has no streams, or the first stream has no width, return a default value.
+     *
+     * @param \BEdita\Core\Model\Entity\Media $media Media entity.
+     * @return int
+     */
+    protected function getStreamWidth(Media $media): int
+    {
+        return Hash::get($media, 'streams.0.width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
+    }
+
+    /**
+     * Get the slot width of a media object.
+     *
+     * @param \BEdita\Core\Model\Entity\Media $variant Media entity.
+     * @return int
+     */
+    protected function getSlotWidth(Media $variant): int
+    {
+        return Hash::get($variant ?? [], '_joinData.params.slot_width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
+    }
+
+    /**
+     * Get sizes attribute for image.
+     *
+     * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
+     * @return string
+     */
+    public function sizes(Media $poster): string
+    {
+        $variant = $this->mobile($poster);
+        $maxWidth = $this->getConfig('PosterMobile.maxWidth', static::MOBILE_MAX_WIDTH);
+        $slotWidth = $this->getSlotWidth($variant);
+
+        return sprintf('(max-width: %spx) %spx', $maxWidth, $slotWidth);
+    }
+
+    /**
      * Check if object has a valid poster, or is an Image itself, and the referenced file does actually exist.
      *
      * ### Poster options:
@@ -120,17 +223,35 @@ class PosterHelper extends Helper
      */
     public function exists(ObjectEntity|null $object, array $options = []): bool
     {
+        return $this->poster($object, $options) !== null;
+    }
+
+    /**
+     * Return a valid poster for the object, or the Image itself.
+     *
+     * ### Poster options:
+     *
+     * - `forceSelf`: restrict checks to the object itself, rather than evaluating its `poster` related objects. Default: `false`
+     * - `variant`: poster variant, i.e. priority of the desired poster related object. Default: 0
+     * - `fallbackSelf`: whether to use object itself as a fallback in case poster related objects cannot be used. Default: `true`
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
+     * @param array $options Poster options.
+     * @return \BEdita\Core\Model\Entity\ObjectEntity|null
+     */
+    protected function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
+    {
         if ($object !== null && $object->has('provider_thumbnail')) {
-            return true;
+            return $object;
         }
 
         foreach ($this->candidates($object, $options) as $media) {
             if ($media->has('media_url')) {
-                return true;
+                return $media;
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -215,9 +336,10 @@ class PosterHelper extends Helper
      * Get position string to manage object-fit CSS property to crop the object poster image.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object to whom crop the poster image.
+     * @param string $prefix Prefix string to add to the position string tokens for the mobile variant image, if available.
      * @return string position string in the following format: '<x-string> <y-string>'
      */
-    public function position(ObjectEntity|null $object): string
+    public function position(ObjectEntity|null $object, string $variantPrefix = 'mobile-'): string
     {
         $props = [];
 
@@ -232,46 +354,59 @@ class PosterHelper extends Helper
             }
         }
 
-        if (empty($props)) {
-            return '';
+        $getPositionValues = function ($props, $prefix = '') {
+            if (empty($props)) {
+                return '';
+            }
+
+            if (!empty($props['position'])) {
+                return $props['position'];
+            }
+
+            if (!isset($props['position_x']) || !isset($props['position_y'])) {
+                return '';
+            }
+
+            $xPos = '';
+            $yPos = '';
+
+            switch ($props['position_x']) {
+                case 0:
+                    $xPos = 'left';
+                    break;
+                case 100:
+                    $xPos = 'right';
+                    break;
+                default:
+                    $xPos = 'center';
+                    break;
+            }
+
+            switch ($props['position_y']) {
+                case 0:
+                    $yPos = 'bottom';
+                    break;
+                case 100:
+                    $yPos = 'top';
+                    break;
+                default:
+                    $yPos = 'center';
+                    break;
+            }
+
+            return $prefix . $xPos . ' ' . $prefix . $yPos;
+        };
+
+        $objPosition = $getPositionValues($props);
+
+        $variant = $this->mobile($poster ?? $object);
+
+        if ($variant) {
+            $variantPosition = $getPositionValues($variant->custom_props, $variantPrefix) ?? '';
+            $objPosition = $variantPosition . ' ' . $objPosition;
         }
 
-        if (!empty($props['position'])) {
-            return $props['position'];
-        }
-
-        if (!isset($props['position_x']) || !isset($props['position_y'])) {
-            return '';
-        }
-
-        $xPos = '';
-        $yPos = '';
-
-        switch ($props['position_x']) {
-            case 0:
-                $xPos = 'left';
-                break;
-            case 100:
-                $xPos = 'right';
-                break;
-            default:
-                $xPos = 'center';
-                break;
-        }
-
-        switch ($props['position_y']) {
-            case 0:
-                $yPos = 'bottom';
-                break;
-            case 100:
-                $yPos = 'top';
-                break;
-            default:
-                $yPos = 'center';
-                break;
-        }
-
-        return $xPos . ' ' . $yPos;
+        return trim($objPosition);
     }
 
     /**

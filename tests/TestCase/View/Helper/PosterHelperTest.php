@@ -83,6 +83,26 @@ class PosterHelperTest extends TestCase
         ]);
     }
 
+    protected function setVariantProviderThumbnail($originalImage, int $width, int $height): void
+    {
+        $image = new Media([
+            'type' => 'images',
+            'width' => $width,
+            'height' => $height,
+        ]);
+
+        $image->set('streams', [$this->createStream($width, $height)]);
+        $image->set('_joinData', [
+            'params' => [
+                'slot_width' => 640,
+            ],
+        ]);
+
+        $image->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
+
+        $originalImage->set('has_variant_mobile', [$image]);
+    }
+
     protected function createImage(int $width, int $height): Media
     {
         $image = new Media([
@@ -140,6 +160,105 @@ class PosterHelperTest extends TestCase
         $object->set('provider_thumbnail', 'https://www.bedita.com/favicon.png');
 
         $this->assertTrue($this->Poster->exists($object));
+    }
+
+    /**
+     * Test {@see PosterHelper::mobileExists()}.
+     *
+     * @return void
+     * @covers ::mobileExists()
+     */
+    public function testExistsVariantMobileProviderThumbnail()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertTrue($this->Poster->mobileExists($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::mobile()}.
+     *
+     * @return void
+     * @covers ::mobile()
+     */
+    public function testMobileProviderThumbnail()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+
+        $this->assertSame($image['has_variant_mobile'][0], $this->Poster->mobile($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::sourceSet()}.
+     *
+     * @return void
+     * @covers ::sourceSet()
+     */
+    public function testSourceSet()
+    {
+        $image = $this->createImage(1500, 1000);
+        $image->set('provider_thumbnail', 'https://www.bedita.com/first.png');
+
+        // no variant
+        $this->assertSame('https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
+
+        $this->setVariantProviderThumbnail($image, 2000, 480);
+
+        // variant available
+        $this->assertSame('https://www.bedita.com/favicon.png 640w, https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::sizes()}.
+     *
+     * @return void
+     * @covers ::sizes()
+     */
+    public function testSizes()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 2000, 480);
+
+        // no slot_width set, using image width
+        $this->assertSame('(max-width: 767px) 640px', $this->Poster->sizes($image));
+
+        // variant with slot_width set
+        $image->get('has_variant_mobile')[0]->set('_joinData', [
+            'params' => [
+                'slot_width' => 320,
+            ],
+        ]);
+
+        $this->assertSame('(max-width: 767px) 320px', $this->Poster->sizes($image));
+    }
+
+    /**
+     * Test {@see PosterHelper::position()}.
+     *
+     * @return void
+     * @covers ::position()
+     */
+    public function testPosition()
+    {
+        $image = $this->createImage(1500, 1000);
+        $this->setVariantProviderThumbnail($image, 640, 480);
+        $image['custom_props'] = [
+            'position_x' => '0',
+            'position_y' => '100',
+        ];
+
+        $this->assertSame('left top', $this->Poster->position($image));
+
+        $image['has_variant_mobile'][0]['custom_props'] = [
+            'position_x' => '100',
+            'position_y' => '0',
+        ];
+
+        $this->assertSame('mobile-right mobile-bottom left top', $this->Poster->position($image));
+
+        $this->assertSame('prefix-right prefix-bottom left top', $this->Poster->position($image, 'prefix-'));
     }
 
     /**
