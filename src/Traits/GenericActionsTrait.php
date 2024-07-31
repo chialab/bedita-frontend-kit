@@ -106,7 +106,7 @@ trait GenericActionsTrait
             ]);
         }
 
-        return $this->paginate($children->order([], true), $settings)->toList();
+        return $this->paginate($children, $settings)->toList();
     }
 
     /**
