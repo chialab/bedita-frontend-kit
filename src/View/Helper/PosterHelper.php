@@ -20,8 +20,6 @@ class PosterHelper extends Helper
 {
     protected const OBJECT_TYPE = 'images';
 
-    protected const MOBILE_DEFAULT_WIDTH = 640;
-
     protected const MOBILE_MAX_WIDTH = 767;
 
     /**
@@ -138,13 +136,11 @@ class PosterHelper extends Helper
             return null;
         }
 
-        $variant = Hash::get($object, 'has_variant_mobile.0');
-
-        return $variant;
+        return Hash::get($object, 'has_variant_mobile.0');
     }
 
     /**
-     * Get `srcset` attribute for image.
+     * Get `srcset` attribute for source tag.
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null $object Object entity.
      * @param array|string|false $thumbOptions
@@ -154,66 +150,25 @@ class PosterHelper extends Helper
     public function sourceSet(ObjectEntity|null $object, array|string|false $thumbOptions = false, array $posterOptions = []): string
     {
         $variant = $this->mobile($object);
-        $fallback = $this->poster($object);
         $posterOptions['forceSelf'] = true;
 
-        $fallbackUrl = $this->url($object, $thumbOptions, $posterOptions);
-        $fallbackWidth = $this->getStreamWidth($fallback);
-
         if (!$variant) {
-            return sprintf('%s %sw', $fallbackUrl, $fallbackWidth);
+            return $this->url($object, $thumbOptions, $posterOptions);
         }
 
-        $url = $this->url($variant, $thumbOptions, $posterOptions);
-        $slotWidth = $this->getSlotWidth($variant);
-
-        return sprintf('%s %sw, %s %sw', $url, $slotWidth, $fallbackUrl, $fallbackWidth);
+        return $this->url($variant, $thumbOptions, $posterOptions);
     }
 
     /**
-     * Get the width of the first stream of a media object.
-     * If the media object has no streams, or the first stream has no width, return a default value.
+     * Get media query for poster.
      *
-     * @param \BEdita\Core\Model\Entity\Media|null $media Media entity.
-     * @return int
-     */
-    protected function getStreamWidth(Media|null $media): int
-    {
-        return Hash::get($media ?? [], 'streams.0.width', $this->getConfig('PosterMobile.slotWidth', static::MOBILE_DEFAULT_WIDTH));
-    }
-
-    /**
-     * Get the slot width for the variant mobile image.
-     *
-     * @param \BEdita\Core\Model\Entity\Media|null $variant Media entity.
-     * @return int
-     */
-    protected function getSlotWidth(Media|null $variant): int
-    {
-        $slotWidth = Hash::get($variant ?? [], '_joinData.params.slot_width');
-
-        if (is_numeric($slotWidth)) {
-            return (int)$slotWidth;
-        }
-
-        $slotWidth = $this->getConfig('PosterMobile.slotWidth');
-
-        return is_numeric($slotWidth) ? (int)$slotWidth : static::MOBILE_DEFAULT_WIDTH;
-    }
-
-    /**
-     * Get sizes attribute for image.
-     *
-     * @param \BEdita\Core\Model\Entity\Media $poster Poster entity.
      * @return string
      */
-    public function sizes(Media $poster): string
+    public function mediaQuery(): string
     {
-        $variant = $this->mobile($poster);
         $maxWidth = $this->getConfig('PosterMobile.maxWidth', static::MOBILE_MAX_WIDTH);
-        $slotWidth = $this->getSlotWidth($variant);
 
-        return sprintf('(max-width: %spx) %spx', $maxWidth, $slotWidth);
+        return sprintf('(max-width: %spx)', $maxWidth);
     }
 
     /**
