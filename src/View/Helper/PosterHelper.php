@@ -136,9 +136,7 @@ class PosterHelper extends Helper
             return null;
         }
 
-        $variant = Hash::get($object, 'has_variant_mobile.0');
-
-        return $variant;
+        return Hash::get($object, 'has_variant_mobile.0');
     }
 
     /**
@@ -154,15 +152,11 @@ class PosterHelper extends Helper
         $variant = $this->mobile($object);
         $posterOptions['forceSelf'] = true;
 
-        $fallbackUrl = $this->url($object, $thumbOptions, $posterOptions);
-
         if (!$variant) {
-            return $fallbackUrl;
+            return $this->url($object, $thumbOptions, $posterOptions);
         }
 
-        $url = $this->url($variant, $thumbOptions, $posterOptions);
-
-        return $url;
+        return $this->url($variant, $thumbOptions, $posterOptions);
     }
 
     /**
