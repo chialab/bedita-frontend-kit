@@ -120,8 +120,7 @@ class DateRangesHelper extends Helper
             ->sortBy(fn (DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
             ->filter(
-                fn (DateRange $dr): bool =>
-                    (new FrozenTime($dr->start_date))->greaterThanOrEquals($now)
+                fn (DateRange $dr): bool => (new FrozenTime($dr->start_date))->greaterThanOrEquals($now)
                     || ($dr->end_date !== null && (new FrozenTime($dr->end_date))->greaterThanOrEquals($now))
             )
             ->first();
