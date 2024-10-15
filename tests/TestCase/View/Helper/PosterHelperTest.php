@@ -202,36 +202,26 @@ class PosterHelperTest extends TestCase
         $image->set('provider_thumbnail', 'https://www.bedita.com/first.png');
 
         // no variant
-        $this->assertSame('https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
+        $this->assertSame('https://www.bedita.com/first.png', $this->Poster->sourceSet($image));
 
-        $this->setVariantProviderThumbnail($image, 2000, 480);
+        $this->setVariantProviderThumbnail($image, 1000, 480);
 
         // variant available
-        $this->assertSame('https://www.bedita.com/favicon.png 640w, https://www.bedita.com/first.png 1500w', $this->Poster->sourceSet($image));
+        $this->assertSame('https://www.bedita.com/favicon.png', $this->Poster->sourceSet($image));
     }
 
     /**
-     * Test {@see PosterHelper::sizes()}.
+     * Test {@see PosterHelper::mediaQuery()}.
      *
      * @return void
-     * @covers ::sizes()
+     * @covers ::mediaQuery()
      */
-    public function testSizes()
+    public function testMediaQuery()
     {
         $image = $this->createImage(1500, 1000);
-        $this->setVariantProviderThumbnail($image, 2000, 480);
+        $this->setVariantProviderThumbnail($image, 500, 480);
 
-        // no slot_width set, using image width
-        $this->assertSame('(max-width: 767px) 640px', $this->Poster->sizes($image));
-
-        // variant with slot_width set
-        $image->get('has_variant_mobile')[0]->set('_joinData', [
-            'params' => [
-                'slot_width' => 320,
-            ],
-        ]);
-
-        $this->assertSame('(max-width: 767px) 320px', $this->Poster->sizes($image));
+        $this->assertSame('(max-width: 767px)', $this->Poster->mediaQuery($image));
     }
 
     /**
