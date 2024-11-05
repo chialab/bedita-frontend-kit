@@ -101,7 +101,7 @@ class PlaceholdersHelperTest extends TestCase
         $this->object = new ObjectEntity([
             'id' => 1,
             'type' => 'objects',
-            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3 -->',
+            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3.eyJjbGFzcyI6InRlc3QifQ -->',
             'placeholder' => [$this->image1, $this->image2],
         ]);
     }
