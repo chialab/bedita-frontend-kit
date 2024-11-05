@@ -101,7 +101,7 @@ class PlaceholdersHelperTest extends TestCase
         $this->object = new ObjectEntity([
             'id' => 1,
             'type' => 'objects',
-            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3.eyJjbGFzcyI6InRlc3QifQ -->',
+            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3.eyJjbGFzcyI6InRlc3QifQ== -->',
             'placeholder' => [$this->image1, $this->image2],
         ]);
     }
@@ -153,7 +153,7 @@ class PlaceholdersHelperTest extends TestCase
     public function testDefaultTemplater()
     {
         $contents = $this->Placeholders::defaultTemplater($this->object, 'body', [$this->image1, $this->image2], fn ($entity, $params) => sprintf('%s %s', $entity->title, $params ? json_encode($params) : ''));
-        $this->assertSame('<p>Hello World image1 </p>image2 {"class":"test"}', $contents);
+        $this->assertSame('<p>Hello World image1 </p>image2 "{\"class\":\"test\"}"', $contents);
     }
 
     /**
