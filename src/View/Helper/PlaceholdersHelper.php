@@ -10,6 +10,7 @@ use Cake\Utility\Hash;
 use Cake\View\Helper;
 use InvalidArgumentException;
 use Iterator;
+use RuntimeException;
 
 /**
  * Placeholders helper.
@@ -33,6 +34,14 @@ class PlaceholdersHelper extends Helper
         'extract' => null,
         'template' => null,
     ];
+
+    /**
+     * The default regex to use to interpolate placeholders data.
+     *
+     * @see https://github.com/bedita/placeholders/blob/main/src/Model/Behavior/PlaceholdersBehavior.php
+     * @var string
+     */
+    protected const REGEX = '/<!--\s*BE-PLACEHOLDER\.(?P<id>\d+)(?:\.(?P<params>[A-Za-z0-9+=-]+))?\s*-->/';
 
     /**
      * @inheritDoc
@@ -102,27 +111,22 @@ class PlaceholdersHelper extends Helper
             return $contents;
         }
 
-        $deltas = [];
-        foreach ($placeholders as $placeholder) {
-            $info = Hash::get($placeholder, ['relation', 'params', $field], []);
-            foreach ($info as $i) {
-                $offset = $i['offset'];
-                $delta = array_sum(array_filter(
-                    $deltas,
-                    function (int $pos) use ($offset): bool {
-                        return $pos < $offset;
-                    },
-                    ARRAY_FILTER_USE_KEY
-                ));
-                $length = $i['length'];
-                $params = $i['params'] ?? null;
+        if (preg_match_all(static::REGEX, $contents, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE) === false) {
+            throw new RuntimeException('Failed to extract placeholders');
+        }
 
-                $replacement = $callback($placeholder, $params);
-
-                $contents = mb_substr($contents, 0, $offset + $delta) . $replacement . mb_substr($contents, $offset + $delta + $length);
-
-                $deltas[$offset] = mb_strlen($replacement) - $length;
+        $placeholdersMap = Hash::combine($placeholders, '{n}.id', '{n}');
+        foreach ($matches as $match) {
+            $placeholder = $placeholdersMap[(int)$match['id'][0]];
+            if ($placeholder === null) {
+                continue;
             }
+
+            $params = !empty($match['params'][0]) ? base64_decode($match['params'][0]) : null;
+
+            $replacement = $callback($placeholder, $params);
+
+            $contents = preg_replace(static::REGEX, $replacement, $contents, 1);
         }
 
         return $contents;
