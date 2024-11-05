@@ -75,7 +75,7 @@ class PlaceholdersHelperTest extends TestCase
                 'params' => [
                     'body' => [[
                         'offset' => 15,
-                        'length' => 18,
+                        'length' => 25,
                     ]],
                 ],
             ],
@@ -88,8 +88,8 @@ class PlaceholdersHelperTest extends TestCase
             'relation' => [
                 'params' => [
                     'body' => [[
-                        'offset' => 37,
-                        'length' => 18,
+                        'offset' => 44,
+                        'length' => 25,
                         'params' => [
                             'class' => 'test',
                         ],
@@ -101,7 +101,7 @@ class PlaceholdersHelperTest extends TestCase
         $this->object = new ObjectEntity([
             'id' => 1,
             'type' => 'objects',
-            'body' => '<p>Hello World <!-- TEMPLATE1 --></p><!-- TEMPLATE2 -->',
+            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3 -->',
             'placeholder' => [$this->image1, $this->image2],
         ]);
     }
