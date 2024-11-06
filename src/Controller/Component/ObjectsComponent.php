@@ -60,6 +60,28 @@ class ObjectsComponent extends Component
     }
 
     /**
+     * Set object types configuration.
+     *
+     * @param array $objectTypesConfig Object types configuration.
+     * @return void
+     */
+    public function setObjectTypesConfig(array $objectTypesConfig): void
+    {
+        $this->getLoader()->setObjectTypesConfig($objectTypesConfig);
+    }
+
+    /**
+     * Set auto-hydrate associations.
+     *
+     * @param array $autoHydrateAssociations Auto-hydrate associations.
+     * @return void
+     */
+    public function setAutoHydrateAssociations(array $autoHydrateAssociations): void
+    {
+        $this->getLoader()->setAutoHydrateAssociations($autoHydrateAssociations);
+    }
+
+    /**
      * Fetch an object by its ID or uname.
      *
      * @param string|int $id Object ID or uname.

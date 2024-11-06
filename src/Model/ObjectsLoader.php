@@ -67,11 +67,33 @@ class ObjectsLoader
      */
     public function __construct(array $objectTypesConfig = [], array $autoHydrateAssociations = [])
     {
-        $this->objectTypesConfig = $objectTypesConfig;
-        $this->autoHydrateAssociations = $autoHydrateAssociations;
+        $this->setObjectTypesConfig($objectTypesConfig);
+        $this->setAutoHydrateAssociations($autoHydrateAssociations);
 
         $this->ObjectTypes = $this->fetchTable('BEdita/Core.ObjectTypes');
         $this->Objects = $this->fetchTable('BEdita/Core.Objects');
+    }
+
+    /**
+     * Set object types configuration.
+     *
+     * @param array $objectTypesConfig Object types configuration.
+     * @return void
+     */
+    public function setObjectTypesConfig(array $objectTypesConfig): void
+    {
+        $this->objectTypesConfig = $objectTypesConfig;
+    }
+
+    /**
+     * Set auto-hydrate associations.
+     *
+     * @param array $autoHydrateAssociations Auto-hydrate associations.
+     * @return void
+     */
+    public function setAutoHydrateAssociations(array $autoHydrateAssociations): void
+    {
+        $this->autoHydrateAssociations = $autoHydrateAssociations;
     }
 
     /**
