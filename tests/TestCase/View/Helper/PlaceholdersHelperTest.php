@@ -75,7 +75,7 @@ class PlaceholdersHelperTest extends TestCase
                 'params' => [
                     'body' => [[
                         'offset' => 15,
-                        'length' => 18,
+                        'length' => 25,
                     ]],
                 ],
             ],
@@ -88,11 +88,9 @@ class PlaceholdersHelperTest extends TestCase
             'relation' => [
                 'params' => [
                     'body' => [[
-                        'offset' => 37,
-                        'length' => 18,
-                        'params' => [
-                            'class' => 'test',
-                        ],
+                        'offset' => 44,
+                        'length' => 25,
+                        'params' => '{"class":"test"}',
                     ]],
                 ],
             ],
@@ -101,7 +99,7 @@ class PlaceholdersHelperTest extends TestCase
         $this->object = new ObjectEntity([
             'id' => 1,
             'type' => 'objects',
-            'body' => '<p>Hello World <!-- TEMPLATE1 --></p><!-- TEMPLATE2 -->',
+            'body' => '<p>Hello World <!-- BE-PLACEHOLDER.2 --></p><!-- BE-PLACEHOLDER.3.eyJjbGFzcyI6InRlc3QifQ== -->',
             'placeholder' => [$this->image1, $this->image2],
         ]);
     }
@@ -152,7 +150,7 @@ class PlaceholdersHelperTest extends TestCase
      */
     public function testDefaultTemplater()
     {
-        $contents = $this->Placeholders::defaultTemplater($this->object, 'body', [$this->image1, $this->image2], fn ($entity, $params) => sprintf('%s %s', $entity->title, $params ? json_encode($params) : ''));
+        $contents = $this->Placeholders::defaultTemplater($this->object, 'body', [$this->image1, $this->image2], fn ($entity, $params) => sprintf('%s %s', $entity->title, $params ? $params : ''));
         $this->assertSame('<p>Hello World image1 </p>image2 {"class":"test"}', $contents);
     }
 

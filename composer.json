@@ -7,7 +7,7 @@
         "php": ">=8.1",
         "ext-intl": "*",
         "ext-json": "*",
-        "bedita/core": "^5.0.0",
+        "bedita/core": "^5.14.0",
         "bedita/i18n": "^4.0",
         "cakephp/cakephp": "^4.0",
         "cakephp/authentication": "^2.0",
@@ -15,11 +15,13 @@
         "chialab/ip": "^1.0"
     },
     "require-dev": {
+        "bedita/placeholders": "^2.0",
         "cakephp/cakephp-codesniffer": "^5.0",
         "cakephp/plugin-installer": "^1.0",
         "phpunit/phpunit": "~8.5.0 || ^9.3"
     },
     "suggest": {
+        "bedita/placeholders": "To manage placeholders in templates",
         "chialab/rna-cakephp": "To manage JavaScript and CSS bundles with RNA"
     },
     "autoload": {

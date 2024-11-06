@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Table\ObjectTypesTable;
+use BEdita\Placeholders\Model\Behavior\PlaceholdersBehavior;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\Utility\Hash;
 use Cake\View\Helper;
 use InvalidArgumentException;
 use Iterator;
@@ -103,15 +103,24 @@ class PlaceholdersHelper extends Helper
         }
 
         $deltas = [];
+        $extracted = PlaceholdersBehavior::extractPlaceholders($entity, [$field]);
+        $getInfo = function (array $extracted, int $id, string $field): array {
+            foreach ($extracted as $it) {
+                if ($it['id'] === $id) {
+                    return $it['params'][$field] ?? [];
+                }
+            }
+
+            return [];
+        };
+
         foreach ($placeholders as $placeholder) {
-            $info = Hash::get($placeholder, ['relation', 'params', $field], []);
+            $info = $getInfo($extracted, $placeholder['id'], $field);
             foreach ($info as $i) {
                 $offset = $i['offset'];
                 $delta = array_sum(array_filter(
                     $deltas,
-                    function (int $pos) use ($offset): bool {
-                        return $pos < $offset;
-                    },
+                    fn (int $pos): bool => $pos < $offset,
                     ARRAY_FILTER_USE_KEY
                 ));
                 $length = $i['length'];
