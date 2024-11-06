@@ -15,10 +15,10 @@
         "chialab/ip": "^1.0"
     },
     "require-dev": {
+        "bedita/placeholders": "^2.0",
         "cakephp/cakephp-codesniffer": "^5.0",
         "cakephp/plugin-installer": "^1.0",
-        "phpunit/phpunit": "~8.5.0 || ^9.3",
-        "bedita/placeholders": "^2.0"
+        "phpunit/phpunit": "~8.5.0 || ^9.3"
     },
     "suggest": {
         "bedita/placeholders": "To manage placeholders in templates",
