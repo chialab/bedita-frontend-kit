@@ -90,9 +90,7 @@ class PlaceholdersHelperTest extends TestCase
                     'body' => [[
                         'offset' => 44,
                         'length' => 25,
-                        'params' => [
-                            'class' => 'test',
-                        ],
+                        'params' => '{"class":"test"}',
                     ]],
                 ],
             ],
