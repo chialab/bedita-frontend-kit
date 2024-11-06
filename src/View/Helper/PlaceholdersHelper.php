@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Table\ObjectTypesTable;
+use BEdita\Placeholders\Model\Behavior\PlaceholdersBehavior;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\Utility\Hash;
 use Cake\View\Helper;
 use InvalidArgumentException;
 use Iterator;
-use RuntimeException;
 
 /**
  * Placeholders helper.
@@ -34,14 +33,6 @@ class PlaceholdersHelper extends Helper
         'extract' => null,
         'template' => null,
     ];
-
-    /**
-     * The default regex to use to interpolate placeholders data.
-     *
-     * @see https://github.com/bedita/placeholders/blob/main/src/Model/Behavior/PlaceholdersBehavior.php
-     * @var string
-     */
-    protected const REGEX = '/<!--\s*BE-PLACEHOLDER\.(?P<id>\d+)(?:\.(?P<params>[A-Za-z0-9+=-]+))?\s*-->/';
 
     /**
      * @inheritDoc
@@ -111,22 +102,36 @@ class PlaceholdersHelper extends Helper
             return $contents;
         }
 
-        if (preg_match_all(static::REGEX, $contents, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE) === false) {
-            throw new RuntimeException('Failed to extract placeholders');
-        }
-
-        $placeholdersMap = Hash::combine($placeholders, '{n}.id', '{n}');
-        foreach ($matches as $match) {
-            $placeholder = $placeholdersMap[(int)$match['id'][0]];
-            if ($placeholder === null) {
-                continue;
+        $deltas = [];
+        $extracted = PlaceholdersBehavior::extractPlaceholders($entity, [$field]);
+        $getInfo = function (array $extracted, int $id, string $field): array {
+            foreach ($extracted as $it) {
+                if ($it['id'] === $id) {
+                    return $it['params'][$field] ?? [];
+                }
             }
 
-            $params = !empty($match['params'][0]) ? base64_decode($match['params'][0]) : null;
+            return [];
+        };
 
-            $replacement = $callback($placeholder, $params);
+        foreach ($placeholders as $placeholder) {
+            $info = $getInfo($extracted, $placeholder['id'], $field);
+            foreach ($info as $i) {
+                $offset = $i['offset'];
+                $delta = array_sum(array_filter(
+                    $deltas,
+                    fn (int $pos): bool => $pos < $offset,
+                    ARRAY_FILTER_USE_KEY
+                ));
+                $length = $i['length'];
+                $params = $i['params'] ?? null;
 
-            $contents = preg_replace(static::REGEX, $replacement, $contents, 1);
+                $replacement = $callback($placeholder, $params);
+
+                $contents = mb_substr($contents, 0, $offset + $delta) . $replacement . mb_substr($contents, $offset + $delta + $length);
+
+                $deltas[$offset] = mb_strlen($replacement) - $length;
+            }
         }
 
         return $contents;
