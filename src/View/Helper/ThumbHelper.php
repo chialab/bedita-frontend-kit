@@ -71,6 +71,10 @@ class ThumbHelper extends Helper
 
         $stream = $this->Media->getStream($media);
         if ($stream !== null) {
+            if ($stream?->mime_type === 'image/gif') {
+                return $media->get('media_url');
+            }
+
             $res = Thumbnail::get($stream, $thumbOptions);
             if (!empty($res['url']) && (!empty($res['ready']) || $allowPending)) {
                 return $res['url'];
