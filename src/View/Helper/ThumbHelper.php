@@ -57,14 +57,6 @@ class ThumbHelper extends Helper
      */
     public function url(ObjectEntity|null $object, array|string $thumbOptions = 'default', array $fallbackOptions = []): string|null
     {
-        if (
-            $object !== null &&
-            $object instanceof Media &&
-            $this->Media->getStream($object)?->mime_type === 'image/gif'
-        ) {
-            return $object->get('media_url');
-        }
-
         $allowPending = filter_var(Hash::get($fallbackOptions, 'allowPending', false), FILTER_VALIDATE_BOOL);
         $fallbackOriginal = filter_var(Hash::get($fallbackOptions, 'fallbackOriginal', true), FILTER_VALIDATE_BOOL);
         $fallbackStatic = filter_var(Hash::get($fallbackOptions, 'fallbackStatic', true), FILTER_VALIDATE_BOOL);
@@ -79,6 +71,10 @@ class ThumbHelper extends Helper
 
         $stream = $this->Media->getStream($media);
         if ($stream !== null) {
+            if ($stream?->mime_type === 'image/gif') {
+                return $media->get('media_url');
+            }
+
             $res = Thumbnail::get($stream, $thumbOptions);
             if (!empty($res['url']) && (!empty($res['ready']) || $allowPending)) {
                 return $res['url'];
