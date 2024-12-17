@@ -95,13 +95,13 @@ trait GenericActionsTrait
 
         $settings = Hash::merge($this->paginate, [
             'order' => $order,
-            'sortableFields' => array_merge($this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+            'sortableFields' => array_filter(array_merge($this->paginate['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order))),
         ]);
         if (isset($settings['Children'])) {
             $settings = Hash::merge($settings, [
                 'Children' => [
                     'order' => $order,
-                    'sortableFields' => array_merge($this->paginate['Children']['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order)),
+                    'sortableFields' => array_filter(array_merge($this->paginate['Children']['sortableFields'] ?? (array)$this->request->getQuery('sort'), array_keys($order))),
                 ],
             ]);
         }
