@@ -100,7 +100,7 @@ class TagsComponent extends Component
     protected function buildTagsSubquery(Table $table, array $tags): Query
     {
         return $table->find()
-            ->where(fn (QueryExpression $exp): QueryExpression => $exp
+            ->where(fn(QueryExpression $exp): QueryExpression => $exp
                 ->or(function (QueryExpression $exp) use ($tags, $table): QueryExpression {
                     $ids = array_filter($tags, 'is_numeric');
                     if (!empty($ids)) {
@@ -135,14 +135,14 @@ class TagsComponent extends Component
                 case 'in':
                     return $exp->in(
                         $table->aliasField('id'),
-                        $tagQuery->innerJoinWith('ObjectTags')->select(['ObjectTags.object_id'])
+                        $tagQuery->innerJoinWith('ObjectTags')->select(['ObjectTags.object_id']),
                     );
                 case 'exists':
                     return $exp->exists(
                         $tagQuery
                             ->select(['existing' => 1])
                             ->innerJoinWith('ObjectTags')
-                            ->where(fn (QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectTags.object_id', $table->aliasField('id'))),
+                            ->where(fn(QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectTags.object_id', $table->aliasField('id'))),
                     );
                 default:
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
@@ -169,14 +169,14 @@ class TagsComponent extends Component
                 case 'in':
                     return $exp->notIn(
                         $table->aliasField('id'),
-                        $tagQuery->innerJoinWith('ObjectTags')->select(['ObjectTags.object_id'])
+                        $tagQuery->innerJoinWith('ObjectTags')->select(['ObjectTags.object_id']),
                     );
                 case 'exists':
                     return $exp->notExists(
                         $tagQuery
                             ->select(['existing' => 1])
                             ->innerJoinWith('ObjectTags')
-                            ->where(fn (QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectTags.object_id', $table->aliasField('id'))),
+                            ->where(fn(QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectTags.object_id', $table->aliasField('id'))),
                     );
                 default:
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));

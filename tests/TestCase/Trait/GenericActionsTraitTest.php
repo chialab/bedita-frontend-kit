@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Chialab\FrontendKit\Test\TestCase\Trait;
 
 use BEdita\Core\Model\Entity\Folder;
+use Cake\Database\Driver\Sqlite;
+use Cake\Datasource\ConnectionManager;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
@@ -140,6 +142,7 @@ class GenericActionsTraitTest extends TestCase
      */
     public function testFallback($url, $objectUname, $children, $related, $parentUname, $ancestorUnames, $body)
     {
+        $this->skipIf(ConnectionManager::get('test')->getDriver() instanceof Sqlite, 'SQLite does not support HAVING');
         [$path, $filters] = $url;
         $this->controller->setRequest($this->controller->getRequest()->withQueryParams($filters));
 
@@ -181,7 +184,7 @@ class GenericActionsTraitTest extends TestCase
         static::assertSame($parentUname, $parent?->uname);
 
         // assert the ancestors have been correctly loaded
-        static::assertSame($ancestorUnames, array_map(fn (Folder $ancestor): string => $ancestor->uname, $ancestors));
+        static::assertSame($ancestorUnames, array_map(fn(Folder $ancestor): string => $ancestor->uname, $ancestors));
 
         // check the response result
         static::assertSame($body, (string)$response->getBody());

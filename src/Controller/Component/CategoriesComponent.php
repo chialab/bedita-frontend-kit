@@ -121,7 +121,7 @@ class CategoriesComponent extends Component
     protected function buildCategoriesSubquery(Table $table, array $categories): Query
     {
         return $table->find()
-            ->where(fn (QueryExpression $exp): QueryExpression => $exp
+            ->where(fn(QueryExpression $exp): QueryExpression => $exp
                 ->or(function (QueryExpression $exp) use ($categories, $table): QueryExpression {
                     $ids = array_filter($categories, 'is_numeric');
                     if (!empty($ids)) {
@@ -176,14 +176,14 @@ class CategoriesComponent extends Component
                 case 'in':
                     return $exp->in(
                         $table->aliasField('id'),
-                        $catQuery->innerJoinWith('ObjectCategories')->select(['ObjectCategories.object_id'])
+                        $catQuery->innerJoinWith('ObjectCategories')->select(['ObjectCategories.object_id']),
                     );
                 case 'exists':
                     return $exp->exists(
                         $catQuery
                             ->select(['existing' => 1])
                             ->innerJoinWith('ObjectCategories')
-                            ->where(fn (QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectCategories.object_id', $table->aliasField('id'))),
+                            ->where(fn(QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectCategories.object_id', $table->aliasField('id'))),
                     );
                 default:
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
@@ -210,14 +210,14 @@ class CategoriesComponent extends Component
                 case 'in':
                     return $exp->notIn(
                         $table->aliasField('id'),
-                        $catQuery->innerJoinWith('ObjectCategories')->select(['ObjectCategories.object_id'])
+                        $catQuery->innerJoinWith('ObjectCategories')->select(['ObjectCategories.object_id']),
                     );
                 case 'exists':
                     return $exp->notExists(
                         $catQuery
                             ->select(['existing' => 1])
                             ->innerJoinWith('ObjectCategories')
-                            ->where(fn (QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectCategories.object_id', $table->aliasField('id'))),
+                            ->where(fn(QueryExpression $exp): QueryExpression => $exp->equalFields('ObjectCategories.object_id', $table->aliasField('id'))),
                     );
                 default:
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));

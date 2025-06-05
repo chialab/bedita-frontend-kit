@@ -95,7 +95,7 @@ class ObjectRoute extends DashedRoute
             throw new RuntimeException(sprintf(
                 'Route `%s` expects the URL option `_entity` to be an array or object implementing \ArrayAccess, but `%s` passed.',
                 $this->template,
-                getTypeName($entity)
+                getTypeName($entity),
             ));
         }
     }
@@ -122,7 +122,7 @@ class ObjectRoute extends DashedRoute
                 function (bool $matches, string $value) use ($entity, $prop): bool {
                     return $matches || fnmatch($value, $entity[$prop]);
                 },
-                false
+                false,
             );
         };
 
@@ -161,7 +161,7 @@ class ObjectRoute extends DashedRoute
                 default:
                     throw new InvalidArgumentException(sprintf(
                         'Unknown route filter "%s"',
-                        $filter
+                        $filter,
                     ));
             }
         }

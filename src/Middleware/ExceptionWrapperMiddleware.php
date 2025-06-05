@@ -31,7 +31,7 @@ class ExceptionWrapperMiddleware implements MiddlewareInterface
     public function __construct()
     {
         $this->exceptionMap = [
-            RecordNotFoundException::class => fn (RecordNotFoundException $e): NotFoundException => new NotFoundException(__('Page not found'), null, $e),
+            RecordNotFoundException::class => fn(RecordNotFoundException $e): NotFoundException => new NotFoundException(__('Page not found'), null, $e),
         ];
     }
 

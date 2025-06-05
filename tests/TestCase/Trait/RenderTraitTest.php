@@ -101,7 +101,7 @@ class RenderTraitTest extends TestCase
         $Object = TableRegistry::getTableLocator()->get('BEdita/Core.Objects');
         $Folders = TableRegistry::getTableLocator()->get('BEdita/Core.Folders');
         $object = $Object->get($id, ['contain' => 'ObjectTypes']);
-        $folders = array_map(fn (int $id) => $Folders->get($id), $parents);
+        $folders = array_map(fn(int $id) => $Folders->get($id), $parents);
 
         $result = [...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders))];
 
@@ -132,7 +132,7 @@ class RenderTraitTest extends TestCase
         $Object = TableRegistry::getTableLocator()->get('BEdita/Core.Objects');
         $Folders = TableRegistry::getTableLocator()->get('BEdita/Core.Folders');
         $object = $Object->get($id, ['contain' => 'ObjectTypes']);
-        $folders = array_map(fn (int $id) => $Folders->get($id), $parents);
+        $folders = array_map(fn(int $id) => $Folders->get($id), $parents);
 
         $response = $this->controller->renderFirstTemplate(...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders)));
 

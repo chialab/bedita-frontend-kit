@@ -101,7 +101,7 @@ class TwigSyntaxCheckCommand extends Command
      */
     protected static function pathsIterator(): Iterator
     {
-        $filterPaths = fn (array $paths): array => array_filter($paths, is_dir(...));
+        $filterPaths = fn(array $paths): array => array_filter($paths, is_dir(...));
 
         yield from $filterPaths(App::path('templates'));
 
@@ -120,7 +120,7 @@ class TwigSyntaxCheckCommand extends Command
     protected static function templatesIterator(string $path, array $extensions): Iterator
     {
         $extensions = array_map(
-            fn (string $ext): string => str_starts_with($ext, '.') ? $ext : '.' . $ext,
+            fn(string $ext): string => str_starts_with($ext, '.') ? $ext : '.' . $ext,
             $extensions,
         );
 

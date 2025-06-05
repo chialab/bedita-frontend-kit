@@ -147,7 +147,7 @@ class ObjectsLoader
         }
 
         if ($hydrate === null) {
-            $hydrate = array_reduce($relations, fn ($acc, $rel) => $acc + [$rel => 2], []);
+            $hydrate = array_reduce($relations, fn($acc, $rel) => $acc + [$rel => 2], []);
         }
 
         return $this->loadObject((string)$id, $type, $options, $hydrate);
@@ -266,7 +266,7 @@ class ObjectsLoader
         $object = $action(static::includeTranslations($contain) ? compact('primaryKey', 'contain') : compact('primaryKey', 'lang', 'contain'));
 
         return $this->autoHydrateAssociations($this->setJoinData([$object], $contain), $depth, $hydrate)
-            ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang))
+            ->map(fn(ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang))
             ->first();
     }
 
@@ -307,7 +307,7 @@ class ObjectsLoader
             }
 
             return $this->autoHydrateAssociations($this->setJoinData($results, array_merge($contain, $lateContain)), $depth, $hydrate)
-                ->map(fn (ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang));
+                ->map(fn(ObjectEntity $object): ObjectEntity => $this->dangerouslyTranslateFields($object, $lang));
         });
     }
 
@@ -349,7 +349,7 @@ class ObjectsLoader
 
             return $this->autoHydrateAssociations($this->setJoinData($objects, $contain), $depth, $hydrate)
                 ->map(function (ObjectEntity $object) use ($results, $lang): ObjectEntity {
-                    $original = collection($results)->filter(fn (ObjectEntity $orig): bool => $orig->id === $object->id)->first();
+                    $original = collection($results)->filter(fn(ObjectEntity $orig): bool => $orig->id === $object->id)->first();
                     if (!$original->isEmpty('_joinData')) {
                         $object->set('relation', $original->get('_joinData'));
                         $object->clean();
@@ -425,7 +425,7 @@ class ObjectsLoader
         $sortedIds = $objects->extract('id')->toList();
 
         return $objects
-            ->combine('id', fn (Entity $object): Entity => $object, fn (Entity $object): string => $object->type ?? '')
+            ->combine('id', fn(Entity $object): Entity => $object, fn(Entity $object): string => $object->type ?? '')
             ->unfold(function (iterable $items, string $type) use ($depth): Iterator {
                 if ($type === '') {
                     yield from $items;
@@ -483,7 +483,7 @@ class ObjectsLoader
 
         /** @var \BEdita\Core\Model\Entity\Translation|null $requestedTranslation */
         $requestedTranslation = collection($object->translations ?? [])
-            ->filter(fn (Translation $tr): bool => $tr->lang === $lang)
+            ->filter(fn(Translation $tr): bool => $tr->lang === $lang)
             ->first();
         if ($requestedTranslation === null) {
             return $object;
@@ -622,8 +622,8 @@ class ObjectsLoader
                 $hydrateAssociations,
                 function (int $maxDepth) use ($depth): bool {
                     return $maxDepth === -1 || $maxDepth > $depth;
-                }
-            )
+                },
+            ),
         );
     }
 
@@ -657,7 +657,7 @@ class ObjectsLoader
                 return $contains;
             }
 
-            $contains[$assoc] = fn (Query $query): Query => $query->limit($limit);
+            $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
 
             return $contains;
         }, []);
