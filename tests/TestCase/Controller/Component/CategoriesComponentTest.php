@@ -140,7 +140,7 @@ class CategoriesComponentTest extends TestCase
             $this->Categories->filterExcludeByCategories($query, $ids, $strategy)
                 ->limit(3)
                 ->toArray(),
-            '{n}.id'
+            '{n}.id',
         );
 
         static::assertEquals($expected, $result);

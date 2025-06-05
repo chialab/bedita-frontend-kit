@@ -42,7 +42,7 @@ class LocaleMiddlewareTest extends TestCase
      * @return void
      * @dataProvider localeProvider())
      */
-    public function testLocale(?string $expectedLocale, string $locale): void
+    public function testLocale(string|null $expectedLocale, string $locale): void
     {
         $middleware = new LocaleMiddleware();
         $request = new ServerRequest(['params' => compact('locale')]);

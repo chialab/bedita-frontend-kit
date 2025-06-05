@@ -81,7 +81,7 @@ class PublicationComponent extends Component
 
         $publicationLoader = new ObjectsLoader(
             $this->getConfig('publicationLoader.objectTypesConfig', []),
-            $this->getConfig('publicationLoader.autoHydrateAssociations', [])
+            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
         );
 
         try {

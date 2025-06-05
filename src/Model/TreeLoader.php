@@ -117,15 +117,15 @@ class TreeLoader
         $exp = $query->newExpr()
             ->eq(
                 new IdentifierExpression($this->Trees->ParentNode->aliasField('root_id')),
-                new IdentifierExpression($this->Trees->aliasField('root_id'))
+                new IdentifierExpression($this->Trees->aliasField('root_id')),
             )
             ->lte(
                 new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_left')),
-                new IdentifierExpression($this->Trees->aliasField('tree_left'))
+                new IdentifierExpression($this->Trees->aliasField('tree_left')),
             )
             ->gte(
                 new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_right')),
-                new IdentifierExpression($this->Trees->aliasField('tree_right'))
+                new IdentifierExpression($this->Trees->aliasField('tree_right')),
             );
         if ($relativeTo !== null) {
             $exp = $exp
@@ -133,13 +133,13 @@ class TreeLoader
                     new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_left')),
                     $this->Trees->find()
                         ->select([$this->Trees->aliasField('tree_left')])
-                        ->where([$this->Trees->aliasField('object_id') => $relativeTo])
+                        ->where([$this->Trees->aliasField('object_id') => $relativeTo]),
                 )
                 ->lt(
                     new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_right')),
                     $this->Trees->find()
                         ->select([$this->Trees->aliasField('tree_right')])
-                        ->where([$this->Trees->aliasField('object_id') => $relativeTo])
+                        ->where([$this->Trees->aliasField('object_id') => $relativeTo]),
                 );
         }
         $query = $query
@@ -149,7 +149,7 @@ class TreeLoader
             ])
             ->innerJoin(
                 [$this->Trees->ParentNode->getName() => $this->Trees->ParentNode->getTable()],
-                $exp
+                $exp,
             );
 
         // Join with objects to get path unames.
@@ -163,8 +163,8 @@ class TreeLoader
                 $query->newExpr()
                     ->eq(
                         new IdentifierExpression($this->Trees->ParentNode->Objects->aliasField('id')),
-                        new IdentifierExpression($this->Trees->ParentNode->aliasField('object_id'))
-                    )
+                        new IdentifierExpression($this->Trees->ParentNode->aliasField('object_id')),
+                    ),
             );
 
         return $query->disableHydration();

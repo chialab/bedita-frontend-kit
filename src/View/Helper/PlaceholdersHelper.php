@@ -120,8 +120,8 @@ class PlaceholdersHelper extends Helper
                 $offset = $i['offset'];
                 $delta = array_sum(array_filter(
                     $deltas,
-                    fn (int $pos): bool => $pos < $offset,
-                    ARRAY_FILTER_USE_KEY
+                    fn(int $pos): bool => $pos < $offset,
+                    ARRAY_FILTER_USE_KEY,
                 ));
                 $length = $i['length'];
                 $params = $i['params'] ?? null;
@@ -152,7 +152,7 @@ class PlaceholdersHelper extends Helper
             $placeholder = iterator_to_array($placeholder);
         } elseif (!is_array($placeholder) && $placeholder !== null) {
             throw new InvalidArgumentException(
-                sprintf('Expected property "%s" to be an iterable, got "%s"', $relation, is_object($placeholder) ? get_class($placeholder) : gettype($placeholder))
+                sprintf('Expected property "%s" to be an iterable, got "%s"', $relation, is_object($placeholder) ? get_class($placeholder) : gettype($placeholder)),
             );
         }
 

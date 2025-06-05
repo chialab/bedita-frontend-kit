@@ -129,7 +129,7 @@ class DateRangesHelperTest extends TestCase
      * @dataProvider formatRangeProvider()
      * @covers ::formatRange()
      */
-    public function testFormatRange(string $expected, DateTimeInterface $start, ?DateTimeInterface $end): void
+    public function testFormatRange(string $expected, DateTimeInterface $start, DateTimeInterface|null $end): void
     {
         $range = new DateRange([
             'start_date' => $start,
@@ -206,7 +206,7 @@ class DateRangesHelperTest extends TestCase
      * @dataProvider getClosestRangeProvider()
      * @covers ::getClosestRange()
      */
-    public function testGetClosestRange(?array $expected, array $ranges): void
+    public function testGetClosestRange(array|null $expected, array $ranges): void
     {
         $actual = $this->DateRanges->getClosestRange(array_map(
             function (array $range): DateRange {
@@ -217,7 +217,7 @@ class DateRangesHelperTest extends TestCase
                     'end_date' => $end,
                 ]);
             },
-            $ranges
+            $ranges,
         ));
 
         if ($expected === null) {
@@ -243,7 +243,7 @@ class DateRangesHelperTest extends TestCase
             return new ObjectEntity([
                 'id' => $id,
                 'type' => 'events',
-                'date_ranges' => array_map(fn (array $range): DateRange => new DateRange([
+                'date_ranges' => array_map(fn(array $range): DateRange => new DateRange([
                     'start_date' => $range[0],
                     'end_date' => $range[1],
                 ]), $ranges),
@@ -260,7 +260,7 @@ class DateRangesHelperTest extends TestCase
         $sorted = $this->DateRanges->sortByClosestRange($items)->toList();
 
         $expected = [3, 6, 1, 4, 5, 2];
-        $actual = array_map(fn ($item) => $item->id, $sorted);
+        $actual = array_map(fn($item) => $item->id, $sorted);
 
         static::assertSame($expected, $actual);
     }

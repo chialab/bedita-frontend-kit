@@ -2,6 +2,7 @@
 <ruleset name="App">
     <file>./src</file>
     <file>./tests</file>
+    <exclude-pattern>./tests/TestApp/Template/Pages/*</exclude-pattern>
 
     <arg name="colors" />
     <arg value="p" />
@@ -9,10 +10,16 @@
     <config name="installed_paths" value="../../cakephp/cakephp-codesniffer,../../slevomat/coding-standard"/>
 
     <rule ref="CakePHP" />
-	<rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat">
+	<rule ref="SlevomatCodingStandard.TypeHints.DNFTypeHintFormat">
         <properties>
             <property name="shortNullable" type="string" value="no"/>
             <property name="nullPosition" type="string" value="last"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="300"/>
+            <property name="absoluteLineLimit" value="500"/>
         </properties>
     </rule>
 </ruleset>

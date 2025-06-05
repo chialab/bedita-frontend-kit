@@ -150,7 +150,7 @@ class PlaceholdersHelperTest extends TestCase
      */
     public function testDefaultTemplater()
     {
-        $contents = $this->Placeholders::defaultTemplater($this->object, 'body', [$this->image1, $this->image2], fn ($entity, $params) => sprintf('%s %s', $entity->title, $params ? $params : ''));
+        $contents = $this->Placeholders::defaultTemplater($this->object, 'body', [$this->image1, $this->image2], fn($entity, $params) => sprintf('%s %s', $entity->title, $params ?: ''));
         $this->assertSame('<p>Hello World image1 </p>image2 {"class":"test"}', $contents);
     }
 

@@ -26,7 +26,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
      */
     public function invokeProvider(): array
     {
-        $requestFactory = fn (string $remoteAddr, string $xForwardedFor): ServerRequest => new ServerRequest([
+        $requestFactory = fn(string $remoteAddr, string $xForwardedFor): ServerRequest => new ServerRequest([
             'environment' => [
                 'REMOTE_ADDR' => $remoteAddr,
                 'HTTP_X_FORWARDED_FOR' => $xForwardedFor,
@@ -53,7 +53,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
      * @return void
      * @dataProvider invokeProvider()
      */
-    public function testInvoke(?string $expectedClientIp, ?array $expectedTrustedProxies, TrustedProxiesMiddleware $middleware, ServerRequestInterface $request): void
+    public function testInvoke(string|null $expectedClientIp, array|null $expectedTrustedProxies, TrustedProxiesMiddleware $middleware, ServerRequestInterface $request): void
     {
         $response = new EmptyResponse();
         $invoked = 0;

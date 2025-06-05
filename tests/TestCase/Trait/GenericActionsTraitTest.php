@@ -181,7 +181,7 @@ class GenericActionsTraitTest extends TestCase
         static::assertSame($parentUname, $parent?->uname);
 
         // assert the ancestors have been correctly loaded
-        static::assertSame($ancestorUnames, array_map(fn (Folder $ancestor): string => $ancestor->uname, $ancestors));
+        static::assertSame($ancestorUnames, array_map(fn(Folder $ancestor): string => $ancestor->uname, $ancestors));
 
         // check the response result
         static::assertSame($body, (string)$response->getBody());

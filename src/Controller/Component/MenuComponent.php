@@ -55,7 +55,7 @@ class MenuComponent extends Component
 
         $menuLoader = new ObjectsLoader(
             $this->getConfig('menuLoader.objectTypesConfig', []),
-            $this->getConfig('menuLoader.autoHydrateAssociations', [])
+            $this->getConfig('menuLoader.autoHydrateAssociations', []),
         );
 
         $this->loader = new TreeLoader($menuLoader);
