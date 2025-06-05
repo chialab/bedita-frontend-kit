@@ -12,6 +12,7 @@ use Cake\Database\Expression\FunctionExpression;
 use Cake\Database\Expression\IdentifierExpression;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 
 /**
  * Class TreeLoader.
@@ -166,6 +167,10 @@ class TreeLoader
                         new IdentifierExpression($this->Trees->ParentNode->aliasField('object_id')),
                     ),
             );
+
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
 
         return $query->disableHydration();
     }

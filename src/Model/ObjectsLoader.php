@@ -19,6 +19,7 @@ use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
@@ -296,6 +297,10 @@ class ObjectsLoader
         $action = new ListObjectsAction(compact('objectType', 'table'));
         /** @var \Cake\ORM\Query $query */
         $query = $action(static::includeTranslations($contain) ? compact('filter', 'contain') : compact('filter', 'lang', 'contain'));
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
+
         /** @var \Cake\ORM\Table $table */
         $table = $query->getRepository();
 
@@ -338,6 +343,9 @@ class ObjectsLoader
 
         /** @var \Cake\ORM\Query $query */
         $query = $action(compact('primaryKey', 'filter', 'lang'));
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
 
         return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $table, $lang): iterable {
             $objects = $this->toConcreteTypes($results, $depth + 1);
