@@ -54,6 +54,7 @@ class TreesFixture extends BETreesFixture
                 'menu' => 1,
                 'depth_level' => 0,
                 'canonical' => 0,
+                'slug' => sprintf('slug-%d', $id),
             ];
 
             $records[] = $entry;
