@@ -29,12 +29,12 @@ jobs:
 
       - name: 'Discover Composer cache directory'
         id: 'cachedir'
-        run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
+        run: 'echo "COMPOSER_CACHE_DIR=$(composer global config cache-dir)" >> $GITHUB_OUTPUT'
 
       - name: 'Share Composer cache across runs'
         uses: 'actions/cache@v3'
         with:
-          path: '${{ steps.cachedir.outputs.path }}'
+          path: '${{ steps.cachedir.outputs.COMPOSER_CACHE_DIR }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
           restore-keys: |
             composer-${{ github.job }}-
@@ -65,12 +65,12 @@ jobs:
 
       - name: 'Discover Composer cache directory'
         id: 'cachedir'
-        run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
+        run: 'echo "COMPOSER_CACHE_DIR=$(composer global config cache-dir)" >> $GITHUB_OUTPUT'
 
       - name: 'Share Composer cache across runs'
         uses: 'actions/cache@v3'
         with:
-          path: '${{ steps.cachedir.outputs.path }}'
+          path: '${{ steps.cachedir.outputs.COMPOSER_CACHE_DIR }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
           restore-keys: |
             composer-${{ github.job }}-
@@ -94,9 +94,10 @@ jobs:
         php:
           - '8.1'
           - '8.2'
+          - '8.3'
         db:
           - '{"vendor": "MySQL 8.0", "pdo": "mysql", "dsn": "mysql://bedita:bedita@127.0.0.1:3306/bedita", "image": "mysql:8.0", "options": "--health-cmd \"mysqladmin ping -h localhost\" --health-interval 10s --health-timeout 5s --health-retries 5"}'
-          - '{"vendor": "MySQL 5.7", "pdo": "mysql", "dsn": "mysql://bedita:bedita@127.0.0.1:3306/bedita?realVendor=mysql5.7", "image": "mysql:5.7", "options": "--health-cmd \"mysqladmin ping -h localhost\" --health-interval 10s --health-timeout 5s --health-retries 5"}'
+          - '{"vendor": "MySQL 8.4", "pdo": "mysql", "dsn": "mysql://bedita:bedita@127.0.0.1:3306/bedita", "image": "mysql:8.4", "options": "--health-cmd \"mysqladmin ping -h localhost\" --health-interval 10s --health-timeout 5s --health-retries 5"}'
 
     env:
       PHP_VERSION: '${{ matrix.php }}'
@@ -135,12 +136,12 @@ jobs:
 
       - name: 'Discover Composer cache directory'
         id: 'cachedir'
-        run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
+        run: 'echo "COMPOSER_CACHE_DIR=$(composer global config cache-dir)" >> $GITHUB_OUTPUT'
 
       - name: 'Share Composer cache across runs'
         uses: 'actions/cache@v3'
         with:
-          path: '${{ steps.cachedir.outputs.path }}'
+          path: '${{ steps.cachedir.outputs.COMPOSER_CACHE_DIR }}'
           key: "composer-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php }}-
