@@ -66,7 +66,7 @@ class TreeLoader
 
         $found = $found->firstOrFail();
 
-        $ids = json_decode($found['path_ids']);
+        $ids = array_reverse(json_decode($found['reverse_path_ids']));
         array_pop($ids);
 
         if (empty($ids)) {
@@ -97,7 +97,7 @@ class TreeLoader
                 fn(QueryExpression $exp): QueryExpression => $exp->add(new FunctionExpression(
                     'JSON_CONTAINS',
                     [
-                        new IdentifierExpression('paths.path_ids'),
+                        new IdentifierExpression('paths.reverse_path_ids'),
                         $via,
                         '$',
                     ],
@@ -125,7 +125,7 @@ class TreeLoader
                 fn(CommonTableExpression $cte, SelectQuery $query): CommonTableExpression => $cte
                     ->recursive()
                     ->name('paths')
-                    ->field(['canonical', 'path_ids', 'path', 'object_id'])
+                    ->field(['canonical', 'reverse_path_ids', 'path', 'parent_id'])
                     ->query(
                         $this->Trees->find()
                             ->select([
@@ -134,47 +134,47 @@ class TreeLoader
                                     new IdentifierExpression($this->Trees->aliasField('object_id')),
                                 ]),
                                 $this->Trees->Objects->aliasField('uname'),
-                                $this->Trees->aliasField('object_id'),
+                                $this->Trees->aliasField('parent_id'),
                             ])
                             ->innerJoinWith($this->Trees->Objects->getName())
-                            ->where(
-                                fn(QueryExpression $exp): QueryExpression => $relativeTo
-                                    ? $exp->eq($this->Trees->aliasField('parent_id'), $relativeTo)
-                                    : $exp->isNull($this->Trees->aliasField('parent_id')),
-                            )
+                            ->where([$this->Trees->aliasField('object_id') => $id])
 
                             ->unionAll(
                                 $this->Trees->find()
                                     ->select([
-                                        $this->Trees->aliasField('canonical'),
+                                        'paths.canonical',
                                         new FunctionExpression('JSON_ARRAY_APPEND', [
-                                            new IdentifierExpression('paths.path_ids'),
+                                            new IdentifierExpression('paths.reverse_path_ids'),
                                             '$',
                                             new IdentifierExpression($this->Trees->aliasField('object_id')),
                                         ]),
                                         $query->func()->concat([
-                                            new IdentifierExpression('paths.path'),
-                                            '/',
                                             new IdentifierExpression($this->Trees->Objects->aliasField('uname')),
+                                            '/',
+                                            new IdentifierExpression('paths.path'),
                                         ]),
-                                        $this->Trees->aliasField('object_id'),
+                                        $this->Trees->aliasField('parent_id'),
                                     ])
                                     ->innerJoinWith($this->Trees->Objects->getName())
                                     ->innerJoin(
                                         'paths',
                                         fn(QueryExpression $exp): QueryExpression => $exp
-                                            ->equalFields('paths.object_id', $this->Trees->aliasField('parent_id')),
+                                            ->equalFields('paths.parent_id', $this->Trees->aliasField('object_id')),
                                     ),
                             ),
                     ),
             )
             ->select([
                 'canonical' => 'paths.canonical',
-                'path_ids' => 'paths.path_ids',
+                'reverse_path_ids' => 'paths.reverse_path_ids',
                 'path' => 'paths.path',
             ])
             ->from('paths')
-            ->where(['paths.object_id' => $id]);
+            ->where(
+                fn(QueryExpression $exp): QueryExpression => $relativeTo
+                    ? $exp->eq('paths.parent_id', $relativeTo)
+                    : $exp->isNull('paths.parent_id'),
+            );
     }
 
     /**
