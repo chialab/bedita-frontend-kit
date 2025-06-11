@@ -174,7 +174,8 @@ class TreeLoader
                 fn(QueryExpression $exp): QueryExpression => $relativeTo
                     ? $exp->eq('paths.parent_id', $relativeTo)
                     : $exp->isNull('paths.parent_id'),
-            );
+            )
+            ->orderDesc('paths.canonical');
     }
 
     /**
