@@ -7,9 +7,11 @@ use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Table\TreesTable;
 use Cake\Collection\CollectionInterface;
-use Cake\Database\Expression\ComparisonExpression;
+use Cake\Database\Expression\CommonTableExpression;
 use Cake\Database\Expression\FunctionExpression;
 use Cake\Database\Expression\IdentifierExpression;
+use Cake\Database\Expression\QueryExpression;
+use Cake\Database\Query\SelectQuery;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 
@@ -60,10 +62,11 @@ class TreeLoader
         $leaf = $this->loader->loadObject(array_pop($parts), 'objects', [], []);
 
         $found = $this->getObjectPaths($leaf->id, $relativeTo)
-            ->having(compact('path'), ['path' => 'string'])
-            ->firstOrFail();
+            ->andWhere(['paths.path' => $path]);
 
-        $ids = explode(',', $found['path_ids']);
+        $found = $found->firstOrFail();
+
+        $ids = array_reverse(json_decode($found['reverse_path_ids']));
         array_pop($ids);
 
         if (empty($ids)) {
@@ -90,9 +93,17 @@ class TreeLoader
     {
         $query = $this->getObjectPaths($id, $relativeTo);
         if ($via !== null) {
-            $query = $query->having(new FunctionExpression('BIT_OR', [
-                new ComparisonExpression($this->Trees->ParentNode->aliasField('object_id'), $via, 'integer', '='),
-            ]));
+            $query = $query->andWhere(
+                fn(QueryExpression $exp): QueryExpression => $exp->add(new FunctionExpression(
+                    'JSON_CONTAINS',
+                    [
+                        new IdentifierExpression('paths.reverse_path_ids'),
+                        $via,
+                        '$',
+                    ],
+                    ['json', 'json', 'string'],
+                )),
+            );
         }
 
         return $query->all()->toList();
@@ -105,69 +116,66 @@ class TreeLoader
      * @param int|null $relativeTo Object ID relative to which paths should be computed.
      * @return \Cake\ORM\Query
      */
-    protected function getObjectPaths(int $id, int|null $relativeTo = null): Query
+    protected function getObjectPaths(int $id, int|null $relativeTo = null): Query\SelectQuery
     {
-        $query = $this->Trees->find()
-            ->select([$this->Trees->aliasField('canonical')])
-            ->where([$this->Trees->aliasField('object_id') => $id])
-            ->group([$this->Trees->aliasField('id'), $this->Trees->aliasField('canonical')])
-            ->orderDesc($this->Trees->aliasField('canonical'));
+        return $this->Trees->find()
+            ->useReadRole()
+            ->disableHydration()
+            ->with(
+                fn(CommonTableExpression $cte, SelectQuery $query): CommonTableExpression => $cte
+                    ->recursive()
+                    ->name('paths')
+                    ->field(['canonical', 'reverse_path_ids', 'path', 'parent_id'])
+                    ->query(
+                        $this->Trees->find()
+                            ->select([
+                                $this->Trees->aliasField('canonical'),
+                                new FunctionExpression('JSON_ARRAY', [
+                                    new IdentifierExpression($this->Trees->aliasField('object_id')),
+                                ]),
+                                $this->Trees->Objects->aliasField('uname'),
+                                $this->Trees->aliasField('parent_id'),
+                            ])
+                            ->innerJoinWith($this->Trees->Objects->getName())
+                            ->where([$this->Trees->aliasField('object_id') => $id])
 
-        // Join with parent nodes, up to the requested node.
-        $exp = $query->newExpr()
-            ->eq(
-                new IdentifierExpression($this->Trees->ParentNode->aliasField('root_id')),
-                new IdentifierExpression($this->Trees->aliasField('root_id')),
-            )
-            ->lte(
-                new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_left')),
-                new IdentifierExpression($this->Trees->aliasField('tree_left')),
-            )
-            ->gte(
-                new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_right')),
-                new IdentifierExpression($this->Trees->aliasField('tree_right')),
-            );
-        if ($relativeTo !== null) {
-            $exp = $exp
-                ->gt(
-                    new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_left')),
-                    $this->Trees->find()
-                        ->select([$this->Trees->aliasField('tree_left')])
-                        ->where([$this->Trees->aliasField('object_id') => $relativeTo]),
-                )
-                ->lt(
-                    new IdentifierExpression($this->Trees->ParentNode->aliasField('tree_right')),
-                    $this->Trees->find()
-                        ->select([$this->Trees->aliasField('tree_right')])
-                        ->where([$this->Trees->aliasField('object_id') => $relativeTo]),
-                );
-        }
-        $query = $query
-            ->select([
-                // TODO: use QueryExpressions for this:
-                'path_ids' => 'GROUP_CONCAT(ParentNode.object_id ORDER BY ParentNode.tree_left SEPARATOR \',\')',
-            ])
-            ->innerJoin(
-                [$this->Trees->ParentNode->getName() => $this->Trees->ParentNode->getTable()],
-                $exp,
-            );
-
-        // Join with objects to get path unames.
-        $query = $query
-            ->select([
-                // TODO: use QueryExpressions for this:
-                'path' => 'GROUP_CONCAT(Objects.uname ORDER BY ParentNode.tree_left SEPARATOR \'/\')',
-            ])
-            ->innerJoin(
-                [$this->Trees->ParentNode->Objects->getName() => $this->Trees->ParentNode->Objects->getTable()],
-                $query->newExpr()
-                    ->eq(
-                        new IdentifierExpression($this->Trees->ParentNode->Objects->aliasField('id')),
-                        new IdentifierExpression($this->Trees->ParentNode->aliasField('object_id')),
+                            ->unionAll(
+                                $this->Trees->find()
+                                    ->select([
+                                        'paths.canonical',
+                                        new FunctionExpression('JSON_ARRAY_APPEND', [
+                                            new IdentifierExpression('paths.reverse_path_ids'),
+                                            '$',
+                                            new IdentifierExpression($this->Trees->aliasField('object_id')),
+                                        ]),
+                                        $query->func()->concat([
+                                            new IdentifierExpression($this->Trees->Objects->aliasField('uname')),
+                                            '/',
+                                            new IdentifierExpression('paths.path'),
+                                        ]),
+                                        $this->Trees->aliasField('parent_id'),
+                                    ])
+                                    ->innerJoinWith($this->Trees->Objects->getName())
+                                    ->innerJoin(
+                                        'paths',
+                                        fn(QueryExpression $exp): QueryExpression => $exp
+                                            ->equalFields('paths.parent_id', $this->Trees->aliasField('object_id')),
+                                    ),
+                            ),
                     ),
-            );
-
-        return $query->disableHydration();
+            )
+            ->select([
+                'canonical' => 'paths.canonical',
+                'reverse_path_ids' => 'paths.reverse_path_ids',
+                'path' => 'paths.path',
+            ])
+            ->from('paths')
+            ->where(
+                fn(QueryExpression $exp): QueryExpression => $relativeTo
+                    ? $exp->eq('paths.parent_id', $relativeTo)
+                    : $exp->isNull('paths.parent_id'),
+            )
+            ->orderDesc('paths.canonical');
     }
 
     /**

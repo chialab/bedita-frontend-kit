@@ -11,6 +11,7 @@ use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
 use InvalidArgumentException;
@@ -55,19 +56,23 @@ class TagsComponent extends Component
     {
         $lang ??= $this->getLang();
 
-        return $this->Tags->find()
+        $query = $this->Tags->find()
             ->where([$this->Tags->aliasField('enabled') => true])
-            ->order([$this->Tags->aliasField('name')])
-            ->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
-                return $results->map(function (Tag $tag) use ($lang): Tag {
-                    $tag->set('slug', Text::slug($tag->name));
-                    $tag = $this->dangerouslyTranslateLabel($tag, $lang);
+            ->order([$this->Tags->aliasField('name')]);
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
 
-                    $tag->clean();
+        return $query->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
+            return $results->map(function (Tag $tag) use ($lang): Tag {
+                $tag->set('slug', Text::slug($tag->name));
+                $tag = $this->dangerouslyTranslateLabel($tag, $lang);
 
-                    return $tag;
-                });
+                $tag->clean();
+
+                return $tag;
             });
+        });
     }
 
     /**
@@ -99,7 +104,7 @@ class TagsComponent extends Component
      */
     protected function buildTagsSubquery(Table $table, array $tags): Query
     {
-        return $table->find()
+        $query = $table->find()
             ->where(fn(QueryExpression $exp): QueryExpression => $exp
                 ->or(function (QueryExpression $exp) use ($tags, $table): QueryExpression {
                     $ids = array_filter($tags, 'is_numeric');
@@ -114,6 +119,11 @@ class TagsComponent extends Component
 
                     return $exp;
                 }));
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
+
+        return $query;
     }
 
     /**
@@ -126,7 +136,7 @@ class TagsComponent extends Component
      */
     public function filterByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
-        return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
@@ -148,6 +158,11 @@ class TagsComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
+
+        return $query;
     }
 
     /**
@@ -160,7 +175,7 @@ class TagsComponent extends Component
      */
     public function filterExcludeByTags(Query $query, array $tags, string $strategy = 'in'): Query
     {
-        return $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
@@ -182,5 +197,10 @@ class TagsComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
+        if ($query instanceof SelectQuery) {
+            $query->useReadRole();
+        }
+
+        return $query;
     }
 }
