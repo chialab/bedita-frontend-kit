@@ -247,16 +247,16 @@ class MetadataHelper extends Helper
 
         $output = '';
         $defaults = [
-            'og:url' => Router::url(null, true),
-            'og:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
-            'og:description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
-            'og:image' => $this->getPoster($object, $publication),
-            'og:site_name' => htmlspecialchars($this->getPublisher(null, $publication) ?? ''),
+            ['property' => 'og:url', 'content' => Router::url(null, true)],
+            ['property' => 'og:title' ,'content' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? '')],
+            ['property' => 'og:description' ,'content' => htmlspecialchars($this->getDescription($object, $publication) ?? '')],
+            ['property' => 'og:image' ,'content' => $this->getPoster($object, $publication)],
+            ['property' => 'og:site_name' ,'content' => htmlspecialchars($this->getPublisher(null, $publication) ?? '')],
         ];
         if ($object !== null) {
             $defaults = [
-                'og:type' => $object->type,
-                'og:updated_time' => $object->modified,
+                ['property' => 'og:type', 'content' => $object->type],
+                ['property' => 'og:updated_time', 'content' => $object->modified],
             ] + $defaults;
         }
 
