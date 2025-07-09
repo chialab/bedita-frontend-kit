@@ -262,7 +262,11 @@ class MetadataHelper extends Helper
 
         $data = $data + $defaults;
         foreach ($data as $key => $value) {
-            if ($value !== null) {
+            if (is_array($value)) {
+                if (!empty($value['content'])) {
+                    $output .= $this->Html->meta($value);
+                }
+            } else if ($value !== null) {
                 $output .= $this->Html->meta($key, $value);
             }
         }
