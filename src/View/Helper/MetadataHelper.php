@@ -74,6 +74,26 @@ class MetadataHelper extends Helper
     }
 
     /**
+     * Get short page title.
+     *
+     * @param \BEdita\Core\Model\Entity\ObjectEntity|null The main object.
+     * @param \BEdita\Core\Model\Entity\Folder|null The publication folder.
+     * @param string|null $separator The separator between object title and publication title.
+     * @return string
+     */
+    public function getShortTitle(ObjectEntity|null $object = null, Folder|null $publication = null): string
+    {
+        if ($object !== null && !empty($object->title)) {
+            return strip_tags($object->title ?? '');
+        }
+        if ($publication !== null) {
+            return strip_tags($publication->title ?? $publication->uname);
+        }
+
+        return '';
+    }
+
+    /**
      * Get page description.
      * Use main object description, fallback to publication description.
      *
@@ -204,8 +224,8 @@ class MetadataHelper extends Helper
         $output = '<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />';
         $defaults = [
             'DC.format' => 'text/html',
-            'DC.title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
-            'DC.description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
+            'DC.title' => htmlspecialchars($this->getShortTitle($object, $publication)),
+            'DC.description' => htmlspecialchars($this->getDescription($object, $publication)),
             'DC.creator' => htmlspecialchars($this->getCreator($object, $publication) ?? ''),
             'DC.publisher' => htmlspecialchars($this->getPublisher($object, $publication) ?? ''),
             'DC.rights' => htmlspecialchars($this->getPublisher($object, $publication) ?? ''),
@@ -248,8 +268,8 @@ class MetadataHelper extends Helper
         $output = '';
         $defaults = [
             ['property' => 'og:url', 'content' => Router::url(null, true)],
-            ['property' => 'og:title' ,'content' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? '')],
-            ['property' => 'og:description' ,'content' => htmlspecialchars($this->getDescription($object, $publication) ?? '')],
+            ['property' => 'og:title' ,'content' => htmlspecialchars($this->getShortTitle($object, $publication))],
+            ['property' => 'og:description' ,'content' => htmlspecialchars($this->getDescription($object, $publication))],
             ['property' => 'og:image' ,'content' => $this->getPoster($object, $publication)],
             ['property' => 'og:site_name' ,'content' => htmlspecialchars($this->getPublisher(null, $publication) ?? '')],
         ];
@@ -290,10 +310,8 @@ class MetadataHelper extends Helper
 
         $output = '';
         $defaults = [
-            'twitter:title' => htmlspecialchars($this->getTitle($object, null) ?? $this->getTitle(null, $publication) ?? ''),
-            'twitter:description' => htmlspecialchars($this->getDescription($object, $publication) ?? ''),
-            'twitter:site' => htmlspecialchars($this->getPublisher(null, $publication) ?? ''),
-            'twitter:creator' => htmlspecialchars($this->getCreator($object, $publication) ?? ''),
+            'twitter:title' => htmlspecialchars($this->getShortTitle($object, $publication)),
+            'twitter:description' => htmlspecialchars($this->getDescription($object, $publication)),
             'twitter:card' => $poster ? 'summary_large_image' : null,
             'twitter:image' => $poster,
         ];
