@@ -78,7 +78,6 @@ class MetadataHelper extends Helper
      *
      * @param \BEdita\Core\Model\Entity\ObjectEntity|null The main object.
      * @param \BEdita\Core\Model\Entity\Folder|null The publication folder.
-     * @param string|null $separator The separator between object title and publication title.
      * @return string
      */
     public function getShortTitle(ObjectEntity|null $object = null, Folder|null $publication = null): string
