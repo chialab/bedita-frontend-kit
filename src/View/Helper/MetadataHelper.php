@@ -286,7 +286,7 @@ class MetadataHelper extends Helper
                 if (!empty($value['content'])) {
                     $output .= $this->Html->meta($value);
                 }
-            } else if ($value !== null) {
+            } elseif ($value !== null) {
                 $output .= $this->Html->meta($key, $value);
             }
         }
