@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Controller\Component;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Table\TreesTable;
+use Cake\Cache\Cache;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -37,6 +38,8 @@ class PublicationComponent extends Component
             'objectTypesConfig' => [],
             'autoHydrateAssociations' => [],
         ],
+        'cache' => null,
+        'cacheConfig' => 'default',
     ];
 
     /**
@@ -79,19 +82,39 @@ class PublicationComponent extends Component
 
         $this->loader = new TreeLoader($this->Objects->getLoader());
 
-        $publicationLoader = new ObjectsLoader(
-            $this->getConfig('publicationLoader.objectTypesConfig', []),
-            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
-        );
-
         try {
-            $publication = $publicationLoader->loadFullObject($publicationUname, 'folders');
+            $cacheName = $this->getConfig('cache');
+            if (!empty($cacheName)) {
+                $publication = Cache::remember(
+                    sprintf('%s.%s', $cacheName, $publicationUname),
+                    fn() => $this->loadPublication($publicationUname),
+                    $this->getConfig('cacheConfig'),
+                );
+            } else {
+                $publication = $this->loadPublication($publicationUname);
+            }
         } catch (RecordNotFoundException $e) {
             throw new NotFoundException(__('Root folder does not exist: {0}', $publicationUname), null, $e);
         }
 
         $this->publication = $publication;
         $this->getController()->set('publication', $this->publication);
+    }
+
+    /**
+     * Load the publication folder.
+     *
+     * @param string $uname Publication folder unique name.
+     * @return \BEdita\Core\Model\Entity\Folder
+     */
+    protected function loadPublication(string $uname): Folder
+    {
+        $publicationLoader = new ObjectsLoader(
+            $this->getConfig('publicationLoader.objectTypesConfig', []),
+            $this->getConfig('publicationLoader.autoHydrateAssociations', []),
+        );
+
+        return $publicationLoader->loadFullObject($uname, 'folders');
     }
 
     /**
