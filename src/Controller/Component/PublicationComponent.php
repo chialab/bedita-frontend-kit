@@ -87,8 +87,8 @@ class PublicationComponent extends Component
             if (!empty($cacheName)) {
                 $publication = Cache::remember(
                     sprintf('%s.%s', $cacheName, $publicationUname),
-                    fn () => $this->loadPublication($publicationUname),
-                    $this->getConfig('cacheConfig')
+                    fn() => $this->loadPublication($publicationUname),
+                    $this->getConfig('cacheConfig'),
                 );
             } else {
                 $publication = $this->loadPublication($publicationUname);
