@@ -202,7 +202,7 @@ class PosterHelper extends Helper
      * @param array $options Poster options.
      * @return \BEdita\Core\Model\Entity\ObjectEntity|null
      */
-    protected function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
+    public function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
     {
         if ($object !== null && $object->has('provider_thumbnail')) {
             return $object;
