@@ -41,7 +41,7 @@ jobs:
             composer-
 
       - name: 'Install dependencies with Composer'
-        run: 'composer install --prefer-dist --no-interaction'
+        run: 'composer install --prefer-dist --no-interaction --no-blocking'
 
       - name: 'Run PHP CodeSniffer'
         run: 'composer run-script cs-check -- -n'
@@ -77,7 +77,7 @@ jobs:
             composer-
 
       - name: 'Install dependencies with Composer'
-        run: 'composer install --prefer-dist --no-interaction'
+        run: 'composer install --prefer-dist --no-interaction --no-blocking'
 
       - name: 'Run PHP STAN'
         run: |
@@ -148,7 +148,7 @@ jobs:
             composer-
 
       - name: 'Install dependencies with Composer'
-        run: 'composer install --prefer-dist --no-interaction'
+        run: 'composer install --prefer-dist --no-interaction --no-blocking'
 
       - name: 'Run PHPUnit'
         run: 'vendor/bin/phpunit --coverage-clover=clover.xml'
