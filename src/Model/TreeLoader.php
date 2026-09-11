@@ -190,7 +190,7 @@ class TreeLoader
     {
         return $this->loader->loadRelatedObjects($id, 'folders', 'children', [], $options, $hydrate)
             ->where([$this->Trees->aliasField('menu') => true])
-            ->order([$this->Trees->aliasField('tree_left') => 'ASC'], true);
+            ->order([$this->Trees->aliasField('priority') => 'ASC'], true);
     }
 
     /**

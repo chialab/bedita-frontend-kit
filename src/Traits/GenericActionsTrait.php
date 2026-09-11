@@ -75,7 +75,7 @@ trait GenericActionsTrait
     /**
      * Load folder's children using paginations and query filters.
      *
-     * @param string|int $id Folder id to load children.
+     * @param \BEdita\Core\Model\Entity\Folder $folder Folder to load children of.
      * @return array<\BEdita\Core\Model\Entity\ObjectEntity> An array of children.
      */
     protected function loadFilteredChildren(Folder $folder): array
@@ -84,11 +84,11 @@ trait GenericActionsTrait
         if ($order) {
             $type = str_starts_with($order, '-') ? substr($order, 1) : $order;
             if ($type === 'position') {
-                $type = 'Trees.tree_left';
+                $type = 'Trees.priority';
             }
             $order = str_starts_with($order, '-') ? [$type => 'DESC'] : [$type => 'ASC'];
         } else {
-            $order = ['Trees.tree_left' => 'ASC'];
+            $order = ['Trees.priority' => 'ASC'];
         }
 
         $children = $this->Objects->loadRelatedObjects($folder['uname'], 'folders', 'children', $this->Filters->fromQuery());
