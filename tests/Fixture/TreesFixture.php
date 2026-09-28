@@ -33,46 +33,30 @@ class TreesFixture extends BETreesFixture
         parent::init();
     }
 
-    private function transformBranch($branch, &$records = null, $parent = null, &$count = 0): array
+    private function transformBranch($branch, &$records = null, $parent = null, &$count = 0): void
     {
         if ($records === null) {
             $records = [];
         }
 
-        $children = [];
-        $left = ($parent ? $parent['tree_left'] : 0) + 1;
-        $parentIndex = $count;
+        $parentNodeId = $count;
+        $priority = 0;
         foreach ($branch as $id => $child) {
-            $index = $count++;
+            $count++;
             $entry = [
                 'object_id' => $id,
                 'parent_id' => $parent ? $parent['object_id'] : null,
                 'root_id' => $parent ? $parent['root_id'] : $id,
-                'parent_node_id' => $parent ? $parentIndex : null,
-                'tree_left' => $left,
-                'tree_right' => $left + 1,
+                'parent_node_id' => $parent ? $parentNodeId : null,
+                'priority' => ++$priority,
                 'menu' => 1,
-                'depth_level' => 0,
                 'canonical' => 0,
                 'slug' => sprintf('slug-%d', $id),
             ];
 
             $records[] = $entry;
 
-            if (!empty($branch)) {
-                $desc = $this->transformBranch($child, $records, $entry, $count);
-                if (empty($desc)) {
-                    $left = $left + 2;
-                } else {
-                    $right = end($desc)['tree_right'] + 1;
-                    $records[$index]['tree_right'] = $right;
-                    $left = $right + 1;
-                }
-            }
-
-            $children[] = $entry;
+            $this->transformBranch($child, $records, $entry, $count);
         }
-
-        return $children;
     }
 }
