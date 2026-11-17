@@ -9,6 +9,7 @@ use Cake\I18n\DateTime;
 use Cake\I18n\I18n;
 use Cake\Routing\Router;
 use Cake\View\Helper;
+use function Cake\Collection\collection;
 
 /**
  * Metadata helper.

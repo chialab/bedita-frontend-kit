@@ -8,6 +8,7 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
 use Iterator;
+use function Cake\Collection\collection;
 
 /**
  * Poster helper.

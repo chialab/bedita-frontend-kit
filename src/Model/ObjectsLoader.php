@@ -23,6 +23,8 @@ use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use Iterator;
+use function Cake\Collection\collection;
+use function Cake\Core\deprecationWarning;
 
 /**
  * Objects loader.
@@ -669,7 +671,7 @@ class ObjectsLoader
                 return $contains;
             }
 
-            $contains[$assoc] = fn(SelectQuery $query): SelectQuery => $query->limit($limit);
+            $contains[$assoc] = fn(SelectQuery $query): SelectQuery => $query->limit((int)$limit);
 
             return $contains;
         }, []);

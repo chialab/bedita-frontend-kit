@@ -30,6 +30,7 @@ use Chialab\FrontendKit\Routing\Route\ObjectRoute;
 use Laminas\Diactoros\Stream;
 use Psr\Http\Message\UriInterface;
 use UnexpectedValueException;
+use function Cake\Collection\collection;
 
 /**
  * Trait with BEdita tree navigation for controllers.

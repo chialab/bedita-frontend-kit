@@ -100,4 +100,12 @@ class ObjectsComponentTest extends TestCase
         static::assertSame('Turing', $children[1]->surname);
         static::assertEmpty($children[1]->author_of);
     }
+
+    /** Limit in `relation|N` includes is parsed as a string and must reach `limit()` as an int. */
+    public function testLoadObjectIncludeWithLimit()
+    {
+        $object = $this->Objects->loadObject('child-1', 'folders', ['include' => 'children|1'], []);
+
+        static::assertCount(1, $object->children);
+    }
 }

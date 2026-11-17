@@ -14,6 +14,7 @@ use Cake\Database\Expression\QueryExpression;
 use Cake\Database\Query\SelectQuery as DatabaseSelectQuery;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query\SelectQuery;
+use function Cake\Collection\collection;
 
 /**
  * Class TreeLoader.

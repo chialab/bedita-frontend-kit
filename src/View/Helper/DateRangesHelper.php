@@ -10,6 +10,8 @@ use Cake\Log\Log;
 use Cake\View\Helper;
 use DateTimeInterface;
 use Generator;
+use function Cake\Collection\collection;
+use function Cake\I18n\__x;
 use const SORT_ASC;
 
 /**

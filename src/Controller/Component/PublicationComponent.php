@@ -14,6 +14,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 use InvalidArgumentException;
+use function Cake\I18n\__;
 
 /**
  * Publication component

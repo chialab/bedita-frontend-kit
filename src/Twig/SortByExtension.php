@@ -6,6 +6,7 @@ namespace Chialab\FrontendKit\Twig;
 use Cake\Utility\Hash;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use function Cake\Collection\collection;
 
 /**
  * Sort by extension for Twig.
