@@ -25,7 +25,7 @@ class PosterHelper extends Helper
     /**
      * @inheritDoc
      */
-    public $helpers = [
+    protected array $helpers = [
         'Html',
         'Chialab/FrontendKit.Media',
         'Chialab/FrontendKit.Thumb',
@@ -34,7 +34,7 @@ class PosterHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'fallbackImage' => null,
     ];
 

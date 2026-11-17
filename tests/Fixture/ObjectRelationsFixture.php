@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\ObjectRelationsFixture as BEObjectRelationsFixture;
  */
 class ObjectRelationsFixture extends BEObjectRelationsFixture
 {
-    public $records = [
+    public array $records = [
         // 1
         [
             'left_id' => 10,

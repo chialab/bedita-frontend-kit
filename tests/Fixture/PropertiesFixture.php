@@ -8,5 +8,5 @@ use BEdita\Core\Test\Fixture\PropertiesFixture as BEPropertiesFixture;
  */
 class PropertiesFixture extends BEPropertiesFixture
 {
-    public $records = [];
+    public array $records = [];
 }

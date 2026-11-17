@@ -17,6 +17,9 @@ namespace Chialab\FrontendKit\Traits;
 use BEdita\Core\Filesystem\FilesystemRegistry;
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\Datasource\Paging\PaginatedInterface;
+use Cake\Datasource\QueryInterface;
+use Cake\Datasource\RepositoryInterface;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -64,13 +67,14 @@ trait GenericActionsTrait
     /**
      * Handles pagination of records in Table objects.
      *
-     * @param \Cake\ORM\Table|\Cake\ORM\Query|string|null $object Table to paginate
+     * @param \Cake\Datasource\RepositoryInterface|\Cake\Datasource\QueryInterface|string|null $object Table to paginate
      * @param array $settings The settings/configuration used for pagination.
-     * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+     * @return \Cake\Datasource\Paging\PaginatedInterface
      */
-    abstract public function paginate($object = null, array $settings = []);
+    abstract public function paginate(
+        RepositoryInterface|QueryInterface|string|null $object = null,
+        array $settings = [],
+    ): PaginatedInterface;
 
     /**
      * Load folder's children using paginations and query filters.
@@ -106,7 +110,7 @@ trait GenericActionsTrait
             ]);
         }
 
-        return $this->paginate($children->order([], true), $settings)->toList();
+        return $this->paginate($children->orderBy([], true), $settings)->toList();
     }
 
     /**

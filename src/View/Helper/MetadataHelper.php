@@ -5,7 +5,7 @@ namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\I18n\I18n;
 use Cake\Routing\Router;
 use Cake\View\Helper;
@@ -20,7 +20,7 @@ class MetadataHelper extends Helper
     /**
      * @inheritDoc
      */
-    public $helpers = [
+    protected array $helpers = [
         'Html',
         'Chialab/FrontendKit.Poster',
     ];
@@ -28,7 +28,7 @@ class MetadataHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'publicationVar' => 'publication',
         'objectVar' => 'object',
         'creatorAssoc' => 'has_author',
@@ -193,13 +193,13 @@ class MetadataHelper extends Helper
     public function getPublicationStatus(ObjectEntity $object): string
     {
         if ($object->has('publish_start')) {
-            if ((new FrozenTime($object->get('publish_start')))->gt(FrozenTime::now())) {
+            if ((new DateTime($object->get('publish_start')))->greaterThan(DateTime::now())) {
                 return 'future';
             }
         }
 
         if ($object->has('publish_end')) {
-            if ((new FrozenTime($object->get('publish_end')))->gt(FrozenTime::now())) {
+            if ((new DateTime($object->get('publish_end')))->greaterThan(DateTime::now())) {
                 return 'expired';
             }
         }

@@ -6,18 +6,18 @@ namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 use BEdita\Core\Model\Entity\Folder;
 use Cake\Controller\ComponentRegistry;
 use Cake\Controller\Controller;
-use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
+use Chialab\FrontendKit\Controller\Component\PublicationComponent;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * {@see \Chialab\FrontendKit\Controller\Component\PublicationComponent} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\PublicationComponent
  */
+#[CoversClass(PublicationComponent::class)]
 class PublicationComponentTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -61,8 +61,7 @@ class PublicationComponentTest extends TestCase
         parent::setUp();
 
         $request = new ServerRequest();
-        $response = new Response();
-        $controller = new Controller($request, $response);
+        $controller = new Controller($request);
 
         $controller->viewBuilder()->setTemplatePath('Pages');
         $this->controller = $controller;
@@ -97,9 +96,6 @@ class PublicationComponentTest extends TestCase
 
     /**
      * Test {@see PublicationComponent::initialize()}.
-     *
-     * @covers ::initialize()
-     * @covers ::getPublication()
      */
     public function testInitialization()
     {
@@ -111,8 +107,6 @@ class PublicationComponentTest extends TestCase
 
     /**
      * Test {@see PublicationComponent::initialize()}.
-     *
-     * @covers ::initialize()
      */
     public function testTemplateVars()
     {

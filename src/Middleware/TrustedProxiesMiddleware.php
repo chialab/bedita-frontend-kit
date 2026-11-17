@@ -102,12 +102,17 @@ class TrustedProxiesMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
+        $forwardedFor = array_map('trim', explode(',', (string)$request->getEnv('HTTP_X_FORWARDED_FOR')));
         while (true) {
             $remoteAddress = $request->clientIp();
             $trustedProxies = $request->getTrustedProxies();
             if (!$this->isTrusted($remoteAddress) || in_array($remoteAddress, $trustedProxies)) {
                 // Remote address does not belong to any trusted proxies,
                 // or there are no more addresses in the `X-Forwarded-For` stack.
+                break;
+            }
+            if ($request->trustProxy && array_diff($forwardedFor, $trustedProxies, [$remoteAddress]) === []) {
+                // CakePHP 5 `clientIp()` breaks when every forwarded address is trusted: keep the left-most one as client.
                 break;
             }
 

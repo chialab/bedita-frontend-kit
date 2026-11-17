@@ -9,15 +9,15 @@ use BEdita\Core\Model\Entity\Stream;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\PosterHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\PosterHelper} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\View\Helper\PosterHelper
  */
+#[CoversClass(PosterHelper::class)]
 class PosterHelperTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -120,7 +120,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     * @covers ::orientation()
      */
     public function testOrientationWithPosterArray()
     {
@@ -136,7 +135,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::orientation()}.
      *
      * @return void
-     * @covers ::orientation()
      */
     public function testOrientationWithPosterCollection()
     {
@@ -152,7 +150,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::exists()}.
      *
      * @return void
-     * @covers ::exists()
      */
     public function testExistsWithProviderThumbnail()
     {
@@ -166,7 +163,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::mobileExists()}.
      *
      * @return void
-     * @covers ::mobileExists()
      */
     public function testExistsVariantMobileProviderThumbnail()
     {
@@ -180,7 +176,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::mobile()}.
      *
      * @return void
-     * @covers ::mobile()
      */
     public function testMobileProviderThumbnail()
     {
@@ -194,7 +189,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::sourceSet()}.
      *
      * @return void
-     * @covers ::sourceSet()
      */
     public function testSourceSet()
     {
@@ -214,7 +208,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::mediaQuery()}.
      *
      * @return void
-     * @covers ::mediaQuery()
      */
     public function testMediaQuery()
     {
@@ -228,7 +221,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::position()}.
      *
      * @return void
-     * @covers ::position()
      */
     public function testPosition()
     {
@@ -255,7 +247,6 @@ class PosterHelperTest extends TestCase
      * Test {@see PosterHelper::url()}.
      *
      * @return void
-     * @covers ::url()
      */
     public function testUrlWithProviderThumbnail()
     {

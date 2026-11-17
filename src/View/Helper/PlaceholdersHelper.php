@@ -28,7 +28,7 @@ class PlaceholdersHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'relation' => 'placeholder',
         'extract' => null,
         'template' => null,

@@ -95,7 +95,7 @@ class ObjectRoute extends DashedRoute
             throw new RuntimeException(sprintf(
                 'Route `%s` expects the URL option `_entity` to be an array or object implementing \ArrayAccess, but `%s` passed.',
                 $this->template,
-                getTypeName($entity),
+                get_debug_type($entity),
             ));
         }
     }

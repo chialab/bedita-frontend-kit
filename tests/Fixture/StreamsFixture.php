@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\StreamsFixture as BEStreamsFixture;
  */
 class StreamsFixture extends BEStreamsFixture
 {
-    public $records = [
+    public array $records = [
         // 1
         [
             'uuid' => '6aceb0eb-bd30-4f60-ac74-273083b921b6',

@@ -5,15 +5,16 @@ namespace Chialab\FrontendKit\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
 use Cake\TestSuite\TestCase;
+use Chialab\FrontendKit\Controller\Component\ObjectsComponent;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * {@see \Chialab\FrontendKit\Controller\Component\ObjectsComponent} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\ObjectsComponent
  */
+#[CoversClass(ObjectsComponent::class)]
 class ObjectsComponentTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -76,9 +77,6 @@ class ObjectsComponentTest extends TestCase
 
     /**
      * Test {@see ObjectsComponent::loadObject()}.
-     *
-     * @covers ::initialize()
-     * @covers ::loadObject()
      */
     public function testLoadObjectFolder()
     {
