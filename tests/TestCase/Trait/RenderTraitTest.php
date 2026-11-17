@@ -8,13 +8,13 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Test\TestApp\Controller\PagesController;
 use Chialab\FrontendKit\Traits\RenderTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Traits\RenderTrait} Test Case
  */
-#[CoversClass(RenderTrait::class)]
+#[CoversTrait(RenderTrait::class)]
 class RenderTraitTest extends TestCase
 {
     protected array $fixtures = [

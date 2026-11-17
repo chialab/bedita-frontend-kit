@@ -110,7 +110,7 @@ trait GenericActionsTrait
             ]);
         }
 
-        return $this->paginate($children->orderBy([], true), $settings)->toList();
+        return iterator_to_array($this->paginate($children->orderBy([], true), $settings)->items(), false);
     }
 
     /**

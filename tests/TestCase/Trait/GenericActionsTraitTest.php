@@ -10,13 +10,13 @@ use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Test\TestApp\Controller\PagesController;
 use Chialab\FrontendKit\Traits\GenericActionsTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Traits\GenericActionsTrait} Test Case
  */
-#[CoversClass(GenericActionsTrait::class)]
+#[CoversTrait(GenericActionsTrait::class)]
 class GenericActionsTraitTest extends TestCase
 {
     protected array $fixtures = [
