@@ -205,12 +205,12 @@ class PosterHelper extends Helper
      */
     public function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
     {
-        if ($object !== null && $object->has('provider_thumbnail')) {
+        if ($object !== null && $object->hasValue('provider_thumbnail')) {
             return $object;
         }
 
         foreach ($this->candidates($object, $options) as $media) {
-            if ($media->has('media_url')) {
+            if ($media->hasValue('media_url')) {
                 return $media;
             }
         }
@@ -256,7 +256,7 @@ class PosterHelper extends Helper
      */
     public function url(ObjectEntity|null $object, array|string|false $thumbOptions = 'default', array $posterOptions = []): string|null
     {
-        if ($object !== null && $object->has('provider_thumbnail')) {
+        if ($object !== null && $object->hasValue('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
         }
 

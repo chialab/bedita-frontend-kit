@@ -124,7 +124,7 @@ class MetadataHelper extends Helper
     public function getCreator(ObjectEntity|null $object = null, Folder|null $publication = null): string|null
     {
         if ($object !== null) {
-            if ($object->has($this->getConfig('creatorAssoc'))) {
+            if ($object->hasValue($this->getConfig('creatorAssoc'))) {
                 $author = collection($object->get($this->getConfig('creatorAssoc')))->first();
                 if ($author !== null) {
                     return strip_tags($author->title ?? '');
@@ -146,7 +146,7 @@ class MetadataHelper extends Helper
     public function getPublisher(ObjectEntity|null $object = null, Folder|null $publication = null): string|null
     {
         if ($object !== null) {
-            if ($object->has($this->getConfig('publisherAssoc'))) {
+            if ($object->hasValue($this->getConfig('publisherAssoc'))) {
                 $publisher = collection($object->get($this->getConfig('publisherAssoc')))->first();
                 if ($publisher !== null) {
                     return strip_tags($publisher->title ?? '');
@@ -154,7 +154,7 @@ class MetadataHelper extends Helper
             }
         }
         if ($publication !== null) {
-            if ($publication->has($this->getConfig('publisherAssoc'))) {
+            if ($publication->hasValue($this->getConfig('publisherAssoc'))) {
                 $publisher = collection($publication->get($this->getConfig('publisherAssoc')))->first();
                 if ($publisher !== null) {
                     return strip_tags($publisher->title ?? '');
@@ -193,13 +193,13 @@ class MetadataHelper extends Helper
      */
     public function getPublicationStatus(ObjectEntity $object): string
     {
-        if ($object->has('publish_start')) {
+        if ($object->hasValue('publish_start')) {
             if ((new DateTime($object->get('publish_start')))->greaterThan(DateTime::now())) {
                 return 'future';
             }
         }
 
-        if ($object->has('publish_end')) {
+        if ($object->hasValue('publish_end')) {
             if ((new DateTime($object->get('publish_end')))->greaterThan(DateTime::now())) {
                 return 'expired';
             }

@@ -255,4 +255,21 @@ class PosterHelperTest extends TestCase
 
         $this->assertSame('https://www.bedita.com/favicon.png', $this->Poster->url($object));
     }
+
+    // CakePHP 5 `has()` is true for null fields: a null provider_thumbnail must not short-circuit to null.
+    public function testUrlWithNullProviderThumbnailUsesFallback(): void
+    {
+        $poster = new PosterHelper(new View(), ['fallbackImage' => '/img/fallback.png']);
+        $image = $this->createImage(1500, 1000);
+        $image->set('provider_thumbnail', null);
+        $image->set('media_url', 'https://www.bedita.com/missing.gif');
+
+        $this->assertSame('/img/fallback.png', $poster->url($image, false));
+
+        $this->setVariantProviderThumbnail($image, 640, 480);
+        $image['has_variant_mobile'][0]->set('provider_thumbnail', null);
+        $image['has_variant_mobile'][0]->set('media_url', 'https://www.bedita.com/missing-mobile.gif');
+
+        $this->assertSame('/img/fallback.png', $poster->sourceSet($image));
+    }
 }
