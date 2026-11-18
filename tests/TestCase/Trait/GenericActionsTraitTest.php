@@ -6,6 +6,7 @@ namespace Chialab\FrontendKit\Test\TestCase\Trait;
 use BEdita\Core\Model\Entity\Folder;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\Paging\PaginatedInterface;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Test\TestApp\Controller\PagesController;
@@ -160,6 +161,8 @@ class GenericActionsTraitTest extends TestCase
         if ($children) {
             // if folder, check the children are loaded too
             static::assertSame(array_keys($children), collection($this->controller->viewBuilder()->getVar('children'))->extract('uname')->toArray());
+            // CakePHP 5 PaginatorHelper reads paging params from a PaginatedInterface view var.
+            static::assertInstanceOf(PaginatedInterface::class, $this->controller->viewBuilder()->getVar('paginatedChildren'));
 
             // check children tree params
             foreach ($this->controller->viewBuilder()->getVar('children') as $child) {
