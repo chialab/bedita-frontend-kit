@@ -112,7 +112,7 @@ class TrustedProxiesMiddleware implements MiddlewareInterface
                 break;
             }
             if ($request->trustProxy && array_diff($forwardedFor, $trustedProxies, [$remoteAddress]) === []) {
-                // CakePHP 5 `clientIp()` breaks when every forwarded address is trusted: keep the left-most one as client.
+                // Use the last remaining address as client.
                 break;
             }
 

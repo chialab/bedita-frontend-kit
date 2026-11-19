@@ -38,7 +38,6 @@ class PlaceholdersHelper extends Helper
     public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): array
     {
         $type = $placeholder->get('type') ?: 'objects';
-        // Fetched here and not on init: BEdita 6 reads the table schema on init, which needs a DB connection.
         /** @var \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes */
         $ObjectTypes = $this->fetchTable('ObjectTypes');
         $objectType = $ObjectTypes->get($type);

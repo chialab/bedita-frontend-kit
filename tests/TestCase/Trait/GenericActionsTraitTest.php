@@ -161,7 +161,6 @@ class GenericActionsTraitTest extends TestCase
         if ($children) {
             // if folder, check the children are loaded too
             static::assertSame(array_keys($children), collection($this->controller->viewBuilder()->getVar('children'))->extract('uname')->toArray());
-            // CakePHP 5 PaginatorHelper reads paging params from a PaginatedInterface view var.
             static::assertInstanceOf(PaginatedInterface::class, $this->controller->viewBuilder()->getVar('paginatedChildren'));
 
             // check children tree params

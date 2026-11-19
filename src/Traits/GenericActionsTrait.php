@@ -112,7 +112,6 @@ trait GenericActionsTrait
         }
 
         $paginated = $this->paginate($children->orderBy([], true), $settings);
-        // CakePHP 5 PaginatorHelper reads paging params from a PaginatedInterface view var, not from the request.
         $this->set('paginatedChildren', $paginated);
 
         return iterator_to_array($paginated->items(), false);

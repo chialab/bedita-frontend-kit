@@ -192,7 +192,7 @@ class ObjectsLoader
         return $this->loadRelated($id, $objectType, $relation, $filter, $options, 1, $hydrate);
     }
 
-    /** Resolve ID or uname via the behavior: calling it through the table is deprecated since CakePHP 5.3. */
+    /** Resolve ID or uname via the behavior. */
     protected function getObjectId(string|int $id): int
     {
         /** @var \BEdita\Core\Model\Behavior\ResourceNameBehavior $behavior */
