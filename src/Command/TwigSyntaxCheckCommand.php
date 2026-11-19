@@ -60,7 +60,7 @@ class TwigSyntaxCheckCommand extends Command
         }
 
         $twig = $view->getTwig();
-        $ignoredPaths = (array)$args->getOption('ignored-paths');
+        $ignoredPaths = $args->getArrayOption('ignored-paths') ?? [];
         $errors = [];
         foreach (static::filterIgnoredPaths(static::pathsIterator(), $ignoredPaths) as $path) {
             $io->verbose(sprintf('=====> Processing templates in path <info>%s</info>...', static::makePathRelative($path)));
