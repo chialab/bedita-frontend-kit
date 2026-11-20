@@ -14,7 +14,7 @@ class ManagerHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'enabled' => true,
         'managerUrl' => null,
     ];

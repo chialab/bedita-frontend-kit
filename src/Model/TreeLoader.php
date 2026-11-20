@@ -11,9 +11,10 @@ use Cake\Database\Expression\CommonTableExpression;
 use Cake\Database\Expression\FunctionExpression;
 use Cake\Database\Expression\IdentifierExpression;
 use Cake\Database\Expression\QueryExpression;
-use Cake\Database\Query\SelectQuery;
+use Cake\Database\Query\SelectQuery as DatabaseSelectQuery;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
+use function Cake\Collection\collection;
 
 /**
  * Class TreeLoader.
@@ -114,15 +115,14 @@ class TreeLoader
      *
      * @param int $id Object ID.
      * @param int|null $relativeTo Object ID relative to which paths should be computed.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function getObjectPaths(int $id, int|null $relativeTo = null): Query\SelectQuery
+    protected function getObjectPaths(int $id, int|null $relativeTo = null): SelectQuery
     {
-        return $this->Trees->find()
+        return $this->Trees->unhydratedFind()
             ->useReadRole()
-            ->disableHydration()
             ->with(
-                fn(CommonTableExpression $cte, SelectQuery $query): CommonTableExpression => $cte
+                fn(CommonTableExpression $cte, DatabaseSelectQuery $query): CommonTableExpression => $cte
                     ->recursive()
                     ->name('paths')
                     ->field(['canonical', 'reverse_path_ids', 'path', 'parent_id'])
@@ -175,7 +175,7 @@ class TreeLoader
                     ? $exp->eq('paths.parent_id', $relativeTo)
                     : $exp->isNull('paths.parent_id'),
             )
-            ->orderDesc('paths.canonical');
+            ->orderByDesc('paths.canonical');
     }
 
     /**
@@ -184,13 +184,13 @@ class TreeLoader
      * @param string|int $id The id or uname of the parent folder.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function loadMenuChildren(string $id, array|null $options = null, array|null $hydrate = null): Query
+    public function loadMenuChildren(string $id, array|null $options = null, array|null $hydrate = null): SelectQuery
     {
         return $this->loader->loadRelatedObjects($id, 'folders', 'children', [], $options, $hydrate)
             ->where([$this->Trees->aliasField('menu') => true])
-            ->order([$this->Trees->aliasField('priority') => 'ASC'], true);
+            ->orderBy([$this->Trees->aliasField('priority') => 'ASC'], true);
     }
 
     /**

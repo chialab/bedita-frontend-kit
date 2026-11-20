@@ -34,7 +34,7 @@ class MenuComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'depth' => 3,
         'menuLoader' => [
             'objectTypesConfig' => [],
@@ -51,7 +51,7 @@ class MenuComponent extends Component
     {
         parent::initialize($config);
 
-        $this->Tress = $this->fetchTable('Trees');
+        $this->Trees = $this->fetchTable('Trees');
 
         $menuLoader = new ObjectsLoader(
             $this->getConfig('menuLoader.objectTypesConfig', []),

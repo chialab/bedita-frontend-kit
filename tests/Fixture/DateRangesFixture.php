@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\DateRangesFixture as BEDateRangesFixture;
  */
 class DateRangesFixture extends BEDateRangesFixture
 {
-    public $records = [
+    public array $records = [
         [
             'object_id' => '13',
             'start_date' => '2022-02-15 12:00:00',

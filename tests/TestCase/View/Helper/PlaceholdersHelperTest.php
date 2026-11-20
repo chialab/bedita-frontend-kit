@@ -8,15 +8,15 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\PlaceholdersHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * {@see \Chialab\FrontendKit\View\Helper\PlaceholdersHelper} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\View\Helper\PlaceholdersHelper
  */
+#[CoversClass(PlaceholdersHelper::class)]
 class PlaceholdersHelperTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -47,14 +47,14 @@ class PlaceholdersHelperTest extends TestCase
      *
      * @var \BEdita\Core\Model\Entity\Media
      */
-    public $media1;
+    public $image1;
 
     /**
      * Test media
      *
      * @var \BEdita\Core\Model\Entity\Media
      */
-    public $media2;
+    public $image2;
 
     /**
      * setUp method
@@ -111,7 +111,7 @@ class PlaceholdersHelperTest extends TestCase
      */
     public function tearDown(): void
     {
-        unset($this->Placeholders, $this->object, $this->media1, $this->media2);
+        unset($this->Placeholders, $this->object, $this->image1, $this->image2);
 
         parent::tearDown();
     }
@@ -120,7 +120,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::getTemplatePaths()}.
      *
      * @return void
-     * @covers ::getTemplatePaths()
      */
     public function testGetTemplatePaths()
     {
@@ -135,7 +134,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::getTemplate()}.
      *
      * @return void
-     * @covers ::getTemplate()
      */
     public function testGetTemplate()
     {
@@ -146,7 +144,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::defaultTemplater()}.
      *
      * @return void
-     * @covers ::defaultTemplater()
      */
     public function testDefaultTemplater()
     {
@@ -158,7 +155,6 @@ class PlaceholdersHelperTest extends TestCase
      * Test {@see PlaceholdersHelper::template()}.
      *
      * @return void
-     * @covers ::template()
      */
     public function testTemplate()
     {

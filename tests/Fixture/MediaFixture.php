@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\MediaFixture as BEMediaFixture;
  */
 class MediaFixture extends BEMediaFixture
 {
-    public $records = [
+    public array $records = [
         [
             'id' => 11,
             'name' => 'image-1',

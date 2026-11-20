@@ -8,6 +8,7 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Utility\Hash;
 use Cake\View\Helper;
 use Iterator;
+use function Cake\Collection\collection;
 
 /**
  * Poster helper.
@@ -25,7 +26,7 @@ class PosterHelper extends Helper
     /**
      * @inheritDoc
      */
-    public $helpers = [
+    protected array $helpers = [
         'Html',
         'Chialab/FrontendKit.Media',
         'Chialab/FrontendKit.Thumb',
@@ -34,7 +35,7 @@ class PosterHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'fallbackImage' => null,
     ];
 
@@ -204,12 +205,12 @@ class PosterHelper extends Helper
      */
     public function poster(ObjectEntity|null $object, array $options = []): ObjectEntity|null
     {
-        if ($object !== null && $object->has('provider_thumbnail')) {
+        if ($object !== null && $object->hasValue('provider_thumbnail')) {
             return $object;
         }
 
         foreach ($this->candidates($object, $options) as $media) {
-            if ($media->has('media_url')) {
+            if ($media->hasValue('media_url')) {
                 return $media;
             }
         }
@@ -255,7 +256,7 @@ class PosterHelper extends Helper
      */
     public function url(ObjectEntity|null $object, array|string|false $thumbOptions = 'default', array $posterOptions = []): string|null
     {
-        if ($object !== null && $object->has('provider_thumbnail')) {
+        if ($object !== null && $object->hasValue('provider_thumbnail')) {
             return $object->get('provider_thumbnail');
         }
 

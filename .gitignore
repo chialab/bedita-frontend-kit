@@ -5,3 +5,4 @@
 /tests/logs
 /coverage
 .phpunit.result.cache
+/.phpunit.cache

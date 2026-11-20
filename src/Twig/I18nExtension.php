@@ -6,6 +6,14 @@ namespace Chialab\FrontendKit\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use function Cake\I18n\__;
+use function Cake\I18n\__d;
+use function Cake\I18n\__dn;
+use function Cake\I18n\__dx;
+use function Cake\I18n\__dxn;
+use function Cake\I18n\__n;
+use function Cake\I18n\__x;
+use function Cake\I18n\__xn;
 
 /**
  * I18n extension for Twig.
@@ -20,14 +28,14 @@ class I18nExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('__', '__'),
-            new TwigFunction('__n', '__n'),
-            new TwigFunction('__d', '__d'),
-            new TwigFunction('__dn', '__dn'),
-            new TwigFunction('__x', '__x'),
-            new TwigFunction('__xn', '__xn'),
-            new TwigFunction('__dx', '__dx'),
-            new TwigFunction('__dxn', '__dxn'),
+            new TwigFunction('__', __(...)),
+            new TwigFunction('__n', __n(...)),
+            new TwigFunction('__d', __d(...)),
+            new TwigFunction('__dn', __dn(...)),
+            new TwigFunction('__x', __x(...)),
+            new TwigFunction('__xn', __xn(...)),
+            new TwigFunction('__dx', __dx(...)),
+            new TwigFunction('__dxn', __dxn(...)),
         ];
     }
 

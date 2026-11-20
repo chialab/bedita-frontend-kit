@@ -38,7 +38,6 @@ $root = $findRoot(__FILE__);
 unset($findRoot);
 chdir($root);
 
-require_once 'vendor/cakephp/cakephp/src/basics.php';
 require_once 'vendor/autoload.php';
 
 define('ROOT', $root . DS . 'tests' . DS);
@@ -48,6 +47,9 @@ define('LOGS', ROOT . DS . 'logs' . DS);
 define('CONFIG', ROOT . DS . 'config' . DS);
 define('CACHE', TMP . 'cache' . DS);
 define('CORE_PATH', $root . DS . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
+define('CAKE', CORE_PATH . 'src' . DS);
+
+require CAKE . 'functions.php';
 
 Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 Configure::write('debug', true);
@@ -74,7 +76,7 @@ Log::setConfig([
 Cache::drop('_bedita_object_types_');
 Cache::drop('_bedita_core_');
 Cache::setConfig([
-    '_cake_core_' => ['engine' => ArrayEngine::class],
+    '_cake_translations_' => ['engine' => ArrayEngine::class],
     '_cake_model_' => ['engine' => ArrayEngine::class],
     '_bedita_object_types_' => ['className' => NullEngine::class],
     '_bedita_core_' => ['className' => NullEngine::class],
@@ -103,7 +105,7 @@ $app->pluginBootstrap();
 
 // clear all before running tests
 TableRegistry::getTableLocator()->clear();
-Cache::clear('_cake_core_');
+Cache::clear('_cake_translations_');
 Cache::clear('_cake_model_');
 Cache::clear('_bedita_object_types_');
 

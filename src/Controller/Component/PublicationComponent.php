@@ -14,6 +14,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 use Chialab\FrontendKit\Model\TreeLoader;
 use InvalidArgumentException;
+use function Cake\I18n\__;
 
 /**
  * Publication component
@@ -27,12 +28,12 @@ class PublicationComponent extends Component
     /**
      * @inheritDoc
      */
-    public $components = ['Chialab/FrontendKit.Objects'];
+    protected array $components = ['Chialab/FrontendKit.Objects'];
 
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'publication' => null,
         'publicationLoader' => [
             'objectTypesConfig' => [],

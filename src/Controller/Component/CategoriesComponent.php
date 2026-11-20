@@ -10,7 +10,6 @@ use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
@@ -27,7 +26,7 @@ class CategoriesComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /**
      * Categories table.
@@ -52,9 +51,9 @@ class CategoriesComponent extends Component
      * @param string|null $type Object type name.
      * @param int|null $parentId ID of parent category.
      * @param string|null $lang Language code to use.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function load(string|null $type = null, int|null $parentId = null, string|null $lang = null): Query
+    public function load(string|null $type = null, int|null $parentId = null, string|null $lang = null): SelectQuery
     {
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true]);
@@ -65,12 +64,12 @@ class CategoriesComponent extends Component
         }
 
         if ($type !== null) {
-            $query = $query->find('type', [$type]);
+            $query = $query->find('type', $type);
         }
 
         $lang ??= $this->getLang();
         $query
-            ->order([$this->Categories->aliasField('name')])
+            ->orderBy([$this->Categories->aliasField('name')])
             ->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
                 return $results->map(function (Category $category) use ($lang): Category {
                     $category->set('slug', Text::slug($category->name));
@@ -81,9 +80,7 @@ class CategoriesComponent extends Component
                     return $category;
                 });
             });
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }
@@ -94,19 +91,17 @@ class CategoriesComponent extends Component
      * @param string $name Category name.
      * @param string $type Category type.
      * @param string|null $lang Language code to use.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function loadByName(string $name, string $type, string|null $lang = null): Query
+    public function loadByName(string $name, string $type, string|null $lang = null): SelectQuery
     {
         $lang ??= $this->getLang();
 
         $query = $this->Categories->find()
             ->where([$this->Categories->aliasField('enabled') => true])
             ->where([$this->Categories->aliasField('name') => $name])
-            ->find('type', [$type]);
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+            ->find('type', $type);
+        $query->useReadRole();
 
         return $query->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
             return $results->map(function (Category $category) use ($lang): Category {
@@ -124,9 +119,9 @@ class CategoriesComponent extends Component
      *
      * @param \Cake\ORM\Table $table Categories table instance.
      * @param array<string|int> $categories Categories ids or names.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function buildCategoriesSubquery(Table $table, array $categories): Query
+    protected function buildCategoriesSubquery(Table $table, array $categories): SelectQuery
     {
         $query = $table->find()
             ->where(fn(QueryExpression $exp): QueryExpression => $exp
@@ -143,9 +138,7 @@ class CategoriesComponent extends Component
 
                     return $exp;
                 }));
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }
@@ -173,14 +166,14 @@ class CategoriesComponent extends Component
     /**
      * Filter contents that are in one or more of the given categories.
      *
-     * @param \Cake\ORM\Query $query The current query.
+     * @param \Cake\ORM\Query\SelectQuery $query The current query.
      * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function filterByCategories(Query $query, array $categories, string $strategy = 'in'): Query
+    public function filterByCategories(SelectQuery $query, array $categories, string $strategy = 'in'): SelectQuery
     {
-        $query = $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, SelectQuery $query) use ($categories, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
@@ -202,9 +195,7 @@ class CategoriesComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }
@@ -212,14 +203,14 @@ class CategoriesComponent extends Component
     /**
      * Filter contents that are not in any of the given categories.
      *
-     * @param \Cake\ORM\Query $query The current query.
+     * @param \Cake\ORM\Query\SelectQuery $query The current query.
      * @param array<string|int> $categories Array of category ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function filterExcludeByCategories(Query $query, array $categories, string $strategy = 'in'): Query
+    public function filterExcludeByCategories(SelectQuery $query, array $categories, string $strategy = 'in'): SelectQuery
     {
-        $query = $query->where(function (QueryExpression $exp, Query $query) use ($categories, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, SelectQuery $query) use ($categories, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $catQuery = $this->buildCategoriesSubquery($table->getAssociation('Categories')->getTarget(), $categories);
@@ -241,9 +232,7 @@ class CategoriesComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }

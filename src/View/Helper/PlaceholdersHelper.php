@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\View\Helper;
 
-use BEdita\Core\Model\Table\ObjectTypesTable;
 use BEdita\Placeholders\Model\Behavior\PlaceholdersBehavior;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -19,30 +18,13 @@ class PlaceholdersHelper extends Helper
     use LocatorAwareTrait;
 
     /**
-     * ObjectTypes table.
-     *
-     * @var \BEdita\Core\Model\Table\ObjectTypesTable
-     */
-    public ObjectTypesTable $ObjectTypes;
-
-    /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'relation' => 'placeholder',
         'extract' => null,
         'template' => null,
     ];
-
-    /**
-     * @inheritDoc
-     */
-    public function initialize(array $config): void
-    {
-        parent::initialize($config);
-
-        $this->ObjectTypes = $this->fetchTable('ObjectTypes');
-    }
 
     /**
      * Get a list of template paths to check.
@@ -56,7 +38,9 @@ class PlaceholdersHelper extends Helper
     public function getTemplatePaths(EntityInterface $entity, string $field, EntityInterface $placeholder, mixed $params = null): array
     {
         $type = $placeholder->get('type') ?: 'objects';
-        $objectType = $this->ObjectTypes->get($type);
+        /** @var \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes */
+        $ObjectTypes = $this->fetchTable('ObjectTypes');
+        $objectType = $ObjectTypes->get($type);
 
         $paths = [];
         foreach ($objectType->getFullInheritanceChain() as $type) {

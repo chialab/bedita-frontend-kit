@@ -9,7 +9,7 @@ use Cake\Core\Configure;
 /**
  * Plugin for Chialab\FrontendKit
  */
-class Plugin extends BasePlugin
+class FrontendKitPlugin extends BasePlugin
 {
     /**
      * @inheritDoc
