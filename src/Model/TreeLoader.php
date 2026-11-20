@@ -119,9 +119,8 @@ class TreeLoader
      */
     protected function getObjectPaths(int $id, int|null $relativeTo = null): SelectQuery
     {
-        return $this->Trees->find()
-            ->useReadRole()
-            ->disableHydration()
+return $this->Trees->unhydratedFind()
+->useReadRole()
             ->with(
                 fn(CommonTableExpression $cte, DatabaseSelectQuery $query): CommonTableExpression => $cte
                     ->recursive()
