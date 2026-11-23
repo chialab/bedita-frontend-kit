@@ -8,15 +8,16 @@ use Cake\TestSuite\TestCase;
 use Cake\Utility\Hash;
 use Chialab\FrontendKit\Controller\Component\CategoriesComponent;
 use Chialab\FrontendKit\Model\ObjectsLoader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Controller\Component\CategoriesComponent} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Controller\Component\CategoriesComponent
  */
+#[CoversClass(CategoriesComponent::class)]
 class CategoriesComponentTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -72,7 +73,7 @@ class CategoriesComponentTest extends TestCase
      *
      * @return array[]
      */
-    public function filterByCategoriesProvider()
+    public static function filterByCategoriesProvider()
     {
         return [
             'inInt' => [[2], [1], 'in'],
@@ -91,9 +92,8 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     * @covers ::filterByCategories()
-     * @dataProvider filterByCategoriesProvider()
      */
+    #[DataProvider('filterByCategoriesProvider')]
     public function testFilterByCategories(array $expected, array $ids, string $strategy)
     {
         $loader = new ObjectsLoader([], [], []);
@@ -109,7 +109,7 @@ class CategoriesComponentTest extends TestCase
      *
      * @return array[]
      */
-    public function filterExcludeByCategoriesProvider()
+    public static function filterExcludeByCategoriesProvider()
     {
         return [
             'inInt' => [[1, 3, 4], [1], 'in'],
@@ -128,9 +128,8 @@ class CategoriesComponentTest extends TestCase
      * @param array $ids Ids or names.
      * @param string $strategy The strategy to use.
      * @return void
-     * @covers ::filterExcludeByCategories()
-     * @dataProvider filterExcludeByCategoriesProvider()
      */
+    #[DataProvider('filterExcludeByCategoriesProvider')]
     public function testFilterExcludeByCategories(array $expected, array $ids, string $strategy)
     {
         $loader = new ObjectsLoader([], [], []);

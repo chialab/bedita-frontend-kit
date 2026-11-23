@@ -18,12 +18,13 @@ use Cake\Log\Log;
 use Cake\ORM\Association;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use Iterator;
+use function Cake\Collection\collection;
+use function Cake\Core\deprecationWarning;
 
 /**
  * Objects loader.
@@ -109,7 +110,7 @@ class ObjectsLoader
     public function loadObject(string $id, string $type = 'objects', array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
-        $id = $this->Objects->getId($id);
+        $id = $this->getObjectId($id);
         $objectType = $this->ObjectTypes->get($type);
 
         return $this->loadSingle($id, $objectType, $options, 1, $hydrate);
@@ -127,7 +128,7 @@ class ObjectsLoader
     public function loadFullObject(string|int $id, string|null $type = null, array|null $options = null, array|null $hydrate = null): ObjectEntity
     {
         // Normalize ID, get type.
-        $id = $this->Objects->getId($id);
+        $id = $this->getObjectId($id);
         if ($type === null) {
             $type = $this->Objects->get($id)->type;
         }
@@ -161,9 +162,9 @@ class ObjectsLoader
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
+     * @return \Cake\ORM\Query\SelectQuery|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): SelectQuery
     {
         // Get type.
         $objectType = $this->ObjectTypes->get($type);
@@ -180,15 +181,24 @@ class ObjectsLoader
      * @param array|null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'poster']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
+     * @return \Cake\ORM\Query\SelectQuery|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): SelectQuery
     {
         // Normalize ID, get type.
-        $id = $this->Objects->getId($id);
+        $id = $this->getObjectId($id);
         $objectType = $this->ObjectTypes->get($type);
 
         return $this->loadRelated($id, $objectType, $relation, $filter, $options, 1, $hydrate);
+    }
+
+    /** Resolve ID or uname via the behavior. */
+    protected function getObjectId(string|int $id): int
+    {
+        /** @var \BEdita\Core\Model\Behavior\ResourceNameBehavior $behavior */
+        $behavior = $this->Objects->getBehavior('ResourceName');
+
+        return $behavior->getId($id);
     }
 
     /**
@@ -232,7 +242,7 @@ class ObjectsLoader
                     $assoc->getName(),
                     $assoc->getProperty(),
                 ));
-                deprecationWarning('Using lowercased association name is a bug and support for it will be removed soon: please use its correct name in CamelCase or the property name in snake_case');
+                deprecationWarning('4.1.0', 'Using lowercased association name is a bug and support for it will be removed soon: please use its correct name in CamelCase or the property name in snake_case');
 
                 return $assoc;
             }
@@ -279,9 +289,9 @@ class ObjectsLoader
      * @param array|null $options Options.
      * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
+     * @return \Cake\ORM\Query\SelectQuery|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    protected function loadMulti(ObjectType $objectType, array $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
+    protected function loadMulti(ObjectType $objectType, array $filter, array|null $options, int $depth = 1, array|null $hydrate = null): SelectQuery
     {
         // Fetch default options.
         if ($options === null) {
@@ -295,11 +305,9 @@ class ObjectsLoader
         $table = $this->getTableLocator()->get($objectType->alias);
 
         $action = new ListObjectsAction(compact('objectType', 'table'));
-        /** @var \Cake\ORM\Query $query */
+        /** @var \Cake\ORM\Query\SelectQuery $query */
         $query = $action(static::includeTranslations($contain) ? compact('filter', 'contain') : compact('filter', 'lang', 'contain'));
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         /** @var \Cake\ORM\Table $table */
         $table = $query->getRepository();
@@ -326,9 +334,9 @@ class ObjectsLoader
      * @param array|null $options Options.
      * @param int $depth Depth level.
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['poster' => 2]`).
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, array|null $filter, array|null $options, int $depth = 1, array|null $hydrate = null): Query
+    protected function loadRelated(int $primaryKey, ObjectType $objectType, string $relation, array|null $filter, array|null $options, int $depth = 1, array|null $hydrate = null): SelectQuery
     {
         // Fetch default options.
         if ($options === null) {
@@ -341,11 +349,9 @@ class ObjectsLoader
         $association = $this->getAssociation($table, $relation);
         $action = new ListRelatedObjectsAction(compact('association'));
 
-        /** @var \Cake\ORM\Query $query */
+        /** @var \Cake\ORM\Query\SelectQuery $query */
         $query = $action(compact('primaryKey', 'filter', 'lang'));
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query->formatResults(function (iterable $results) use ($contain, $depth, $hydrate, $table, $lang): iterable {
             $objects = $this->toConcreteTypes($results, $depth + 1);
@@ -358,7 +364,7 @@ class ObjectsLoader
             return $this->autoHydrateAssociations($this->setJoinData($objects, $contain), $depth, $hydrate)
                 ->map(function (ObjectEntity $object) use ($results, $lang): ObjectEntity {
                     $original = collection($results)->filter(fn(ObjectEntity $orig): bool => $orig->id === $object->id)->first();
-                    if (!$original->isEmpty('_joinData')) {
+                    if ($original->hasValue('_joinData')) {
                         $object->set('relation', $original->get('_joinData'));
                         $object->clean();
                     }
@@ -379,7 +385,7 @@ class ObjectsLoader
     {
         $associations = array_keys(Hash::normalize($containedAssociations));
         $fix = function (ObjectEntity $e): void {
-            if ($e->isEmpty('_joinData')) {
+            if (!$e->hasValue('_joinData')) {
                 return;
             }
             $e->set('relation', $e->get('_joinData'));
@@ -395,7 +401,7 @@ class ObjectsLoader
                     }
                     $prop = $this->getAssociation($table, $name)->getProperty();
 
-                    if (!$object->has($prop) || $object->isEmpty($prop)) {
+                    if (!$object->has($prop) || !$object->hasValue($prop)) {
                         continue;
                     }
                     $related = $object->get($prop);
@@ -542,7 +548,7 @@ class ObjectsLoader
         return $objects
             ->each(function (ObjectEntity $object) use ($associations, $depth, $options): void {
                 foreach ($associations as $prop) {
-                    if (!$object->has($prop) || $object->isEmpty($prop)) {
+                    if (!$object->has($prop) || !$object->hasValue($prop)) {
                         continue;
                     }
 
@@ -553,7 +559,7 @@ class ObjectsLoader
 
                         $objectType = $this->ObjectTypes->get($related->type);
                         $related = $this->loadSingle($related->id, $objectType, null, $depth + 1, $options);
-                        if (!$original->isEmpty('_joinData')) {
+                        if ($original->hasValue('_joinData')) {
                             $related->set('relation', $original->get('_joinData'));
                             $related->clean();
                         }
@@ -572,7 +578,7 @@ class ObjectsLoader
                             }
 
                             $orig = Hash::get($original, $rel->id);
-                            if ($orig === null || $orig->isEmpty('_joinData')) {
+                            if ($orig === null || !$orig->hasValue('_joinData')) {
                                 return;
                             }
 
@@ -665,7 +671,7 @@ class ObjectsLoader
                 return $contains;
             }
 
-            $contains[$assoc] = fn(Query $query): Query => $query->limit($limit);
+            $contains[$assoc] = fn(SelectQuery $query): SelectQuery => $query->limit((int)$limit);
 
             return $contains;
         }, []);

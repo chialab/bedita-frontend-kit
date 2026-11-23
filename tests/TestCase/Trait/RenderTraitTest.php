@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace Chialab\FrontendKit\Test\TestCase\Trait;
 
-use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Test\TestApp\Controller\PagesController;
+use Chialab\FrontendKit\Traits\RenderTrait;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Traits\RenderTrait} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Traits\RenderTrait
  */
+#[CoversTrait(RenderTrait::class)]
 class RenderTraitTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -57,8 +58,7 @@ class RenderTraitTest extends TestCase
                 'controller' => 'Pages',
             ],
         ]);
-        $response = new Response();
-        $this->controller = new PagesController($request, $response);
+        $this->controller = new PagesController($request);
     }
 
     /**
@@ -78,7 +78,7 @@ class RenderTraitTest extends TestCase
      *
      * @return array[]
      */
-    public function getTemplatesToIterateProvider()
+    public static function getTemplatesToIterateProvider()
     {
         return [
             'single' => [['profile-1', 'profiles', 'objects'], 12, []],
@@ -92,15 +92,13 @@ class RenderTraitTest extends TestCase
 
     /**
      * Test {@see RenderTrait::getTemplatesToIterate()}.
-     *
-     * @covers ::getTemplatesToIterate()
-     * @dataProvider getTemplatesToIterateProvider()
      */
+    #[DataProvider('getTemplatesToIterateProvider')]
     public function testGetTemplatesToIterate($expected, $id, $parents)
     {
         $Object = TableRegistry::getTableLocator()->get('BEdita/Core.Objects');
         $Folders = TableRegistry::getTableLocator()->get('BEdita/Core.Folders');
-        $object = $Object->get($id, ['contain' => 'ObjectTypes']);
+        $object = $Object->get($id, contain: ['ObjectTypes']);
         $folders = array_map(fn(int $id) => $Folders->get($id), $parents);
 
         $result = [...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders))];
@@ -113,7 +111,7 @@ class RenderTraitTest extends TestCase
      *
      * @return array[]
      */
-    public function renderFirstTemplateProvider()
+    public static function renderFirstTemplateProvider()
     {
         return [
             'single' => ['profiles', 12, []],
@@ -123,15 +121,13 @@ class RenderTraitTest extends TestCase
 
     /**
      * Test {@see RenderTrait::renderFirstTemplate()}.
-     *
-     * @covers ::renderFirstTemplate()
-     * @dataProvider renderFirstTemplateProvider()
      */
+    #[DataProvider('renderFirstTemplateProvider')]
     public function testRenderFirstTemplate($expected, $id, $parents)
     {
         $Object = TableRegistry::getTableLocator()->get('BEdita/Core.Objects');
         $Folders = TableRegistry::getTableLocator()->get('BEdita/Core.Folders');
-        $object = $Object->get($id, ['contain' => 'ObjectTypes']);
+        $object = $Object->get($id, contain: ['ObjectTypes']);
         $folders = array_map(fn(int $id) => $Folders->get($id), $parents);
 
         $response = $this->controller->renderFirstTemplate(...$this->controller->getTemplatesToIterate($object, ...array_reverse($folders)));

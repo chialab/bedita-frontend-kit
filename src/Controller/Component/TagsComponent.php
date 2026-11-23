@@ -10,7 +10,6 @@ use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
 use Cake\Database\Expression\QueryExpression;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\Utility\Text;
@@ -27,7 +26,7 @@ class TagsComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /**
      * Tags table.
@@ -50,18 +49,16 @@ class TagsComponent extends Component
      * Load Tags.
      *
      * @param string|null $lang Language code to use.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function load(string|null $lang = null): Query
+    public function load(string|null $lang = null): SelectQuery
     {
         $lang ??= $this->getLang();
 
         $query = $this->Tags->find()
             ->where([$this->Tags->aliasField('enabled') => true])
-            ->order([$this->Tags->aliasField('name')]);
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+            ->orderBy([$this->Tags->aliasField('name')]);
+        $query->useReadRole();
 
         return $query->formatResults(function (CollectionInterface $results) use ($lang): CollectionInterface {
             return $results->map(function (Tag $tag) use ($lang): Tag {
@@ -100,9 +97,9 @@ class TagsComponent extends Component
      *
      * @param \Cake\ORM\Table $table Tags table instance.
      * @param array<string|int> $tags Tags ids or names.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    protected function buildTagsSubquery(Table $table, array $tags): Query
+    protected function buildTagsSubquery(Table $table, array $tags): SelectQuery
     {
         $query = $table->find()
             ->where(fn(QueryExpression $exp): QueryExpression => $exp
@@ -119,9 +116,7 @@ class TagsComponent extends Component
 
                     return $exp;
                 }));
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }
@@ -129,14 +124,14 @@ class TagsComponent extends Component
     /**
      * Filter contents that has at least one of the given tags.
      *
-     * @param \Cake\ORM\Query $query The current query.
+     * @param \Cake\ORM\Query\SelectQuery $query The current query.
      * @param array<string|int> $tags Array of tag ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id IN (...)` condition to filter contents. If 'exists', use a `WHERE EXISTS(...)` condition.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function filterByTags(Query $query, array $tags, string $strategy = 'in'): Query
+    public function filterByTags(SelectQuery $query, array $tags, string $strategy = 'in'): SelectQuery
     {
-        $query = $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, SelectQuery $query) use ($tags, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
@@ -158,9 +153,7 @@ class TagsComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }
@@ -168,14 +161,14 @@ class TagsComponent extends Component
     /**
      * Filter contents that does not have any of the given tags
      *
-     * @param \Cake\ORM\Query $query The current query.
+     * @param \Cake\ORM\Query\SelectQuery $query The current query.
      * @param array<string|int> $tags Array of tags ids or names.
      * @param 'in'|'exists' $strategy If 'in', use a `WHERE id NOT IN (...)` condition to filter contents. If 'exists', use a `WHERE NOT EXISTS(...)` condition.
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery
      */
-    public function filterExcludeByTags(Query $query, array $tags, string $strategy = 'in'): Query
+    public function filterExcludeByTags(SelectQuery $query, array $tags, string $strategy = 'in'): SelectQuery
     {
-        $query = $query->where(function (QueryExpression $exp, Query $query) use ($tags, $strategy): QueryExpression {
+        $query = $query->where(function (QueryExpression $exp, SelectQuery $query) use ($tags, $strategy): QueryExpression {
             /** @var \Cake\ORM\Table $table */
             $table = $query->getRepository();
             $tagQuery = $this->buildTagsSubquery($table->getAssociation('Tags')->getTarget(), $tags);
@@ -197,9 +190,7 @@ class TagsComponent extends Component
                     throw new InvalidArgumentException(sprintf('Unknown strategy "%s", valid strategies are: in, exists', $strategy));
             }
         });
-        if ($query instanceof SelectQuery) {
-            $query->useReadRole();
-        }
+        $query->useReadRole();
 
         return $query;
     }

@@ -6,19 +6,21 @@ namespace Chialab\FrontendKit\Test\TestCase\Trait;
 use BEdita\Core\Model\Entity\Folder;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionManager;
-use Cake\Http\Response;
+use Cake\Datasource\Paging\PaginatedInterface;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Test\TestApp\Controller\PagesController;
+use Chialab\FrontendKit\Traits\GenericActionsTrait;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Traits\GenericActionsTrait} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Traits\GenericActionsTrait
  */
+#[CoversTrait(GenericActionsTrait::class)]
 class GenericActionsTraitTest extends TestCase
 {
-    public $fixtures = [
+    protected array $fixtures = [
         'plugin.Chialab/FrontendKit.ObjectTypes',
         'plugin.BEdita/Core.PropertyTypes',
         'plugin.Chialab/FrontendKit.Properties',
@@ -59,8 +61,7 @@ class GenericActionsTraitTest extends TestCase
                 'controller' => 'Pages',
             ],
         ]);
-        $response = new Response();
-        $this->controller = new PagesController($request, $response);
+        $this->controller = new PagesController($request);
     }
 
     /**
@@ -80,7 +81,7 @@ class GenericActionsTraitTest extends TestCase
      *
      * @return array[]
      */
-    public function fallbackProvider()
+    public static function fallbackProvider()
     {
         return [
             'folder' => [
@@ -136,10 +137,8 @@ class GenericActionsTraitTest extends TestCase
 
     /**
      * Test {@see GenericActionsTrait::fallback()}.
-     *
-     * @covers ::fallback()
-     * @dataProvider fallbackProvider()
      */
+    #[DataProvider('fallbackProvider')]
     public function testFallback($url, $objectUname, $children, $related, $parentUname, $ancestorUnames, $body)
     {
         $this->skipIf(ConnectionManager::get('test')->getDriver() instanceof Sqlite, 'SQLite does not support HAVING');
@@ -162,6 +161,7 @@ class GenericActionsTraitTest extends TestCase
         if ($children) {
             // if folder, check the children are loaded too
             static::assertSame(array_keys($children), collection($this->controller->viewBuilder()->getVar('children'))->extract('uname')->toArray());
+            static::assertInstanceOf(PaginatedInterface::class, $this->controller->viewBuilder()->getVar('paginatedChildren'));
 
             // check children tree params
             foreach ($this->controller->viewBuilder()->getVar('children') as $child) {

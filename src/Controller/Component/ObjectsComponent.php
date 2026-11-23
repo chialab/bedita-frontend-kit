@@ -6,7 +6,7 @@ namespace Chialab\FrontendKit\Controller\Component;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use Cake\Collection\CollectionInterface;
 use Cake\Controller\Component;
-use Cake\ORM\Query;
+use Cake\ORM\Query\SelectQuery;
 use Chialab\FrontendKit\Model\ObjectsLoader;
 
 /**
@@ -20,7 +20,7 @@ class ObjectsComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'objectTypesConfig' => [
             'objects' => ['include' => 'poster'],
         ],
@@ -116,9 +116,9 @@ class ObjectsComponent extends Component
      * @param string $type Object type name.
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
+     * @return \Cake\ORM\Query\SelectQuery|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): Query
+    public function loadObjects(array $filter, string $type = 'objects', array|null $options = null, array|null $hydrate = null): SelectQuery
     {
         return $this->loader->loadObjects($filter, $type, $options, $hydrate);
     }
@@ -143,9 +143,9 @@ class ObjectsComponent extends Component
      * @param null $filter Relation objects filter (e.g. `['query' => 'doc']`).
      * @param array|null $options Additional options (e.g.: `['include' => 'children']`).
      * @param array|null $hydrate Override auto-hydrate options (e.g.: `['children' => 2]`).
-     * @return \Cake\ORM\Query|array<\BEdita\Core\Model\Entity\ObjectEntity>
+     * @return \Cake\ORM\Query\SelectQuery|array<\BEdita\Core\Model\Entity\ObjectEntity>
      */
-    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): Query
+    public function loadRelatedObjects(string $id, string $type, string $relation, array|null $filter = null, array|null $options = null, array|null $hydrate = null): SelectQuery
     {
         return $this->loader->loadRelatedObjects($id, $type, $relation, $filter, $options, $hydrate);
     }

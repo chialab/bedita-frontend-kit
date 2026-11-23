@@ -8,7 +8,7 @@ use BEdita\Core\Test\Fixture\ProfilesFixture as BEProfilesFixture;
  */
 class ProfilesFixture extends BEProfilesFixture
 {
-    public $records = [
+    public array $records = [
         // 1
         [
             'id' => 12,

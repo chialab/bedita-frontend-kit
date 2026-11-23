@@ -19,6 +19,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Psr\Http\Message\UriInterface;
+use function Cake\I18n\__;
 
 /**
  * Auth trait for BEdita frontends.

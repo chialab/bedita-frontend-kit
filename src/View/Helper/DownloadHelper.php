@@ -16,12 +16,12 @@ class DownloadHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $helpers = ['Url'];
+    protected array $helpers = ['Url'];
 
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'route' => ['_name' => 'pages:download:filename'],
     ];
 

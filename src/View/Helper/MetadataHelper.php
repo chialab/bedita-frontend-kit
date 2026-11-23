@@ -5,10 +5,11 @@ namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\I18n\I18n;
 use Cake\Routing\Router;
 use Cake\View\Helper;
+use function Cake\Collection\collection;
 
 /**
  * Metadata helper.
@@ -20,7 +21,7 @@ class MetadataHelper extends Helper
     /**
      * @inheritDoc
      */
-    public $helpers = [
+    protected array $helpers = [
         'Html',
         'Chialab/FrontendKit.Poster',
     ];
@@ -28,7 +29,7 @@ class MetadataHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'publicationVar' => 'publication',
         'objectVar' => 'object',
         'creatorAssoc' => 'has_author',
@@ -123,7 +124,7 @@ class MetadataHelper extends Helper
     public function getCreator(ObjectEntity|null $object = null, Folder|null $publication = null): string|null
     {
         if ($object !== null) {
-            if ($object->has($this->getConfig('creatorAssoc'))) {
+            if ($object->hasValue($this->getConfig('creatorAssoc'))) {
                 $author = collection($object->get($this->getConfig('creatorAssoc')))->first();
                 if ($author !== null) {
                     return strip_tags($author->title ?? '');
@@ -145,7 +146,7 @@ class MetadataHelper extends Helper
     public function getPublisher(ObjectEntity|null $object = null, Folder|null $publication = null): string|null
     {
         if ($object !== null) {
-            if ($object->has($this->getConfig('publisherAssoc'))) {
+            if ($object->hasValue($this->getConfig('publisherAssoc'))) {
                 $publisher = collection($object->get($this->getConfig('publisherAssoc')))->first();
                 if ($publisher !== null) {
                     return strip_tags($publisher->title ?? '');
@@ -153,7 +154,7 @@ class MetadataHelper extends Helper
             }
         }
         if ($publication !== null) {
-            if ($publication->has($this->getConfig('publisherAssoc'))) {
+            if ($publication->hasValue($this->getConfig('publisherAssoc'))) {
                 $publisher = collection($publication->get($this->getConfig('publisherAssoc')))->first();
                 if ($publisher !== null) {
                     return strip_tags($publisher->title ?? '');
@@ -192,14 +193,14 @@ class MetadataHelper extends Helper
      */
     public function getPublicationStatus(ObjectEntity $object): string
     {
-        if ($object->has('publish_start')) {
-            if ((new FrozenTime($object->get('publish_start')))->gt(FrozenTime::now())) {
+        if ($object->hasValue('publish_start')) {
+            if ((new DateTime($object->get('publish_start')))->greaterThan(DateTime::now())) {
                 return 'future';
             }
         }
 
-        if ($object->has('publish_end')) {
-            if ((new FrozenTime($object->get('publish_end')))->gt(FrozenTime::now())) {
+        if ($object->hasValue('publish_end')) {
+            if ((new DateTime($object->get('publish_end')))->greaterThan(DateTime::now())) {
                 return 'expired';
             }
         }

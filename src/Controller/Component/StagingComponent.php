@@ -14,7 +14,7 @@ class StagingComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'requireAuth' => true,
         'authConfig' => [],
     ];

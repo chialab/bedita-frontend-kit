@@ -8,15 +8,16 @@ use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\ServerRequest as DiactorosServerRequest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Test {@see \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware}.
- *
- * @covers \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware
  */
+#[CoversClass(TrustedProxiesMiddleware::class)]
 class TrustedProxiesMiddlewareTest extends TestCase
 {
     /**
@@ -24,7 +25,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
      *
      * @return array{string|null, string[]|null, \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware, \Psr\Http\Message\ServerRequestInterface}[]
      */
-    public function invokeProvider(): array
+    public static function invokeProvider(): array
     {
         $requestFactory = fn(string $remoteAddr, string $xForwardedFor): ServerRequest => new ServerRequest([
             'environment' => [
@@ -39,7 +40,7 @@ class TrustedProxiesMiddlewareTest extends TestCase
             'trusted proxies' => ['192.168.1.1', ['127.0.0.1'], new TrustedProxiesMiddleware('127.0.0.1'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1')],
             'multiple trusted proxies' => ['10.0.1.1', ['127.0.0.1', '192.168.1.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1')],
             'invalid address' => ['not-an-ip-address', ['127.0.0.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '10.0.1.1, 192.168.1.1, not-an-ip-address')],
-            'all trusted' => ['192.168.1.1', ['127.0.0.1', '192.168.1.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '192.168.1.1')],
+            'all trusted' => ['192.168.1.1', ['127.0.0.1'], new TrustedProxiesMiddleware('127.0.0.1', '192.168.0.0/16'), $requestFactory('127.0.0.1', '192.168.1.1')],
         ];
     }
 
@@ -51,8 +52,8 @@ class TrustedProxiesMiddlewareTest extends TestCase
      * @param \Chialab\FrontendKit\Middleware\TrustedProxiesMiddleware $middleware Middleware instance.
      * @param \Psr\Http\Message\ServerRequestInterface $request Incoming request.
      * @return void
-     * @dataProvider invokeProvider()
      */
+    #[DataProvider('invokeProvider')]
     public function testInvoke(string|null $expectedClientIp, array|null $expectedTrustedProxies, TrustedProxiesMiddleware $middleware, ServerRequestInterface $request): void
     {
         $response = new EmptyResponse();

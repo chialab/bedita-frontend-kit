@@ -14,7 +14,7 @@ class FiltersComponent extends Component
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'params' => [
             'query' => 'q',
         ],

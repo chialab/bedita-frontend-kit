@@ -5,12 +5,13 @@ namespace Chialab\FrontendKit\Test\TestCase\Twig;
 
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Twig\FileExtension;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * {@see \Chialab\FrontendKit\Twig\FileExtension} Test Case
- *
- * @coversDefaultClass \Chialab\FrontendKit\Twig\FileExtension
  */
+#[CoversClass(FileExtension::class)]
 class FileExtensionTest extends TestCase
 {
     /**
@@ -37,12 +38,12 @@ class FileExtensionTest extends TestCase
      *
      * @return array[]
      */
-    public function formatFileSizeProvider(): array
+    public static function formatFileSizeProvider(): array
     {
         return [
             'bytes' => ['100 Bytes', 100],
-            'kilo' => ['2 KB', 2048],
-            'mega' => ['1.5 MB', 1572864],
+            'kilo' => ['2 KB', 2000],
+            'mega' => ['1.5 MB', 1500000],
         ];
     }
 
@@ -50,9 +51,8 @@ class FileExtensionTest extends TestCase
      * Test {@see FileExtension::formatFileSize()}.
      *
      * @return void
-     * @dataProvider formatFileSizeProvider()
-     * @covers ::formatFileSize()
      */
+    #[DataProvider('formatFileSizeProvider')]
     public function testFormatFileSize(string $expected, int $size)
     {
         static::assertSame($expected, $this->extension->formatFileSize($size));
@@ -63,7 +63,7 @@ class FileExtensionTest extends TestCase
      *
      * @return array[]
      */
-    public function mediaTypeCateoryProvider(): array
+    public static function mediaTypeCateoryProvider(): array
     {
         return [
             'word' => ['word', 'application/msword'],
@@ -77,9 +77,8 @@ class FileExtensionTest extends TestCase
      * Test {@see FileExtension::mediaTypeCategory()}.
      *
      * @return void
-     * @dataProvider mediaTypeCateoryProvider()
-     * @covers ::mediaTypeCategory()
      */
+    #[DataProvider('mediaTypeCateoryProvider')]
     public function testMediaTypeCategory(string $expected, string $mediaType)
     {
         static::assertSame($expected, $this->extension->mediaTypeCategory($mediaType));

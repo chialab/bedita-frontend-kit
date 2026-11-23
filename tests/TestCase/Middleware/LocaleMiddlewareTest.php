@@ -8,21 +8,22 @@ use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Chialab\FrontendKit\Middleware\LocaleMiddleware;
 use Laminas\Diactoros\Response\EmptyResponse;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Test {@see \Chialab\FrontendKit\Middleware\LocaleMiddleware}.
- *
- * @covers \Chialab\FrontendKit\Middleware\LocaleMiddleware
  */
+#[CoversClass(LocaleMiddleware::class)]
 class LocaleMiddlewareTest extends TestCase
 {
     /**
      * @return array
      */
-    public function localeProvider(): array
+    public static function localeProvider(): array
     {
         return [
             'invalid language code (ISO 639-1)' => [null, 'xk'],
@@ -40,8 +41,8 @@ class LocaleMiddlewareTest extends TestCase
      * @param string|null $expectedLocale Expected configured locale.
      * @param string $locale Requested locale.
      * @return void
-     * @dataProvider localeProvider())
      */
+    #[DataProvider('localeProvider')]
     public function testLocale(string|null $expectedLocale, string $locale): void
     {
         $middleware = new LocaleMiddleware();

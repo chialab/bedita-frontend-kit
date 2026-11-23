@@ -5,11 +5,13 @@ namespace Chialab\FrontendKit\View\Helper;
 
 use BEdita\Core\Model\Entity\DateRange;
 use BEdita\Core\Model\Entity\ObjectEntity;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\View\Helper;
 use DateTimeInterface;
 use Generator;
+use function Cake\Collection\collection;
+use function Cake\I18n\__x;
 use const SORT_ASC;
 
 /**
@@ -20,7 +22,7 @@ class DateRangesHelper extends Helper
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'single' => '{0,date,long}, {0,time,short}',
         'wholeDay' => '{0,date,long}',
         'sameDay' => '{0,date,long}, dalle {0,time,short} alle {1,time,short}',
@@ -33,11 +35,11 @@ class DateRangesHelper extends Helper
      * Normalize date object.
      *
      * @param \DateTimeInterface $dt Date time object.
-     * @return \Cake\I18n\FrozenTime
+     * @return \Cake\I18n\DateTime
      */
-    protected static function normalize(DateTimeInterface $dt): FrozenTime
+    protected static function normalize(DateTimeInterface $dt): DateTime
     {
-        return new FrozenTime($dt);
+        return new DateTime($dt);
     }
 
     /**
@@ -79,11 +81,11 @@ class DateRangesHelper extends Helper
     /**
      * Iterate through applicable formats for the given range.
      *
-     * @param \Cake\I18n\FrozenTime $start Beginning of range.
-     * @param \Cake\I18n\FrozenTime $end End of range.
+     * @param \Cake\I18n\DateTime $start Beginning of range.
+     * @param \Cake\I18n\DateTime $end End of range.
      * @return \Generator|array<string>
      */
-    protected function getFormats(FrozenTime $start, FrozenTime $end): Generator
+    protected function getFormats(DateTime $start, DateTime $end): Generator
     {
         if ($end->isSameDay($start)) {
             if ($start->second(0)->equals($start->startOfDay()) && $end->second(59)->equals($end->endOfDay())) {
@@ -114,14 +116,14 @@ class DateRangesHelper extends Helper
      */
     public function getClosestRange(array $ranges, string|null $now = null): DateRange|null
     {
-        $now = $now !== null ? new FrozenTime($now) : FrozenTime::now();
+        $now = $now !== null ? new DateTime($now) : DateTime::now();
         $sorted = collection($ranges)
             ->filter(fn(DateRange $dr): bool => $dr->start_date !== null)
             ->sortBy(fn(DateRange $dr): DateTimeInterface => $dr->start_date, SORT_ASC);
         $currentOrFuture = $sorted
             ->filter(
-                fn(DateRange $dr): bool => (new FrozenTime($dr->start_date))->greaterThanOrEquals($now)
-                    || ($dr->end_date !== null && (new FrozenTime($dr->end_date))->greaterThanOrEquals($now)),
+                fn(DateRange $dr): bool => (new DateTime($dr->start_date))->greaterThanOrEquals($now)
+                    || ($dr->end_date !== null && (new DateTime($dr->end_date))->greaterThanOrEquals($now)),
             )
             ->first();
         if ($currentOrFuture !== null) {
