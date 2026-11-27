@@ -5,6 +5,7 @@ namespace Chialab\FrontendKit\Test\TestCase\View\Helper;
 
 use BEdita\Core\Model\Entity\Folder;
 use BEdita\Core\Model\Entity\ObjectEntity;
+use Cake\I18n\DateTime;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\FrontendKit\View\Helper\MetadataHelper;
@@ -23,6 +24,7 @@ class MetadataHelperTest extends TestCase
     }
 
     // CakePHP 5 `has()` is true for null fields: null relations must fall back instead of failing.
+
     public function testCreatorAndPublisherWithNullRelations(): void
     {
         $object = new ObjectEntity(['has_author' => null, 'has_publisher' => null]);
@@ -31,5 +33,23 @@ class MetadataHelperTest extends TestCase
         $this->assertSame('Publisher', $this->Metadata->getCreator($object, $publication));
         $this->assertSame('Publisher', $this->Metadata->getPublisher($object, $publication));
         $this->assertNull($this->Metadata->getPublisher($object, new Folder(['has_publisher' => null])));
+    }
+
+    // CakePHP 5 `HtmlHelper::meta()` only accepts strings: dates must be formatted before.
+    public function testMetaDcFormatsDates(): void
+    {
+        $object = new ObjectEntity([
+            'type' => 'documents',
+            'uname' => 'doc',
+            'created' => new DateTime('2026-01-01 10:00:00', 'UTC'),
+            'modified' => new DateTime('2026-02-01 10:00:00', 'UTC'),
+            'publish_start' => null,
+        ]);
+
+        $output = $this->Metadata->metaDc([], $object, new Folder(['title' => 'Publication']));
+
+        $this->assertStringContainsString('name="DC.date" content="2026-01-01T10:00:00+00:00"', $output);
+        $this->assertStringContainsString('name="DC.created" content="2026-01-01T10:00:00+00:00"', $output);
+        $this->assertStringContainsString('name="DC.modified" content="2026-02-01T10:00:00+00:00"', $output);
     }
 }

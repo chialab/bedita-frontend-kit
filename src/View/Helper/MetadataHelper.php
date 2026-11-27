@@ -9,6 +9,7 @@ use Cake\I18n\DateTime;
 use Cake\I18n\I18n;
 use Cake\Routing\Router;
 use Cake\View\Helper;
+use DateTimeInterface;
 use function Cake\Collection\collection;
 
 /**
@@ -209,6 +210,17 @@ class MetadataHelper extends Helper
     }
 
     /**
+     * Format a date as ISO 8601, as expected by Dublin Core and Open Graph meta tags.
+     *
+     * @param \DateTimeInterface|null $date The date.
+     * @return string|null
+     */
+    protected static function formatDate(DateTimeInterface|null $date): string|null
+    {
+        return $date?->format(DateTimeInterface::ATOM);
+    }
+
+    /**
      * Dublin Core meta tags generator.
      *
      * @param array $data Data to set.
@@ -233,9 +245,9 @@ class MetadataHelper extends Helper
         ];
         if ($object !== null) {
             $defaults = [
-                'DC.date' => $object->publish_start ?? $object->created,
-                'DC.created' => $object->created,
-                'DC.modified' => $object->modified,
+                'DC.date' => static::formatDate($object->publish_start ?? $object->created),
+                'DC.created' => static::formatDate($object->created),
+                'DC.modified' => static::formatDate($object->modified),
                 'DC.type' => $object->type,
                 'DC.identifier' => $object->uname,
                 'DC.language' => $object->lang ?? I18n::getLocale(),
@@ -276,7 +288,7 @@ class MetadataHelper extends Helper
         if ($object !== null) {
             $defaults = [
                 ['property' => 'og:type', 'content' => $object->type],
-                ['property' => 'og:updated_time', 'content' => $object->modified],
+                ['property' => 'og:updated_time', 'content' => static::formatDate($object->modified)],
             ] + $defaults;
         }
 
