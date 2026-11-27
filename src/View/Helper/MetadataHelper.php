@@ -278,17 +278,18 @@ class MetadataHelper extends Helper
         $publication = $publication ?? $this->getPublication();
 
         $output = '';
+        // Keyed by property, so that `+` merges by property instead of overwriting by list position.
         $defaults = [
-            ['property' => 'og:url', 'content' => Router::url(null, true)],
-            ['property' => 'og:title' ,'content' => htmlspecialchars($this->getShortTitle($object, $publication))],
-            ['property' => 'og:description' ,'content' => htmlspecialchars($this->getDescription($object, $publication))],
-            ['property' => 'og:image' ,'content' => $this->getPoster($object, $publication)],
-            ['property' => 'og:site_name' ,'content' => htmlspecialchars($this->getPublisher(null, $publication) ?? '')],
+            'og:url' => ['property' => 'og:url', 'content' => Router::url(null, true)],
+            'og:title' => ['property' => 'og:title', 'content' => htmlspecialchars($this->getShortTitle($object, $publication))],
+            'og:description' => ['property' => 'og:description', 'content' => htmlspecialchars($this->getDescription($object, $publication))],
+            'og:image' => ['property' => 'og:image', 'content' => $this->getPoster($object, $publication)],
+            'og:site_name' => ['property' => 'og:site_name', 'content' => htmlspecialchars($this->getPublisher(null, $publication) ?? '')],
         ];
         if ($object !== null) {
             $defaults = [
-                ['property' => 'og:type', 'content' => $object->type],
-                ['property' => 'og:updated_time', 'content' => static::formatDate($object->modified)],
+                'og:type' => ['property' => 'og:type', 'content' => $object->type],
+                'og:updated_time' => ['property' => 'og:updated_time', 'content' => static::formatDate($object->modified)],
             ] + $defaults;
         }
 
